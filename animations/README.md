@@ -19,11 +19,11 @@ The humanoid Idle, Walk and Dance were adapted from the [Quaternius Universal An
 
 ## Rebuild and test
 
-Run from the repository root with Node.js, Python with NumPy and SciPy, and Blender 4.3 or later. The Blender test runs on decoded GLBs so it also works in distributions that ship Blender without its Draco import library.
+Run from the repository root with Node.js, Python with NumPy, SciPy and Pillow, and Blender 4.3 or later. The Blender test runs on decoded GLBs so it also works in distributions that ship Blender without its Draco import library.
 
 ```sh
 npm ci --prefix animations
-python -m pip install numpy scipy
+python -m pip install numpy scipy Pillow
 node animations/decode.mjs /tmp/ruralive-decoded
 python animations/build.py /tmp/ruralive-decoded /tmp/ruralive-rigged
 blender -b --python-exit-code 1 --python animations/test_blender.py -- /tmp/ruralive-rigged

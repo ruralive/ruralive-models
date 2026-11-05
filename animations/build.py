@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Build separate rigged GLBs from decoded Ruralive assets."""
 import argparse
+import io
 import json
 import math
 import struct
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 from scipy.spatial.transform import Rotation, Slerp
 from scipy.spatial import cKDTree
 
@@ -32,6 +34,35 @@ class Asset:
         return np.ndarray((a['count'], width), dtype=dtype, buffer=self.bin,
                           offset=v.get('byteOffset', 0) + a.get('byteOffset', 0),
                           strides=(v.get('byteStride', width * dtype.itemsize), dtype.itemsize)).copy()
+
+    def embed_compatible_textures(self):
+        for texture in self.doc.get('textures', []):
+            extensions = texture.get('extensions', {})
+            webp = extensions.pop('EXT_texture_webp', None)
+            if webp is not None:
+                texture['source'] = webp['source']
+            if not extensions:
+                texture.pop('extensions', None)
+        for key in ('extensionsUsed', 'extensionsRequired'):
+            if key in self.doc:
+                self.doc[key] = [name for name in self.doc[key] if name != 'EXT_texture_webp']
+                if not self.doc[key]:
+                    del self.doc[key]
+        views = self.doc['bufferViews']
+        for image in self.doc.get('images', []):
+            if image['mimeType'] != 'image/webp':
+                continue
+            view = views[image['bufferView']]
+            start = view.get('byteOffset', 0)
+            original = self.bin[start:start + view['byteLength']]
+            encoded = io.BytesIO()
+            with Image.open(io.BytesIO(original)) as pixels:
+                pixels.save(encoded, format='PNG')
+            self.bin.extend(b'\0' * (-len(self.bin) % 4))
+            image['bufferView'] = len(views)
+            image['mimeType'] = 'image/png'
+            views.append(dict(buffer=0, byteOffset=len(self.bin), byteLength=len(encoded.getbuffer())))
+            self.bin.extend(encoded.getbuffer())
 
     def repair_geometry(self):
         # Gemini includes non-finite normals on a small set of vertices.
@@ -308,6 +339,7 @@ def build(path, entry, output, motions):
     asset = Asset(path)
     doc = asset.doc
     asset.repair_geometry()
+    asset.embed_compatible_textures()
     name = entry['id']
     world, parents = scene_matrices(asset)
     lo, hi = bounds(asset, world)
