@@ -1,0 +1,409 @@
+[
+  {
+    "id": "barramundi_fish",
+    "rig": "weighted body and tail",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Swim"
+    ]
+  },
+  {
+    "id": "street_rat",
+    "rig": "weighted body and tail",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Tail_Flick"
+    ]
+  },
+  {
+    "id": "grass_bermuda_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 21,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "grass_medium_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 17,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "grass_medium_02",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 5,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "bark_debris_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 4,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "pine_roots",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 2,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "sand_rocks_small_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "dandelion_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 5,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "fern_02",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 4,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "flower_gazania",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 8,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "moss_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 12,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "nettle_plant",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 6,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "potted_plant_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 4,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "shrub_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "shrub_02",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 4,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "boulder_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Tumble"
+    ]
+  },
+  {
+    "id": "coastal_cliff_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "moon_rock_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 4,
+    "clips": [
+      "Tumble"
+    ]
+  },
+  {
+    "id": "moon_rock_02",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Tumble"
+    ]
+  },
+  {
+    "id": "mountainside",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "namaqualand_boulder_02",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Tumble"
+    ]
+  },
+  {
+    "id": "rock_face_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "rock_moss_set_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 6,
+    "clips": [
+      "Tumble"
+    ]
+  },
+  {
+    "id": "apollo-lunar-module",
+    "rig": "rigid root",
+    "original_clips": 135,
+    "skins": 134,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "astronaut",
+    "rig": "weighted humanoid",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Dance"
+    ]
+  },
+  {
+    "id": "cassini",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 11,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "gemini-spacesuit",
+    "rig": "weighted humanoid",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Idle"
+    ]
+  },
+  {
+    "id": "hubble",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "ingenuity-helicopter",
+    "rig": "rigid root and rotor joints",
+    "original_clips": 0,
+    "skins": 11,
+    "clips": [
+      "Rotor_Hover"
+    ]
+  },
+  {
+    "id": "space-station",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "james-webb",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1600,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "mark-3-spacesuit",
+    "rig": "weighted humanoid",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Idle"
+    ]
+  },
+  {
+    "id": "mercury-spacesuit",
+    "rig": "weighted humanoid",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Idle"
+    ]
+  },
+  {
+    "id": "mission-control",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "perseverance-rover",
+    "rig": "original rover skin and rigid assembly root",
+    "original_clips": 23,
+    "skins": 68,
+    "clips": [
+      "Survey_Rock"
+    ]
+  },
+  {
+    "id": "saturn-v",
+    "rig": "rigid root",
+    "original_clips": 23,
+    "skins": 22,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "space-shuttle",
+    "rig": "rigid root",
+    "original_clips": 177,
+    "skins": 176,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "viking-lander",
+    "rig": "rigid root",
+    "original_clips": 2,
+    "skins": 2,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "voyager",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Orbital_Turn"
+    ]
+  },
+  {
+    "id": "z2-spacesuit",
+    "rig": "weighted humanoid",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Idle"
+    ]
+  },
+  {
+    "id": "dead_tree_trunk",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "island_tree_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "quiver_tree_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "tree_stump_01",
+    "rig": "rigid root",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Prop_Reveal"
+    ]
+  }
+]
