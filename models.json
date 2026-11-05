@@ -1,0 +1,282 @@
+[
+ {
+  "id": "barramundi_fish",
+  "file": "models/barramundi_fish.glb",
+  "megabytes": 11.9,
+  "name": "Barramundi Fish",
+  "category": "animals",
+  "license": "CC0-1.0",
+  "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/BarramundiFish",
+  "authors": "Microsoft"
+ },
+ {
+  "id": "street_rat",
+  "file": "models/street_rat.glb",
+  "megabytes": 3.4,
+  "name": "Street Rat",
+  "category": "animals",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/street_rat",
+  "authors": "Sean Buckley"
+ },
+ {
+  "id": "grass_bermuda_01",
+  "file": "models/grass_bermuda_01.glb",
+  "megabytes": 1.4,
+  "name": "Grass Bermuda 01",
+  "category": "grass",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/grass_bermuda_01",
+  "authors": "Rico Cilliers"
+ },
+ {
+  "id": "grass_medium_01",
+  "file": "models/grass_medium_01.glb",
+  "megabytes": 2.9,
+  "name": "Grass Medium 01",
+  "category": "grass",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/grass_medium_01",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "grass_medium_02",
+  "file": "models/grass_medium_02.glb",
+  "megabytes": 0.8,
+  "name": "Grass Medium 02",
+  "category": "grass",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/grass_medium_02",
+  "authors": "Rico Cilliers"
+ },
+ {
+  "id": "bark_debris_01",
+  "file": "models/bark_debris_01.glb",
+  "megabytes": 7.7,
+  "name": "Bark Debris 01",
+  "category": "ground",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/bark_debris_01",
+  "authors": "Greg Zaal, Jenelle van Heerden"
+ },
+ {
+  "id": "pine_roots",
+  "file": "models/pine_roots.glb",
+  "megabytes": 9.3,
+  "name": "Pine Roots",
+  "category": "ground",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/pine_roots",
+  "authors": "Rob Tuytel"
+ },
+ {
+  "id": "sand_rocks_small_01",
+  "file": "models/sand_rocks_small_01.glb",
+  "megabytes": 22.7,
+  "name": "Sand Rocks Small 01",
+  "category": "ground",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/sand_rocks_small_01",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "dandelion_01",
+  "file": "models/dandelion_01.glb",
+  "megabytes": 3.0,
+  "name": "Dandelion 01",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/dandelion_01",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "fern_02",
+  "file": "models/fern_02.glb",
+  "megabytes": 1.1,
+  "name": "Fern 02",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/fern_02",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "flower_gazania",
+  "file": "models/flower_gazania.glb",
+  "megabytes": 2.7,
+  "name": "Flower Gazania",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/flower_gazania",
+  "authors": "James Ray Cock, Jenelle van Heerden"
+ },
+ {
+  "id": "moss_01",
+  "file": "models/moss_01.glb",
+  "megabytes": 0.9,
+  "name": "Moss 01",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/moss_01",
+  "authors": "Rob Tuytel"
+ },
+ {
+  "id": "nettle_plant",
+  "file": "models/nettle_plant.glb",
+  "megabytes": 2.4,
+  "name": "Nettle Plant",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/nettle_plant",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "potted_plant_01",
+  "file": "models/potted_plant_01.glb",
+  "megabytes": 6.0,
+  "name": "Potted Plant 01",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/potted_plant_01",
+  "authors": "Rico Cilliers"
+ },
+ {
+  "id": "shrub_01",
+  "file": "models/shrub_01.glb",
+  "megabytes": 6.6,
+  "name": "Shrub 01",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/shrub_01",
+  "authors": "Rico Cilliers"
+ },
+ {
+  "id": "shrub_02",
+  "file": "models/shrub_02.glb",
+  "megabytes": 1.9,
+  "name": "Shrub 02",
+  "category": "plants",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/shrub_02",
+  "authors": "Rico Cilliers"
+ },
+ {
+  "id": "boulder_01",
+  "file": "models/boulder_01.glb",
+  "megabytes": 5.5,
+  "name": "Boulder 01",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/boulder_01",
+  "authors": "Rico Cilliers"
+ },
+ {
+  "id": "coastal_cliff_01",
+  "file": "models/coastal_cliff_01.glb",
+  "megabytes": 14.7,
+  "name": "Coastal Cliff 01",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/coastal_cliff_01",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "moon_rock_01",
+  "file": "models/moon_rock_01.glb",
+  "megabytes": 1.6,
+  "name": "Moon Rock 01",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/moon_rock_01",
+  "authors": "Greg Zaal, Rico Cilliers, Jenelle van Heerden, Dario Barresi"
+ },
+ {
+  "id": "moon_rock_02",
+  "file": "models/moon_rock_02.glb",
+  "megabytes": 1.4,
+  "name": "Moon Rock 02",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/moon_rock_02",
+  "authors": "Rico Cilliers, Greg Zaal, Jenelle van Heerden"
+ },
+ {
+  "id": "mountainside",
+  "file": "models/mountainside.glb",
+  "megabytes": 7.0,
+  "name": "Mountainside",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/mountainside",
+  "authors": "Dario Barresi, Rico Cilliers"
+ },
+ {
+  "id": "namaqualand_boulder_02",
+  "file": "models/namaqualand_boulder_02.glb",
+  "megabytes": 4.9,
+  "name": "Namaqualand Boulder 02",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/namaqualand_boulder_02",
+  "authors": "Greg Zaal, Rico Cilliers"
+ },
+ {
+  "id": "rock_face_01",
+  "file": "models/rock_face_01.glb",
+  "megabytes": 2.9,
+  "name": "Rock Face 01",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/rock_face_01",
+  "authors": "Dario Barresi"
+ },
+ {
+  "id": "rock_moss_set_01",
+  "file": "models/rock_moss_set_01.glb",
+  "megabytes": 1.8,
+  "name": "Rock Moss Set 01",
+  "category": "rocks",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/rock_moss_set_01",
+  "authors": "Kless Gyzen"
+ },
+ {
+  "id": "dead_tree_trunk",
+  "file": "models/dead_tree_trunk.glb",
+  "megabytes": 4.6,
+  "name": "Dead Tree Trunk",
+  "category": "trees",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/dead_tree_trunk",
+  "authors": "Rob Tuytel"
+ },
+ {
+  "id": "island_tree_01",
+  "file": "models/island_tree_01.glb",
+  "megabytes": 63.3,
+  "name": "Island Tree 01",
+  "category": "trees",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/island_tree_01",
+  "authors": "Rob Tuytel, Rico Cilliers"
+ },
+ {
+  "id": "quiver_tree_01",
+  "file": "models/quiver_tree_01.glb",
+  "megabytes": 8.5,
+  "name": "Quiver Tree 01",
+  "category": "trees",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/quiver_tree_01",
+  "authors": "James Ray Cock, Dario Barresi, Rico Cilliers"
+ },
+ {
+  "id": "tree_stump_01",
+  "file": "models/tree_stump_01.glb",
+  "megabytes": 3.8,
+  "name": "Tree Stump 01",
+  "category": "trees",
+  "license": "CC0-1.0",
+  "source": "https://polyhaven.com/a/tree_stump_01",
+  "authors": "Rob Tuytel"
+ }
+]
