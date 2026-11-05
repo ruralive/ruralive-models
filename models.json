@@ -240,6 +240,176 @@
   "authors": "Kless Gyzen"
  },
  {
+  "id": "apollo-lunar-module",
+  "file": "models/apollo-lunar-module.glb",
+  "megabytes": 0.7,
+  "name": "Apollo Lunar Module",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Apollo%20Lunar%20Module",
+  "authors": "NASA"
+ },
+ {
+  "id": "astronaut",
+  "file": "models/astronaut.glb",
+  "megabytes": 0.7,
+  "name": "Astronaut",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Astronaut",
+  "authors": "NASA"
+ },
+ {
+  "id": "cassini",
+  "file": "models/cassini.glb",
+  "megabytes": 1.6,
+  "name": "Cassini-Huygens",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Cassini-Huygens%20%28A%29",
+  "authors": "NASA"
+ },
+ {
+  "id": "gemini-spacesuit",
+  "file": "models/gemini-spacesuit.glb",
+  "megabytes": 2.7,
+  "name": "Gemini Spacesuit",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Gemini%20Spacesuit",
+  "authors": "NASA"
+ },
+ {
+  "id": "hubble",
+  "file": "models/hubble.glb",
+  "megabytes": 1.6,
+  "name": "Hubble Telescope",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Hubble%20Space%20Telescope%20%28A%29",
+  "authors": "NASA"
+ },
+ {
+  "id": "ingenuity-helicopter",
+  "file": "models/ingenuity-helicopter.glb",
+  "megabytes": 1.9,
+  "name": "Ingenuity Helicopter",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Ingenuity%20Mars%20Helicopter",
+  "authors": "NASA"
+ },
+ {
+  "id": "space-station",
+  "file": "models/space-station.glb",
+  "megabytes": 0.0,
+  "name": "International Space Station",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/International%20Space%20Station%20%28ISS%29%20%28A%29",
+  "authors": "NASA"
+ },
+ {
+  "id": "james-webb",
+  "file": "models/james-webb.glb",
+  "megabytes": 4.5,
+  "name": "James Webb Telescope",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/James%20Webb%20Space%20Telescope%20%28A%29",
+  "authors": "NASA"
+ },
+ {
+  "id": "mark-3-spacesuit",
+  "file": "models/mark-3-spacesuit.glb",
+  "megabytes": 0.9,
+  "name": "Mark III Spacesuit",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Mark%20III%20Spacesuit",
+  "authors": "NASA"
+ },
+ {
+  "id": "mercury-spacesuit",
+  "file": "models/mercury-spacesuit.glb",
+  "megabytes": 0.5,
+  "name": "Mercury Spacesuit",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Mercury%20Spacesuit",
+  "authors": "NASA"
+ },
+ {
+  "id": "mission-control",
+  "file": "models/mission-control.glb",
+  "megabytes": 0.2,
+  "name": "Mission Control Room",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/JSC%20Mission%20Control%20Room",
+  "authors": "NASA"
+ },
+ {
+  "id": "perseverance-rover",
+  "file": "models/perseverance-rover.glb",
+  "megabytes": 4.8,
+  "name": "Perseverance Rover",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Mars%202020%20Perseverance%20Rover",
+  "authors": "NASA"
+ },
+ {
+  "id": "saturn-v",
+  "file": "models/saturn-v.glb",
+  "megabytes": 0.9,
+  "name": "Saturn V",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Saturn%20V",
+  "authors": "NASA"
+ },
+ {
+  "id": "space-shuttle",
+  "file": "models/space-shuttle.glb",
+  "megabytes": 1.1,
+  "name": "Space Shuttle",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Space%20Shuttle%20%28A%29",
+  "authors": "NASA"
+ },
+ {
+  "id": "viking-lander",
+  "file": "models/viking-lander.glb",
+  "megabytes": 1.8,
+  "name": "Viking Lander",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Viking%20Lander",
+  "authors": "NASA"
+ },
+ {
+  "id": "voyager",
+  "file": "models/voyager.glb",
+  "megabytes": 0.3,
+  "name": "Voyager Probe",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Voyager%20Probe%20%28A%29",
+  "authors": "NASA"
+ },
+ {
+  "id": "z2-spacesuit",
+  "file": "models/z2-spacesuit.glb",
+  "megabytes": 16.1,
+  "name": "Z2 Spacesuit",
+  "category": "space",
+  "license": "NASA, no copyright (see README)",
+  "source": "https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/Z2%20Spacesuit",
+  "authors": "NASA"
+ },
+ {
   "id": "dead_tree_trunk",
   "file": "models/dead_tree_trunk.glb",
   "megabytes": 4.6,
