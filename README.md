@@ -9,15 +9,18 @@ These are copies from the sources below, packed into single `.glb` files at 1K t
 | Source | Models | Licence |
 |---|---|---|
 | [Poly Haven](https://polyhaven.com/models) | Trees, plants, grass, rocks, ground cover, street rat | [CC0 1.0](https://polyhaven.com/license) |
+| [NASA 3D Resources](https://github.com/nasa/NASA-3D-Resources) | Astronaut, spacesuits, rovers, spacecraft, telescopes, Mission Control | No copyright, under [NASA's media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/) |
 | [Khronos glTF Sample Assets](https://github.com/KhronosGroup/glTF-Sample-Assets) | Barramundi Fish | CC0 1.0 |
 
 Thanks to Poly Haven and its artists. CC0 does not require credit, but we give it anyway.
 
 ## Licence
 
-Everything here is under [CC0 1.0](LICENSE), including the build script. Only models under CC0 are accepted, so nothing here requires credit.
+The Poly Haven and Khronos models and the build script are under [CC0 1.0](LICENSE). Only CC0 models are accepted from those sources, so they require no credit.
 
-CC0 gives no warranty and grants no trademark rights. If you use these models, check the original source for its current terms.
+**NASA models are not under that licence.** NASA describes them as free and without copyright, and they come with its own conditions: use must not suggest that NASA endorses a product or film, and NASA's names, logos and insignia, some of which may appear on the models, have their own rules. Read [NASA's guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/) before commercial use.
+
+These files come with no warranty and grant no trademark rights. If you use these models, check the original source for its current terms.
 
 ## Updating
 

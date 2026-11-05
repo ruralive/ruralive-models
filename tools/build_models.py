@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Downloads the listed models from their sources and packs each into one .glb file."""
-import base64, json, os, struct, urllib.request
+import base64, json, os, struct, urllib.parse, urllib.request
 
 AGENT = 'RuraliveModels/1.0 (https://github.com/ruralive/ruralive-models)'
 KHRONOS = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/8f492390ddc7a2ae221a1369ef560589cf8c70fb/Models/'
@@ -13,6 +13,26 @@ POLY_HAVEN = {
     'rocks': ['boulder_01', 'rock_moss_set_01', 'rock_face_01', 'namaqualand_boulder_02', 'coastal_cliff_01', 'mountainside', 'moon_rock_01', 'moon_rock_02'],
     'ground': ['pine_roots', 'bark_debris_01', 'sand_rocks_small_01'],
     'animals': ['street_rat'],
+}
+NASA = 'https://raw.githubusercontent.com/nasa/NASA-3D-Resources/11ebb4ee043715aefbba6aeec8a61746fad67fa7/3D%20Models/'
+NASA_MODELS = {
+    'astronaut': ('Astronaut', 'Astronaut'),
+    'z2-spacesuit': ('Z2 Spacesuit', 'Z2 Spacesuit'),
+    'mark-3-spacesuit': ('Mark III Spacesuit', 'Mark III Spacesuit'),
+    'gemini-spacesuit': ('Gemini Spacesuit', 'Gemini Spacesuit'),
+    'mercury-spacesuit': ('Mercury Spacesuit', 'Mercury Spacesuit'),
+    'perseverance-rover': ('Perseverance Rover', 'Mars 2020 Perseverance Rover'),
+    'ingenuity-helicopter': ('Ingenuity Helicopter', 'Ingenuity Mars Helicopter'),
+    'viking-lander': ('Viking Lander', 'Viking Lander'),
+    'apollo-lunar-module': ('Apollo Lunar Module', 'Apollo Lunar Module'),
+    'saturn-v': ('Saturn V', 'Saturn V'),
+    'space-shuttle': ('Space Shuttle', 'Space Shuttle (A)'),
+    'space-station': ('International Space Station', 'International Space Station (ISS) (A)'),
+    'hubble': ('Hubble Telescope', 'Hubble Space Telescope (A)'),
+    'james-webb': ('James Webb Telescope', 'James Webb Space Telescope (A)'),
+    'voyager': ('Voyager Probe', 'Voyager Probe (A)'),
+    'cassini': ('Cassini-Huygens', 'Cassini-Huygens (A)'),
+    'mission-control': ('Mission Control Room', 'JSC Mission Control Room'),
 }
 KHRONOS_MODELS = {
     'barramundi_fish': {'name': 'Barramundi Fish', 'category': 'animals', 'folder': 'BarramundiFish', 'license': 'CC0-1.0', 'authors': 'Microsoft'},
@@ -91,6 +111,12 @@ def main():
                 })
             except Exception as error:  # One unavailable model must not stop the others.
                 skipped.append(key + ' (' + str(error) + ')')
+    for key, (name, folder) in NASA_MODELS.items():
+        quoted = urllib.parse.quote(folder)
+        save(key, fetch(NASA + quoted + '/' + quoted + '.glb'), {
+            'name': name, 'category': 'space', 'license': 'NASA, no copyright (see README)',
+            'source': 'https://github.com/nasa/NASA-3D-Resources/tree/master/3D%20Models/' + quoted, 'authors': 'NASA',
+        })
     for key, entry in KHRONOS_MODELS.items():
         folder = entry.get('folder', entry['name'])
         path = folder + '/glTF-Binary/' + folder + '.glb'
