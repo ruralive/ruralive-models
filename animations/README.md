@@ -36,7 +36,7 @@ The Blender check imports every model and checks every added clip for visible ve
 
 ## Nature assets and NASA adjustments
 
-[nature.json](nature.json) credits the four Poly Haven trees and 12 CC0 Quaternius animals from the [Animated Animal Pack](https://poly.pizza/bundle/Animated-Animal-Pack-ILAPXeUYiS). The tree builder keeps one variant, reduces the branch and trunk geometry, and keeps whole textured foliage islands. It needs the large upstream tree files during a rebuild. The resulting rigged GLBs are considerably smaller.
+[nature.json](nature.json) credits the four Poly Haven trees and 12 CC0 Quaternius animals from the [Animated Animal Pack](https://poly.pizza/bundle/Animated-Animal-Pack-ILAPXeUYiS). The tree builder keeps one variant, reduces the branch and trunk geometry, and keeps whole textured foliage islands. It needs the large upstream tree files during a rebuild. The checksum-pinned, CC0 animal originals are included as compressed build inputs because the upstream CDN can block unattended builds. The resulting rigged GLBs are considerably smaller.
 
 The Z2 suit uses a cleaned version of the source colour atlas. James Webb starts with its gold mirror array in view, with revised mirror and sunshield finishes. These are Setfilm presentation changes to the NASA originals.
 
