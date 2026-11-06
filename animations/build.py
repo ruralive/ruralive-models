@@ -81,7 +81,7 @@ class Asset:
         mask = np.zeros((height, width), dtype=np.float32)
         # Atlas coordinates measured on the 768 px authoring preview.
         for cx, cy, rx, ry in [
-            (119, 106, 42, 43), (115, 265, 37, 45), (467, 29, 25, 27),
+            (119, 106, 52, 51), (115, 265, 45, 51), (467, 29, 25, 27),
             (437, 102, 23, 28), (531, 110, 27, 26), (507, 173, 29, 26),
             (224, 333, 46, 28), (364, 319, 30, 24), (425, 358, 23, 21),
             (46, 398, 48, 77), (116, 690, 57, 46), (229, 712, 61, 27),
@@ -89,11 +89,10 @@ class Asset:
             distance = ((x * 768 / width - cx) / rx) ** 2 + ((y * 768 / height - cy) / ry) ** 2
             feather = np.clip((1 - distance) * 1.65, 0, 1)
             np.maximum(mask, feather * feather * (3 - 2 * feather), out=mask)
-        # Protect coloured patches and genuinely black fittings.
+        # Protect coloured patches. The feathered regions avoid the black fittings and visor.
         saturation = cloth.max(axis=2) - cloth.min(axis=2)
-        mask *= np.clip((47 - saturation) / 19, 0, 1)
-        mask *= np.clip((cloth.mean(axis=2) - 20) / 27, 0, 1)
-        lift = np.clip((155 - luma) * .82, 0, 100) * mask
+        mask *= np.clip((68 - saturation) / 28, 0, 1)
+        lift = np.clip((190 - luma) * .96, 0, 175) * mask
         cleaned = Image.fromarray(np.clip(cloth + lift[:, :, None], 0, 255).astype('u1'))
         encoded = io.BytesIO()
         cleaned.save(encoded, format='PNG')
@@ -596,10 +595,10 @@ def build(path, entry, output, motions):
             rig = 'original rover skin plus six independent rigid wheel bones'
             clip(asset, 'Survey_Rock', times * 4, [(root, 'rotation', rotation([0, 0, 1], .045 * np.sin(phase)))])
         elif entry['category'] == 'space' and name != 'mission-control':
-            heading = math.radians(71) if name == 'james-webb' else 0
+            heading = math.radians(-109) if name == 'james-webb' else 0
             if heading:
                 asset.nodes[root]['rotation'] = rotation([0, 1, 0], [heading])[0].tolist()
-                asset.nodes[root]['extras'] = {'setfilmFit': 1.38}
+                asset.nodes[root]['extras'] = {'setfilmFit': 1.67, 'setfilmTargetY': .71}
             clip(asset, 'Orbital_Turn', times * 8, [(root, 'rotation', rotation([0, 1, 0], phase + heading))])
         elif name in {'boulder_01', 'moon_rock_01', 'moon_rock_02', 'namaqualand_boulder_02', 'rock_moss_set_01'}:
             clip(asset, 'Tumble', times * 6, [(root, 'rotation', rotation([.6, 0, .8], phase)),
