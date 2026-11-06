@@ -5,6 +5,7 @@ from pathlib import Path
 
 import bpy
 import numpy as np
+from mathutils import Vector
 
 directory = Path(sys.argv[sys.argv.index('--') + 1])
 report = []
@@ -39,6 +40,26 @@ for entry in json.loads((directory / 'manifest.json').read_text()):
     rest = sample(1)
     extent = np.ptp(rest, axis=0).max()
     assert extent > 0, entry['id']
+    if entry.get('wheels'):
+        wheel_meshes = [scene.objects[name + '.mesh'] for name in entry['wheels']]
+        armature = next(obj for obj in scene.objects if obj.type == 'ARMATURE' and
+                        all(name in obj.pose.bones for name in entry['wheels']))
+        def wheel_geometry():
+            bpy.context.view_layer.update()
+            deps = bpy.context.evaluated_depsgraph_get()
+            return [np.array([tuple(v.co) for v in mesh.evaluated_get(deps).data.vertices])
+                    for mesh in wheel_meshes]
+        original = wheel_geometry()
+        for index, name in enumerate(entry['wheels']):
+            bone = armature.pose.bones[name]
+            axis = armature.matrix_world.to_3x3() @ bone.bone.matrix_local.to_3x3() @ Vector((0, 1, 0))
+            assert abs(axis.normalized().x) > .9999, (name, axis)
+            bone.rotation_mode = 'XYZ'
+            bone.rotation_euler.y = .53
+            moved = [np.max(np.abs(a - b)) for a, b in zip(original, wheel_geometry())]
+            assert moved[index] > .01 and all(d < 1e-6 for i, d in enumerate(moved) if i != index), (name, moved)
+            bone.rotation_euler.y = 0
+        print('PASS all six wheels rotate independently around their axles', flush=True)
     results = []
     for name in entry['clips']:
         selected = [t for data in animated for t in data.nla_tracks if t.name == name]

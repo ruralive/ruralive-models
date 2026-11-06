@@ -457,6 +457,9 @@ def build(path, entry, output, motions):
     extent = max(hi - lo)
     native_animal = entry['category'] == 'animals' and bool(doc.get('skins'))
     if native_animal:
+        for skin in doc['skins']:
+            # The source declares a sibling of some joints as the optional skeleton root.
+            skin.pop('skeleton', None)
         clips = [a for a in doc['animations'] if '|' not in a['name']]
         preferred = ('Idle', 'Walk', 'Gallop')
         clips.sort(key=lambda a: preferred.index(a['name']) if a['name'] in preferred else len(preferred))
