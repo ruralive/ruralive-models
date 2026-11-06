@@ -1,0 +1,392 @@
+{
+  "license": "CC0-1.0",
+  "models": [
+    {
+      "file": "vael-ring-city.glb",
+      "bytes": 41396,
+      "animation": "Orbital Rotation",
+      "animations": [
+        "Orbital Rotation"
+      ],
+      "armature": false
+    },
+    {
+      "file": "meridian-hymn.glb",
+      "bytes": 22632,
+      "animation": "Engine and Roll",
+      "animations": [
+        "Engine and Roll"
+      ],
+      "armature": false
+    },
+    {
+      "file": "vael-transit-car.glb",
+      "bytes": 15900,
+      "animation": "Cruise in Place",
+      "animations": [
+        "Cruise in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-night-shuttle.glb",
+      "bytes": 24876,
+      "animation": "Cruise in Place",
+      "animations": [
+        "Cruise in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-commuter-train.glb",
+      "bytes": 15904,
+      "animation": "Cruise in Place",
+      "animations": [
+        "Cruise in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-studio-cat.glb",
+      "bytes": 19220,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "opening-dandelion.glb",
+      "bytes": 32144,
+      "animation": "Open and Drift",
+      "animations": [
+        "Open and Drift"
+      ],
+      "armature": false
+    },
+    {
+      "file": "vael-signal-probe.glb",
+      "bytes": 18448,
+      "animation": "Signal Sweep",
+      "animations": [
+        "Signal Sweep"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-severance-cut.glb",
+      "bytes": 15324,
+      "animation": "Arm and Cut",
+      "animations": [
+        "Arm and Cut"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-memory-fish.glb",
+      "bytes": 10820,
+      "animation": "Swim in Place",
+      "animations": [
+        "Swim in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "vael-apartment.glb",
+      "bytes": 8572,
+      "animation": "Room Details",
+      "animations": [
+        "Room Details"
+      ],
+      "armature": false
+    },
+    {
+      "file": "vael-cradle-room.glb",
+      "bytes": 9472,
+      "animation": "Room Details",
+      "animations": [
+        "Room Details"
+      ],
+      "armature": false
+    },
+    {
+      "file": "vael-clinic.glb",
+      "bytes": 9460,
+      "animation": "Room Details",
+      "animations": [
+        "Room Details"
+      ],
+      "armature": false
+    },
+    {
+      "file": "vael-mission-control.glb",
+      "bytes": 10020,
+      "animation": "Room Details",
+      "animations": [
+        "Room Details"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-open-studio.glb",
+      "bytes": 12120,
+      "animation": "Room Details",
+      "animations": [
+        "Room Details"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-edit-bay.glb",
+      "bytes": 8572,
+      "animation": "Room Details",
+      "animations": [
+        "Room Details"
+      ],
+      "armature": false
+    },
+    {
+      "file": "aru-crystal-being.glb",
+      "bytes": 13336,
+      "animation": "Hover and Turn",
+      "animations": [
+        "Hover and Turn"
+      ],
+      "armature": false
+    },
+    {
+      "file": "lumen-glass-figure.glb",
+      "bytes": 12208,
+      "animation": "Hover and Turn",
+      "animations": [
+        "Hover and Turn"
+      ],
+      "armature": false
+    },
+    {
+      "file": "kite-core.glb",
+      "bytes": 16828,
+      "animation": "Hover and Turn",
+      "animations": [
+        "Hover and Turn"
+      ],
+      "armature": false
+    },
+    {
+      "file": "story-lantern.glb",
+      "bytes": 15380,
+      "animation": "Glow and Drift",
+      "animations": [
+        "Glow and Drift"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-stylus-and-page.glb",
+      "bytes": 12044,
+      "animation": "Ink Stroke",
+      "animations": [
+        "Ink Stroke"
+      ],
+      "armature": false
+    },
+    {
+      "file": "director-laptop.glb",
+      "bytes": 6396,
+      "animation": "Close and Open",
+      "animations": [
+        "Close and Open"
+      ],
+      "armature": false
+    },
+    {
+      "file": "mira-phone.glb",
+      "bytes": 5676,
+      "animation": "Incoming Signal",
+      "animations": [
+        "Incoming Signal"
+      ],
+      "armature": false
+    },
+    {
+      "file": "directors-pen-jar.glb",
+      "bytes": 6240,
+      "animation": "Gold Glint",
+      "animations": [
+        "Gold Glint"
+      ],
+      "armature": false
+    },
+    {
+      "file": "studio-light-table.glb",
+      "bytes": 5952,
+      "animation": "Light Table Pulse",
+      "animations": [
+        "Light Table Pulse"
+      ],
+      "armature": false
+    },
+    {
+      "file": "archive-panel-stack.glb",
+      "bytes": 19684,
+      "animation": "Pages Unfold",
+      "animations": [
+        "Pages Unfold"
+      ],
+      "armature": false
+    },
+    {
+      "file": "severance-lance.glb",
+      "bytes": 11612,
+      "animation": "Arm and Fire",
+      "animations": [
+        "Arm and Fire"
+      ],
+      "armature": false
+    },
+    {
+      "file": "lyra-visor.glb",
+      "bytes": 10760,
+      "animation": "Visor Signal",
+      "animations": [
+        "Visor Signal"
+      ],
+      "armature": false
+    },
+    {
+      "file": "lyra.glb",
+      "bytes": 214632,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "teo.glb",
+      "bytes": 214572,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "teo-child.glb",
+      "bytes": 214592,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "ismael.glb",
+      "bytes": 214440,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "tanaka-bell.glb",
+      "bytes": 214600,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "mira.glb",
+      "bytes": 214528,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "mira-director.glb",
+      "bytes": 214684,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "mira-director-child.glb",
+      "bytes": 214684,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "producer-vale.glb",
+      "bytes": 214500,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    }
+  ]
+}
