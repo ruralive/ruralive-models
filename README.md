@@ -15,6 +15,7 @@ The [rigged/](rigged/) folder contains self-contained animated GLBs. See [the an
 | [Poly Haven](https://polyhaven.com/models) | Trees, plants, grass, rocks, ground cover, street rat | [CC0 1.0](https://polyhaven.com/license) |
 | [NASA 3D Resources](https://github.com/nasa/NASA-3D-Resources) | Astronaut, spacesuits, rovers, spacecraft, telescopes, Mission Control | No copyright, under [NASA's media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/) |
 | [Khronos glTF Sample Assets](https://github.com/KhronosGroup/glTF-Sample-Assets) | Barramundi Fish | CC0 1.0 |
+| [Quaternius Animated Animal Pack](https://poly.pizza/bundle/Animated-Animal-Pack-ILAPXeUYiS) | Deer, stag, horses, donkey, cow, bull, alpaca, fox, wolf, husky, Shiba Inu | CC0 1.0 |
 | [Quaternius Universal Animation Library Standard](https://opengameart.org/content/universal-animation-library) | Humanoid Idle, Walk and Dance motion on the rigged astronaut and spacesuits | CC0 1.0 |
 
 Thanks to Poly Haven, Quaternius and their artists. CC0 does not require credit, but we give it anyway.
