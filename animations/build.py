@@ -64,6 +64,24 @@ class Asset:
             views.append(dict(buffer=0, byteOffset=len(self.bin), byteLength=len(encoded.getbuffer())))
             self.bin.extend(encoded.getbuffer())
 
+    def grade_pine_needles(self):
+        # Lift the very dark baked needle colour without changing bark or alpha.
+        material = next(m for m in self.doc['materials'] if m.get('name') == 'pine_tree_01_twig')
+        texture = material['pbrMetallicRoughness']['baseColorTexture']['index']
+        image = self.doc['images'][self.doc['textures'][texture]['source']]
+        views = self.doc['bufferViews']
+        view = views[image['bufferView']]
+        start = view.get('byteOffset', 0)
+        with Image.open(io.BytesIO(self.bin[start:start + view['byteLength']])) as source:
+            rgb = np.asarray(source.convert('RGB'), dtype=np.float32) / 255
+        rgb = np.clip(np.power(rgb, .77) * [.82, 1.04, .78] + [.035, .075, .027], 0, 1)
+        encoded = io.BytesIO()
+        Image.fromarray(np.rint(rgb * 255).astype('u1')).save(encoded, format='JPEG', quality=94)
+        self.bin.extend(b'\0' * (-len(self.bin) % 4))
+        image['bufferView'] = len(views)
+        views.append(dict(buffer=0, byteOffset=len(self.bin), byteLength=len(encoded.getbuffer())))
+        self.bin.extend(encoded.getbuffer())
+
     def clean_z2_fabric(self):
         # The source colour atlas has the dark areas baked into the cloth.
         # A feathered mask lifts low-frequency stains while retaining stitch detail.
@@ -435,6 +453,8 @@ def build(path, entry, output, motions):
     asset.repair_geometry()
     asset.embed_compatible_textures()
     name = entry['id']
+    if name == 'pine_tree_01':
+        asset.grade_pine_needles()
     if name == 'z2-spacesuit':
         asset.clean_z2_fabric()
     if name == 'james-webb':
