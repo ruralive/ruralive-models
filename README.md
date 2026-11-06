@@ -16,6 +16,8 @@ Browse the [islands, flying birds, furnished house sections and stone well](rigg
 
 Browse the [motion props](rigged/motion-props/) for twelve CC0 models with articulated loops, including a drawbridge, excavator, locomotive and carousel.
 
+Browse the [farm and worksite collection](rigged/farm-and-worksite/) for construction equipment, farm animals, storage props and rigged characters with multiple animation clips.
+
 ## Sources
 
 | Source | Models | Licence |

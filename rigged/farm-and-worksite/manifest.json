@@ -1,0 +1,331 @@
+{
+  "license": "CC0-1.0",
+  "models": [
+    {
+      "file": "farm-tractor.glb",
+      "bytes": 23196,
+      "animation": "Drive in Place",
+      "animations": [
+        "Drive in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "construction-dump-truck.glb",
+      "bytes": 22472,
+      "animation": "Tip and Return",
+      "animations": [
+        "Tip and Return"
+      ],
+      "armature": false
+    },
+    {
+      "file": "construction-forklift.glb",
+      "bytes": 21356,
+      "animation": "Lift and Lower",
+      "animations": [
+        "Lift and Lower"
+      ],
+      "armature": false
+    },
+    {
+      "file": "construction-road-roller.glb",
+      "bytes": 22184,
+      "animation": "Roll in Place",
+      "animations": [
+        "Roll in Place"
+      ],
+      "armature": false
+    },
+    {
+      "file": "construction-bulldozer.glb",
+      "bytes": 26128,
+      "animation": "Raise and Lower Blade",
+      "animations": [
+        "Raise and Lower Blade"
+      ],
+      "armature": false
+    },
+    {
+      "file": "construction-wheel-loader.glb",
+      "bytes": 23340,
+      "animation": "Scoop and Dump",
+      "animations": [
+        "Scoop and Dump"
+      ],
+      "armature": false
+    },
+    {
+      "file": "construction-tower-crane.glb",
+      "bytes": 27576,
+      "animation": "Slew, Lower Hook and Return",
+      "animations": [
+        "Slew, Lower Hook and Return"
+      ],
+      "armature": false
+    },
+    {
+      "file": "wooden-crate.glb",
+      "bytes": 6668,
+      "animation": "Open, Hold and Close",
+      "animations": [
+        "Open, Hold and Close"
+      ],
+      "armature": false
+    },
+    {
+      "file": "metal-equipment-crate.glb",
+      "bytes": 6672,
+      "animation": "Open, Hold and Close",
+      "animations": [
+        "Open, Hold and Close"
+      ],
+      "armature": false
+    },
+    {
+      "file": "treasure-chest.glb",
+      "bytes": 18196,
+      "animation": "Open, Hold and Close",
+      "animations": [
+        "Open, Hold and Close"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farmyard-barn.glb",
+      "bytes": 14392,
+      "animation": "Farmyard Gate",
+      "animations": [
+        "Farmyard Gate"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-cow.glb",
+      "bytes": 28652,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-pig.glb",
+      "bytes": 31236,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-sheep.glb",
+      "bytes": 26044,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-goat.glb",
+      "bytes": 27600,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-hen.glb",
+      "bytes": 25540,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-duck.glb",
+      "bytes": 24492,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "farm-goose.glb",
+      "bytes": 24460,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Forage",
+        "Idle"
+      ],
+      "armature": false
+    },
+    {
+      "file": "tall-slim-person.glb",
+      "bytes": 214468,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "plus-size-person.glb",
+      "bytes": 214548,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "short-stocky-person.glb",
+      "bytes": 214512,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "tall-athletic-person.glb",
+      "bytes": 214512,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "slim-construction-worker.glb",
+      "bytes": 228096,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "plus-size-construction-worker.glb",
+      "bytes": 228156,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "humanoid-fox.glb",
+      "bytes": 252224,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "humanoid-rabbit.glb",
+      "bytes": 245600,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "humanoid-bear.glb",
+      "bytes": 236484,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    },
+    {
+      "file": "humanoid-pig.glb",
+      "bytes": 221544,
+      "animation": "Walk in Place",
+      "animations": [
+        "Walk in Place",
+        "Run in Place",
+        "Idle",
+        "Wave",
+        "Dance",
+        "Jump",
+        "Squat"
+      ],
+      "armature": true
+    }
+  ]
+}
