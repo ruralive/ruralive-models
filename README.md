@@ -12,6 +12,8 @@ The [rigged/](rigged/) folder contains self-contained animated GLBs. See [the an
 
 Browse the [37 CC0 animated models](rigged/expansion/) and their [manifest](rigged/expansion/manifest.json). Each file embeds its textures and animation.
 
+Browse the [islands, flying birds, furnished house sections and stone well](rigged/places/) in the CC0 [places manifest](rigged/places/manifest.json). The house sections are separate models with an open front and furnished rooms.
+
 ## Sources
 
 | Source | Models | Licence |

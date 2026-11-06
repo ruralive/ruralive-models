@@ -1,0 +1,65 @@
+{
+  "license": "CC0-1.0",
+  "models": [
+    {
+      "file": "tropical-island.glb",
+      "bytes": 24296,
+      "animation": "Island Breeze"
+    },
+    {
+      "file": "atoll-island.glb",
+      "bytes": 25412,
+      "animation": "Island Breeze"
+    },
+    {
+      "file": "rocky-island.glb",
+      "bytes": 18552,
+      "animation": "Island Breeze"
+    },
+    {
+      "file": "volcanic-island.glb",
+      "bytes": 22956,
+      "animation": "Island Breeze"
+    },
+    {
+      "file": "coastal-gull.glb",
+      "bytes": 12648,
+      "animation": "Flight"
+    },
+    {
+      "file": "rock-pigeon.glb",
+      "bytes": 12612,
+      "animation": "Flight"
+    },
+    {
+      "file": "golden-eagle.glb",
+      "bytes": 12684,
+      "animation": "Flight"
+    },
+    {
+      "file": "cottage-exterior.glb",
+      "bytes": 7596,
+      "animation": "House Details"
+    },
+    {
+      "file": "cottage-section.glb",
+      "bytes": 16304,
+      "animation": "House Details"
+    },
+    {
+      "file": "modern-house-exterior.glb",
+      "bytes": 7468,
+      "animation": "House Details"
+    },
+    {
+      "file": "modern-house-section.glb",
+      "bytes": 17940,
+      "animation": "House Details"
+    },
+    {
+      "file": "stone-well.glb",
+      "bytes": 22776,
+      "animation": "Bucket Lift"
+    }
+  ]
+}
