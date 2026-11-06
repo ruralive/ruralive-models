@@ -2,7 +2,7 @@ name: Build rigged models
 on:
   workflow_dispatch:
   push:
-    branches: [main, setfilm-rigged-models]
+    branches: [main, setfilm-rigged-models, setfilm-scene-assets]
     paths: ['animations/**', '.github/workflows/build-rigged.yml']
 permissions:
   contents: write
@@ -25,6 +25,7 @@ jobs:
       - run: python -m pip install numpy==2.2.6 scipy==1.15.3 Pillow==11.3.0
       - run: |
           node animations/decode.mjs "$RUNNER_TEMP/decoded"
+          python animations/prepare-nature.py "$RUNNER_TEMP/nature-source" "$RUNNER_TEMP/decoded"
           OPENBLAS_NUM_THREADS=1 python animations/build.py "$RUNNER_TEMP/decoded" "$RUNNER_TEMP/rigged"
           node animations/pack.mjs "$RUNNER_TEMP/rigged"
           mkdir -p rigged

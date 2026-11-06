@@ -8,7 +8,7 @@ import struct
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageFilter
 from scipy.spatial.transform import Rotation, Slerp
 from scipy.spatial import cKDTree
 
@@ -64,6 +64,45 @@ class Asset:
             views.append(dict(buffer=0, byteOffset=len(self.bin), byteLength=len(encoded.getbuffer())))
             self.bin.extend(encoded.getbuffer())
 
+    def clean_z2_fabric(self):
+        # The source colour atlas has the dark areas baked into the cloth.
+        # A feathered mask lifts low-frequency stains while retaining stitch detail.
+        tex = self.doc['materials'][0]['pbrMetallicRoughness']['baseColorTexture']['index']
+        image = self.doc['images'][self.doc['textures'][tex]['source']]
+        views = self.doc['bufferViews']
+        view = views[image['bufferView']]
+        start = view.get('byteOffset', 0)
+        with Image.open(io.BytesIO(self.bin[start:start + view['byteLength']])) as source:
+            atlas = source.convert('RGB')
+        width, height = atlas.size
+        cloth = np.asarray(atlas, dtype=np.float32)
+        luma = np.asarray(atlas.convert('L').filter(ImageFilter.GaussianBlur(width / 180)), dtype=np.float32)
+        y, x = np.ogrid[:height, :width]
+        mask = np.zeros((height, width), dtype=np.float32)
+        # Atlas coordinates measured on the 768 px authoring preview.
+        for cx, cy, rx, ry in [
+            (119, 106, 42, 43), (115, 265, 37, 45), (467, 29, 25, 27),
+            (437, 102, 23, 28), (531, 110, 27, 26), (507, 173, 29, 26),
+            (224, 333, 46, 28), (364, 319, 30, 24), (425, 358, 23, 21),
+            (46, 398, 48, 77), (116, 690, 57, 46), (229, 712, 61, 27),
+        ]:
+            distance = ((x * 768 / width - cx) / rx) ** 2 + ((y * 768 / height - cy) / ry) ** 2
+            feather = np.clip((1 - distance) * 1.65, 0, 1)
+            np.maximum(mask, feather * feather * (3 - 2 * feather), out=mask)
+        # Protect coloured patches and genuinely black fittings.
+        saturation = cloth.max(axis=2) - cloth.min(axis=2)
+        mask *= np.clip((47 - saturation) / 19, 0, 1)
+        mask *= np.clip((cloth.mean(axis=2) - 20) / 27, 0, 1)
+        lift = np.clip((155 - luma) * .82, 0, 100) * mask
+        cleaned = Image.fromarray(np.clip(cloth + lift[:, :, None], 0, 255).astype('u1'))
+        encoded = io.BytesIO()
+        cleaned.save(encoded, format='PNG')
+        self.bin.extend(b'\0' * (-len(self.bin) % 4))
+        image['bufferView'] = len(views)
+        image['mimeType'] = 'image/png'
+        views.append(dict(buffer=0, byteOffset=len(self.bin), byteLength=len(encoded.getbuffer())))
+        self.bin.extend(encoded.getbuffer())
+
     def repair_geometry(self):
         # Gemini includes non-finite normals on a small set of vertices.
         for mesh in self.doc['meshes']:
@@ -106,7 +145,7 @@ class Asset:
         views = self.doc['bufferViews']
         views.append(view)
         self.bin.extend(values.tobytes())
-        accessor = dict(bufferView=len(views) - 1, componentType=5121 if values.dtype == np.uint8 else 5126,
+        accessor = dict(bufferView=len(views) - 1, componentType={np.dtype('u1'): 5121, np.dtype('<u2'): 5123, np.dtype('<u4'): 5125}.get(values.dtype, 5126),
                         count=len(values), type=kind)
         if bounds:
             accessor.update(min=np.atleast_1d(values.min(axis=0)).tolist(), max=np.atleast_1d(values.max(axis=0)).tolist())
@@ -304,6 +343,62 @@ def rigid_weights(pos, node):
     return ids, weights
 
 
+def split_rover_wheels(asset, world):
+    wheel_node = next(i for i, node in enumerate(asset.nodes) if node.get('name') == 'Wheels_objs')
+    source = asset.doc['meshes'][asset.nodes[wheel_node].pop('mesh')]
+    transform = world[wheel_node]
+    primitives = []
+    for primitive in source['primitives']:
+        assert primitive.get('mode', 4) == 4 and 'targets' not in primitive
+        attributes = {key: asset.read(i) for key, i in primitive['attributes'].items()}
+        xyz = points(transform, attributes['POSITION'])
+        triangles = asset.read(primitive['indices']).reshape(-1, 3)
+        primitives.append((primitive, attributes, xyz, triangles))
+    z = np.sort(np.concatenate([xyz[:, 2] for _, _, xyz, _ in primitives]))
+    cuts = np.sort(np.argsort(np.diff(z))[-2:])
+    limits = (z[cuts] + z[cuts + 1]) / 2
+    names = []
+    for row, end in enumerate(('R', 'M', 'F')):
+        for side in ('L', 'R'):
+            name = 'wheel.' + end + side
+            parts, vertices = [], []
+            for primitive, attributes, xyz, triangles in primitives:
+                # In this NASA model +Z faces forward and +X is rover-left.
+                inside = (np.searchsorted(limits, xyz[:, 2]) == row) & ((xyz[:, 0] > 0) == (side == 'L'))
+                face = inside[triangles]
+                assert not np.any(face.any(axis=1) & ~face.all(axis=1)), name
+                selected = triangles[face.all(axis=1)]
+                used, remapped = np.unique(selected, return_inverse=True)
+                assert used.size, name
+                vertices.append(xyz[used])
+                attrs = {
+                    key: asset.add(values[used], asset.doc['accessors'][primitive['attributes'][key]]['type'],
+                                   target=34962, bounds=key == 'POSITION')
+                    for key, values in attributes.items()
+                }
+                index = asset.add(remapped.reshape(-1).astype('<u2' if used.size <= 65535 else '<u4'), 'SCALAR', 34963)
+                parts.append({**primitive, 'attributes': attrs, 'indices': index})
+            xyz = np.concatenate(vertices)
+            low, high = xyz.min(axis=0), xyz.max(axis=0)
+            center = (low + high) / 2
+            radius = float(np.max(np.linalg.norm(xyz[:, 1:] - center[1:], axis=1)))
+            assert .24 < radius < .29, (name, radius)
+            bone = add_node(asset, name, points(np.linalg.inv(transform), center), wheel_node)
+            # Local +Y is the bone axis in Blender. All six point along glTF +X.
+            axle = Rotation.from_euler('z', -90, degrees=True)
+            asset.nodes[bone]['rotation'] = (Rotation.from_matrix(transform[:3, :3]).inv() * axle).as_quat().tolist()
+            asset.nodes[bone]['extras'] = dict(wheelName=name, radius=radius, axle=[0, 1, 0])
+            mesh = add_node(asset, name + '.mesh', [0, 0, 0], wheel_node)
+            asset.nodes[mesh]['mesh'] = len(asset.doc['meshes'])
+            asset.doc['meshes'].append(dict(name=name + '.mesh', primitives=parts))
+            bind = IDENTITY.copy()
+            bind[:3, :3] = axle.as_matrix()
+            bind[:3, 3] = center
+            skin_mesh(asset, mesh, transform, [bone], [bind], rigid_weights)
+            names.append(name)
+    return sorted(names)
+
+
 def source_rotations(source, wanted, samples=41):
     world, parents = scene_matrices(source)
     result = {}
@@ -341,11 +436,43 @@ def build(path, entry, output, motions):
     asset.repair_geometry()
     asset.embed_compatible_textures()
     name = entry['id']
+    if name == 'z2-spacesuit':
+        asset.clean_z2_fabric()
+    if name == 'james-webb':
+        finishes = {
+            'mirror_blinn': ([.92, .59, .105, 1], .72, .25),
+            'shld_silv1': ([.65, .68, .73, 1], .57, .37),
+            'shld_pink1': ([.58, .31, .37, 1], .46, .42),
+        }
+        for material in doc['materials']:
+            finish = finishes.get(material.get('name', '').split(':')[-1])
+            if finish:
+                colour, metal, roughness = finish
+                material['pbrMetallicRoughness'].update(baseColorFactor=colour, metallicFactor=metal,
+                                                        roughnessFactor=roughness)
     world, parents = scene_matrices(asset)
     lo, hi = bounds(asset, world)
     center = (lo + hi) / 2
     height = hi[1] - lo[1]
     extent = max(hi - lo)
+    native_animal = entry['category'] == 'animals' and bool(doc.get('skins'))
+    if native_animal:
+        clips = [a for a in doc['animations'] if '|' not in a['name']]
+        preferred = ('Idle', 'Walk', 'Gallop')
+        clips.sort(key=lambda a: preferred.index(a['name']) if a['name'] in preferred else len(preferred))
+        assert [a['name'] for a in clips[:3]] == list(preferred), name
+        for motion in clips[:3]:
+            for channel in motion['channels']:
+                sampler = motion['samplers'][channel['sampler']]
+                assert sampler.get('interpolation', 'LINEAR') == 'LINEAR'
+                output_index = sampler['output']
+                values = asset.read(output_index)
+                if np.allclose(values[0], values[-1], atol=1e-7):
+                    continue
+                flip = channel['target']['path'] == 'rotation' and values[-2] @ values[0] < 0
+                values[-1] = -values[0] if flip else values[0]
+                sampler['output'] = asset.add(values, doc['accessors'][output_index]['type'])
+        doc['animations'] = clips
     originals = len(doc.get('animations', []))
     rest_root = center.copy()
     rest_root[1] = lo[1]
@@ -367,7 +494,13 @@ def build(path, entry, output, motions):
 
     weight_for = rigid_weights
     rig = 'rigid root'
-    if name in HUMANS:
+    if native_animal:
+        rig = 'original quadruped skin'
+        pivots = {asset.nodes[i].get('name'): transform[:3, 3] for i, transform in world.items()}
+        forward = pivots['Head'] - pivots['Tail1']
+        angle = -math.atan2(forward[0], forward[2])
+        asset.nodes[root]['rotation'] = rotation([0, 1, 0], [angle])[0].tolist()
+    elif name in HUMANS:
         rig = 'weighted humanoid'
         layout = humanoid_layout(name, lo, hi)
         for key, (parent, pos, _) in layout.items():
@@ -457,16 +590,21 @@ def build(path, entry, output, motions):
             tracks.append((root, 'translation', np.column_stack([times * 0, .16 * extent * (1 - np.cos(phase)) / 2, times * 0])))
             clip(asset, 'Rotor_Hover', times * 2, tracks)
         elif name == 'perseverance-rover':
-            rig = 'original rover skin and rigid assembly root'
+            rig = 'original rover skin plus six independent rigid wheel bones'
             clip(asset, 'Survey_Rock', times * 4, [(root, 'rotation', rotation([0, 0, 1], .045 * np.sin(phase)))])
         elif entry['category'] == 'space' and name != 'mission-control':
-            clip(asset, 'Orbital_Turn', times * 8, [(root, 'rotation', rotation([0, 1, 0], phase))])
+            heading = math.radians(71) if name == 'james-webb' else 0
+            if heading:
+                asset.nodes[root]['rotation'] = rotation([0, 1, 0], [heading])[0].tolist()
+                asset.nodes[root]['extras'] = {'setfilmFit': 1.38}
+            clip(asset, 'Orbital_Turn', times * 8, [(root, 'rotation', rotation([0, 1, 0], phase + heading))])
         elif name in {'boulder_01', 'moon_rock_01', 'moon_rock_02', 'namaqualand_boulder_02', 'rock_moss_set_01'}:
             clip(asset, 'Tumble', times * 6, [(root, 'rotation', rotation([.6, 0, .8], phase)),
                                              (root, 'translation', np.column_stack([times * 0, .18 * extent * (1 - np.cos(phase)), times * 0]))])
         else:
             clip(asset, 'Prop_Reveal', times * 5, [(root, 'rotation', rotation([0, 1, 0], .15 * np.sin(phase)))])
 
+    wheels = split_rover_wheels(asset, world) if name == 'perseverance-rover' else []
     bind_matrices = []
     for pos in binds:
         bind = IDENTITY.copy()
@@ -493,8 +631,9 @@ def build(path, entry, output, motions):
     assert doc.get('skins')
     destination = output / (name + '.glb')
     asset.write(destination)
+    tested_clips = [a['name'] for a in (doc['animations'][:3] if native_animal else added)]
     return dict(id=name, rig=rig, original_clips=originals, skins=len(doc['skins']),
-                clips=[a['name'] for a in added])
+                clips=tested_clips, **({'wheels': wheels} if wheels else {}))
 
 
 def main():
@@ -511,8 +650,9 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     motions = json.loads(motions_path.read_text())
     records = []
-    for entry in json.loads((ROOT / 'models.json').read_text()):
-        record = build(args.decoded / Path(entry['file']).name, entry, args.output, motions)
+    entries = json.loads((ROOT / 'models.json').read_text()) + json.loads((Path(__file__).with_name('nature.json')).read_text())
+    for entry in entries:
+        record = build(args.decoded / (entry['id'] + '.glb'), entry, args.output, motions)
         records.append(record)
         print(record['id'], record['rig'], ', '.join(record['clips']), flush=True)
     (args.output / 'manifest.json').write_text(json.dumps(records, indent=2) + '\n')
