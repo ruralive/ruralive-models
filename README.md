@@ -14,6 +14,8 @@ Browse the [37 CC0 animated models](rigged/expansion/) and their [manifest](rigg
 
 Browse the [islands, flying birds, furnished house sections and stone well](rigged/places/) in the CC0 [places manifest](rigged/places/manifest.json). The house sections are separate models with an open front and furnished rooms.
 
+Browse the [motion props](rigged/motion-props/) for twelve CC0 models with articulated loops, including a drawbridge, excavator, locomotive and carousel.
+
 ## Sources
 
 | Source | Models | Licence |

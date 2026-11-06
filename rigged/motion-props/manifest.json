@@ -1,0 +1,65 @@
+{
+  "license": "CC0-1.0",
+  "models": [
+    {
+      "file": "stone-windmill.glb",
+      "bytes": 20792,
+      "animation": "Sails Turning"
+    },
+    {
+      "file": "coastal-lighthouse.glb",
+      "bytes": 19428,
+      "animation": "Beacon Sweep"
+    },
+    {
+      "file": "canal-drawbridge.glb",
+      "bytes": 9832,
+      "animation": "Open, Hold and Close"
+    },
+    {
+      "file": "tracked-excavator.glb",
+      "bytes": 18972,
+      "animation": "Dig and Dump"
+    },
+    {
+      "file": "steam-locomotive.glb",
+      "bytes": 30984,
+      "animation": "Driving Rods"
+    },
+    {
+      "file": "assembly-robot.glb",
+      "bytes": 14988,
+      "animation": "Reach, Grip and Return"
+    },
+    {
+      "file": "wooden-rowboat.glb",
+      "bytes": 37544,
+      "animation": "Power and Recovery Stroke"
+    },
+    {
+      "file": "observatory-telescope.glb",
+      "bytes": 10508,
+      "animation": "Scan the Sky"
+    },
+    {
+      "file": "brass-gramophone.glb",
+      "bytes": 28156,
+      "animation": "Record and Tonearm"
+    },
+    {
+      "file": "pendulum-clock.glb",
+      "bytes": 14496,
+      "animation": "Clockwork"
+    },
+    {
+      "file": "opening-umbrella.glb",
+      "bytes": 30408,
+      "animation": "Open, Hold and Fold"
+    },
+    {
+      "file": "fairground-carousel.glb",
+      "bytes": 34608,
+      "animation": "Roundabout"
+    }
+  ]
+}
