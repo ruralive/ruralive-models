@@ -1,0 +1,190 @@
+{
+  "license": "CC0-1.0",
+  "models": [
+    {
+      "file": "city-hatchback.glb",
+      "animation": "Wheel Roll",
+      "bytes": 12540
+    },
+    {
+      "file": "utility-pickup.glb",
+      "animation": "Wheel Roll",
+      "bytes": 13420
+    },
+    {
+      "file": "open-car-with-driver.glb",
+      "animation": "Wheels and steering",
+      "bytes": 188208
+    },
+    {
+      "file": "city-bicycle.glb",
+      "animation": "Wheel Roll",
+      "bytes": 22716
+    },
+    {
+      "file": "road-motorcycle.glb",
+      "animation": "Wheel Roll",
+      "bytes": 25348
+    },
+    {
+      "file": "motorcycle-with-rider.glb",
+      "animation": "Ride",
+      "bytes": 189936
+    },
+    {
+      "file": "woman-in-dress.glb",
+      "animation": "Walk in Place",
+      "bytes": 173532
+    },
+    {
+      "file": "woman-in-workwear.glb",
+      "animation": "Walk in Place",
+      "bytes": 172304
+    },
+    {
+      "file": "man-in-denim.glb",
+      "animation": "Walk in Place",
+      "bytes": 170460
+    },
+    {
+      "file": "man-in-outdoor-jacket.glb",
+      "animation": "Walk in Place",
+      "bytes": 170504
+    },
+    {
+      "file": "cavewoman.glb",
+      "animation": "Walk in Place",
+      "bytes": 171876
+    },
+    {
+      "file": "caveman.glb",
+      "animation": "Walk in Place",
+      "bytes": 168748
+    },
+    {
+      "file": "chestnut-horse.glb",
+      "animation": "Trot",
+      "bytes": 17348
+    },
+    {
+      "file": "wild-rabbit.glb",
+      "animation": "Hop",
+      "bytes": 17116
+    },
+    {
+      "file": "crested-dinosaur.glb",
+      "animation": "Trot",
+      "bytes": 17148
+    },
+    {
+      "file": "housefly.glb",
+      "animation": "Wingbeat",
+      "bytes": 14368
+    },
+    {
+      "file": "mosquito.glb",
+      "animation": "Wingbeat",
+      "bytes": 14612
+    },
+    {
+      "file": "butterfly.glb",
+      "animation": "Wingbeat",
+      "bytes": 15336
+    },
+    {
+      "file": "desert-cactus.glb",
+      "animation": "Breeze",
+      "bytes": 14272
+    },
+    {
+      "file": "sunflower.glb",
+      "animation": "Breeze",
+      "bytes": 15156
+    },
+    {
+      "file": "young-palm.glb",
+      "animation": "Breeze",
+      "bytes": 13268
+    },
+    {
+      "file": "planet-venus.glb",
+      "animation": "Rotation",
+      "bytes": 7088
+    },
+    {
+      "file": "planet-saturn.glb",
+      "animation": "Rotation",
+      "bytes": 16340
+    },
+    {
+      "file": "solar-star.glb",
+      "animation": "Rotation",
+      "bytes": 12644
+    },
+    {
+      "file": "variable-star.glb",
+      "animation": "Pulse",
+      "bytes": 12592
+    },
+    {
+      "file": "black-hole.glb",
+      "animation": "Rotation",
+      "bytes": 20252
+    },
+    {
+      "file": "sand-dunes.glb",
+      "animation": "Wind",
+      "bytes": 30368
+    },
+    {
+      "file": "rocky-river.glb",
+      "animation": "Current",
+      "bytes": 29216
+    },
+    {
+      "file": "snowy-mountains.glb",
+      "animation": "Cloud Drift",
+      "bytes": 10968
+    },
+    {
+      "file": "limestone-cave.glb",
+      "animation": "Drips",
+      "bytes": 18136
+    },
+    {
+      "file": "erupting-volcano.glb",
+      "animation": "Eruption",
+      "bytes": 25996
+    },
+    {
+      "file": "giant-breaking-wave.glb",
+      "animation": "Wave Break",
+      "bytes": 30592
+    },
+    {
+      "file": "steel-spoon.glb",
+      "animation": "Turntable",
+      "bytes": 10512
+    },
+    {
+      "file": "mechanical-gears.glb",
+      "animation": "Mesh",
+      "bytes": 10236
+    },
+    {
+      "file": "chemical-reaction-bench.glb",
+      "animation": "Reaction",
+      "bytes": 18648
+    },
+    {
+      "file": "snare-drum.glb",
+      "animation": "Beat",
+      "bytes": 14172
+    },
+    {
+      "file": "acoustic-guitar.glb",
+      "animation": "String Vibration",
+      "bytes": 17596
+    }
+  ]
+}

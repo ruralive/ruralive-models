@@ -2,11 +2,15 @@
 
 Free 3D models for the Realistic 3D Model node in Ruralive Set Film. The app downloads each file once to the viewer's browser the first time it is used.
 
-These are copies from the sources below, packed into single `.glb` files at 1K texture resolution. We did not make them. [`CREDITS.md`](CREDITS.md) lists every model with its authors, licence and source, and [`models.json`](models.json) holds the same data for the app.
+The sourced models below are packed into single `.glb` files at 1K texture resolution. [`CREDITS.md`](CREDITS.md) lists every model with its authors, licence and source, and [`models.json`](models.json) holds the same data for the app.
 
 ## Rigged versions
 
 The [rigged/](rigged/) folder contains self-contained animated GLBs. See [the animation guide](animations/README.md) for the rig types, clips and tests.
+
+## Original animated expansion
+
+Browse the [37 CC0 animated models](rigged/expansion/) and their [manifest](rigged/expansion/manifest.json). Each file embeds its textures and animation.
 
 ## Sources
 
