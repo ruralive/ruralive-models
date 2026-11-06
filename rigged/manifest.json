@@ -318,11 +318,19 @@
   },
   {
     "id": "perseverance-rover",
-    "rig": "original rover skin and rigid assembly root",
+    "rig": "original rover skin plus six independent rigid wheel bones",
     "original_clips": 23,
-    "skins": 68,
+    "skins": 73,
     "clips": [
       "Survey_Rock"
+    ],
+    "wheels": [
+      "wheel.FL",
+      "wheel.FR",
+      "wheel.ML",
+      "wheel.MR",
+      "wheel.RL",
+      "wheel.RR"
     ]
   },
   {
@@ -404,6 +412,174 @@
     "skins": 1,
     "clips": [
       "Prop_Reveal"
+    ]
+  },
+  {
+    "id": "pine_tree_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "fir_tree_01",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "jacaranda_tree",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "tree_small_02",
+    "rig": "weighted wind chain",
+    "original_clips": 0,
+    "skins": 1,
+    "clips": [
+      "Wind"
+    ]
+  },
+  {
+    "id": "animal-alpaca",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-bull",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-cow",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-deer",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-donkey",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-fox",
+    "rig": "original quadruped skin",
+    "original_clips": 12,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-horse",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-husky",
+    "rig": "original quadruped skin",
+    "original_clips": 12,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-shiba-inu",
+    "rig": "original quadruped skin",
+    "original_clips": 12,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-stag",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 2,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-white-horse",
+    "rig": "original quadruped skin",
+    "original_clips": 13,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
+    ]
+  },
+  {
+    "id": "animal-wolf",
+    "rig": "original quadruped skin",
+    "original_clips": 12,
+    "skins": 1,
+    "clips": [
+      "Idle",
+      "Walk",
+      "Gallop"
     ]
   }
 ]
