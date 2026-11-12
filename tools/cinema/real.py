@@ -32,7 +32,7 @@ CAST = {
                    african=0.85, asian=0.05, caucasian=0.1),
         skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
         freckles=0.0, stubble=0.0, hair='coils', hair_color='#120c0a',
-        outfit=(('rib', '#b5532f'), ('denim', '#6d8bb0')),
+        outfit=(('wool', '#7e3526'), ('wool', '#3b4632')),
         assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
                     clothes=['female_casualsuit01', 'shoes05'])),
     'tomas': dict(
@@ -40,7 +40,7 @@ CAST = {
                    african=0.0, asian=0.0, caucasian=1.0),
         skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
         freckles=0.15, stubble=0.75, hair='short', hair_color='#5a4b40',
-        outfit=(('heather', '#3d4248'), ('denim', '#25304a')),
+        outfit=(('linen', '#c4b38c'), ('wool', '#4a3626')),
         assets=dict(eyes='grey', eyebrows='eyebrow001', eyelashes='eyelashes01', hair='short02',
                     clothes=['male_casualsuit04', 'shoes02'])),
     'mei': dict(
@@ -48,7 +48,7 @@ CAST = {
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#b0565c', iris='#2a1a12',
         freckles=0.05, stubble=0.0, hair='long', hair_color='#0e0b0b',
-        outfit=(('heather', '#e9e3d6'), ('twill', '#1c1c21')),
+        outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit02', 'shoes06'])),
 }
@@ -135,6 +135,21 @@ def fabric(m, kind, color):
         fleck = m.noise(1400, 2, 0.6)
         col = m.ramp(fleck, [(0.35, dark), (0.65, light)])
         return m.mix(col, c, m.math('MULTIPLY', var, 0.3)), fleck, 0.9
+    if kind == 'linen':
+        # Hand-spun linen: uneven slubs along the threads, a loose plain weave, sun-faded patches.
+        slub = m.noise(420, 3, 0.7, co=m.stretch(1, 1, 0.08))
+        weave = m.math('MAXIMUM', m.wave(1500, 1.5, 1, direction='X'), m.wave(1500, 1.5, 1, direction='Z'))
+        col = m.ramp(var, [(0.15, dark), (0.6, c), (0.9, light)])
+        col = m.mix(col, light, m.math('MULTIPLY', m.ramp(slub, [(0.6, 0.0), (0.8, 1.0)]), 0.5))
+        col = m.mix(col, '#6a5a44', m.math('MULTIPLY', m.ramp(m.noise(2.5, 5, 0.7), [(0.6, 0.0), (0.85, 1.0)]), 0.25))
+        return col, m.math('ADD', m.math('MULTIPLY', weave, 0.6), m.math('MULTIPLY', slub, 0.4)), 0.92
+    if kind == 'wool':
+        # Fulled wool: a soft felted surface, carded fibres of mixed tones, worn darker in places.
+        fibres = m.noise(900, 4, 0.75, 1.5)
+        felt = m.noise(120, 5, 0.65)
+        col = m.ramp(fibres, [(0.3, dark), (0.55, c), (0.75, light)])
+        col = m.mix(col, dark, m.math('MULTIPLY', m.ramp(m.noise(3, 5, 0.7), [(0.55, 0.0), (0.85, 1.0)]), 0.45))
+        return col, m.math('ADD', m.math('MULTIPLY', felt, 0.6), m.math('MULTIPLY', fibres, 0.4)), 0.97
     weave = m.noise(900, 2, 0.5)
     return m.ramp(var, [(0.2, dark), (0.8, c)]), weave, 0.75
 
@@ -709,6 +724,9 @@ def build(model_id):
         if kind == 'Clothes' and 'suit' in os.path.basename(mat_path or ''):
             mat = outfit_material(spec, mat_path, j['hips'].z + 0.07)
             name = model_id + '_outfit'
+        elif kind == 'Clothes' and 'shoes' in os.path.basename(mat_path or ''):
+            mat = M.leather('#3e2a1c', 'boots', 0.62)
+            name = model_id + '_boots'
         else:
             mat = mh_material(mat_path, kind.lower()) if mat_path else None
         parts.append((kind, freeze(obj, name, mat)))
@@ -743,7 +761,7 @@ def build(model_id):
 def bake_all(model_id, body, clothes):
     bake_atlas(body, 4096, name=model_id + '_skin', do_unwrap=False, ao_samples=16)
     for c in clothes:
-        if c.name.endswith('_outfit'):
+        if c.name.endswith('_outfit') or c.name.endswith('_boots'):
             bake_atlas(c, 2048, name=model_id + '_outfit', do_unwrap=False, ao_samples=8)
     # Skin lets light in: only the renders here use it, the web player draws the baked colour.
     for mat in body.data.materials:
