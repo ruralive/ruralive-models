@@ -75,7 +75,7 @@ Too clean = CG. For a period piece (medieval) push them further; for a glossy fu
 - **Broken capillaries**: thin noise ridges (scale 120) masked by the flush zone, `#b0302a` ×0.22.
 - **T-zone**: bigger open pores and lower roughness down the nose and across the forehead.
 - **Dry patches**: low-frequency noise, ashy lighter colour and rougher, with tiny flakes.
-- **Dirt / grime** (for rough, outdoor or period characters): add a cavity-weighted dark layer
+- **Dirt / grime** (`spec["grime"]`, 0.4–0.7 for the medieval cast): a cavity-weighted dark layer
   (pointiness or AO while baking) on hands, nails, neck creases and feet, warm grey-brown
   `#4a3a2a`, plus a large noise of smudges ×0.1–0.25. Keep it off the lips and eye whites.
 - Use a different `seed` per layer in `rare_spots` so marks don't line up.

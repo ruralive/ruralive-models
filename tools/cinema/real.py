@@ -31,7 +31,7 @@ CAST = {
         macro=dict(gender=0.0, age=0.523, muscle=0.58, weight=0.5, height=0.55, proportions=0.6,
                    african=0.85, asian=0.05, caucasian=0.1),
         skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
-        freckles=0.0, stubble=0.0, body_hair=0.35, hair='coils', hair_color='#120c0a',
+        freckles=0.0, stubble=0.0, body_hair=0.35, grime=0.5, hair='coils', hair_color='#120c0a',
         outfit=(('wool', '#7e3526'), ('wool', '#3b4632')),
         assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
                     clothes=['female_casualsuit01', 'shoes05'])),
@@ -39,7 +39,7 @@ CAST = {
         macro=dict(gender=1.0, age=0.654, muscle=0.55, weight=0.6, height=0.6, proportions=0.5,
                    african=0.0, asian=0.0, caucasian=1.0),
         skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
-        freckles=0.15, stubble=0.75, body_hair=0.85, hair='short', hair_color='#5a4b40',
+        freckles=0.15, stubble=0.75, body_hair=0.85, grime=0.7, hair='short', hair_color='#5a4b40',
         outfit=(('linen', '#c4b38c'), ('wool', '#4a3626')),
         assets=dict(eyes='grey', eyebrows='eyebrow001', eyelashes='eyelashes01', hair='short02',
                     clothes=['male_casualsuit04', 'shoes02'])),
@@ -47,7 +47,7 @@ CAST = {
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#a35a58', iris='#2a1a12',
-        freckles=0.05, stubble=0.0, body_hair=0.2, hair='long', hair_color='#0e0b0b',
+        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, hair='long', hair_color='#0e0b0b',
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit01', 'shoes06'])),
@@ -412,7 +412,7 @@ def rare_spots(m, scale, rate, size, seed):
     return spot, pick
 
 
-def skin_imperfections(m, spec, j, base, height, rough, flush):
+def skin_imperfections(m, spec, j, base, height, rough, flush, lips):
     """What makes skin look lived in: blemishes and the marks they leave, a scar or two, broken
     capillaries, blotchy redness, shadows under the eyes, open pores and oil on the T-zone,
     dry patches. Returns the new (base, height, rough)."""
@@ -457,6 +457,21 @@ def skin_imperfections(m, spec, j, base, height, rough, flush):
     rough = mm('ADD', rough, mm('MULTIPLY', dry, 0.12))
     flake = m.ramp(m.voronoi(900, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.05, 0.0)])
     height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', flake, dry), 0.25))
+    # Grime: a working life before running water. Dirt settles in creases and cavities (pointiness
+    # is correct while baking in Cycles), gathers on hands, feet and the neck, and lies in faint
+    # smudges elsewhere. Kept off the lips.
+    g = spec.get('grime', 0.0)
+    if g:
+        cavity = mm('SUBTRACT', 1.0, m.pointiness(0.46, 0.52))
+        parts = any_of(m, *[blob(m, j['wr' + sd] + j['d' + sd] * 0.08, 0.11) for sd in 'LR'],
+                       *[blob(m, j['an' + sd] + Vector((0, -0.03, -0.04)), 0.12) for sd in 'LR'],
+                       blob(m, j['neck'], 0.08, (0.9, 0.9, 1.4)))
+        smudge = m.ramp(m.noise(7, 4, 0.6, 1.0), [(0.55, 0.0), (0.8, 1.0)])
+        dirt = mm('ADD', mm('MULTIPLY', cavity, mm('ADD', 0.25, mm('MULTIPLY', parts, 0.75))),
+                  mm('MULTIPLY', smudge, mm('ADD', 0.12, mm('MULTIPLY', parts, 0.3))))
+        dirt = mm('MULTIPLY', mm('MULTIPLY', dirt, g), mm('SUBTRACT', 1.0, lips), clamp=True)
+        base = m.mix(base, '#4a3a2a', mm('MULTIPLY', dirt, 0.45))
+        rough = mm('ADD', rough, mm('MULTIPLY', dirt, 0.15))
     return base, height, rough
 
 
@@ -596,7 +611,7 @@ def skin_material(spec, j):
                    m.math('MULTIPLY', lips, -0.18))
     height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.5),
                                                m.math('MULTIPLY', parting, 0.8)))
-    base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush)
+    base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush, lips)
     if spec.get('body_hair'):
         # Fine arm hair: soft darker patches made of short strokes laid along the arm.
         zone = N(m.nt, 'Attribute', attribute_name='hairzone').outputs['Fac']
