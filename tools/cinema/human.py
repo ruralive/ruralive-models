@@ -606,9 +606,13 @@ def curl(P, side, amount, thumb=None):
         P.turn('Thumb%d.%s' % (i, side), y=sx * t * 0.6, x=t * 0.4)
 
 
-def arm(P, side, fwd=0.0, out=0.0, bend=0.0, twist=0.0, down=0.33):
+REST_DOWN = 0.33  # how far the arms swing down from the rig's rest pose to hang
+
+
+def arm(P, side, fwd=0.0, out=0.0, bend=0.0, twist=0.0, down=None):
     """fwd: swing forward; out: lift sideways from hanging; bend: elbow."""
     sx = 1 if side == 'L' else -1
+    down = REST_DOWN if down is None else down
     P.turn('UpperArm.' + side, x=-fwd, y=sx * (down - out), z=sx * twist)
     P.turn('ForeArm.' + side, x=-bend)
 
@@ -700,7 +704,7 @@ def animate(rig, s, k):
     def wave_clip(t, P):
         up = pulse(t, 0.05, 0.25, 0.75, 0.95)
         idle(t, P)
-        P.turn('UpperArm.R', x=0, y=-0.33 + up * 2.25, z=0)
+        P.turn('UpperArm.R', x=0, y=-REST_DOWN + up * 2.25, z=0)
         P.turn('ForeArm.R', y=up * (0.5 + 0.45 * math.sin(math.tau * t * 4)), x=-up * 0.3)
         P.turn('Hand.R', y=up * 0.25 * math.sin(math.tau * t * 4 + 0.6))
         curl(P, 'R', 0.45 * (1 - up) + 0.05)
@@ -786,7 +790,7 @@ def animate(rig, s, k):
         P.turn('Head', x=-0.2 * b)
         P.turn('Jaw', x=0.25 * b)
         for side, sx in (('L', 1), ('R', -1)):
-            P.turn('UpperArm.' + side, y=sx * (0.33 - 2.5 - 0.25 * b), x=-0.2)
+            P.turn('UpperArm.' + side, y=sx * (REST_DOWN - 2.5 - 0.25 * b), x=-0.2)
             P.turn('ForeArm.' + side, x=-0.3 + 0.25 * b)
             curl(P, side, 1.1)
             P.move('ik_foot.' + side, sx * 0.05 * k, 0, 0.05 * max(0, b - 0.6) * k)
@@ -858,7 +862,7 @@ def animate(rig, s, k):
     def reach(t, P):
         up = pulse(t, 0.1, 0.45, 0.6, 0.95)
         drift(t, P)
-        P.turn('UpperArm.R', x=-1.5 * up, y=-(0.33 - 0.55) * (1 - up) - 0.25 * up)
+        P.turn('UpperArm.R', x=-1.5 * up, y=-(REST_DOWN - 0.55) * (1 - up) - 0.25 * up)
         P.turn('ForeArm.R', x=-0.7 * (1 - up) - 0.08)
         P.turn('Hand.R', x=-0.2 * up)
         curl(P, 'R', 0.35 * (1 - up) + 0.04)
