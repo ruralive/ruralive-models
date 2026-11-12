@@ -30,21 +30,24 @@ CAST = {
     'amara': dict(
         macro=dict(gender=0.0, age=0.523, muscle=0.58, weight=0.5, height=0.55, proportions=0.6,
                    african=0.85, asian=0.05, caucasian=0.1),
-        skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#5a2f2c', iris='#3a2414',
+        skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
         freckles=0.0, stubble=0.0, hair='coils', hair_color='#120c0a',
-        top=('tank', '#b5532f'), bottom=('jeans', '#6f8db3'), shoes='#e8e4dc'),
+        assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
+                    clothes=['female_casualsuit01', 'shoes05'])),
     'tomas': dict(
         macro=dict(gender=1.0, age=0.654, muscle=0.55, weight=0.6, height=0.6, proportions=0.5,
                    african=0.0, asian=0.0, caucasian=1.0),
-        skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#a8645c', iris='#6b8090',
+        skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
         freckles=0.15, stubble=0.75, hair='short', hair_color='#5a4b40',
-        top=('tee', '#4d6378'), bottom=('chinos', '#2e2c2a'), shoes='#4a2e1e'),
+        assets=dict(eyes='grey', eyebrows='eyebrow001', eyelashes='eyelashes01', hair='short02',
+                    clothes=['male_casualsuit04', 'shoes02'])),
     'mei': dict(
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
-        skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#b56a68', iris='#2a1a12',
+        skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#b0565c', iris='#2a1a12',
         freckles=0.05, stubble=0.0, hair='long', hair_color='#0e0b0b',
-        top=('tee', '#ece6da'), bottom=('trousers', '#1d1d22'), shoes='#1a1a1c'),
+        assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
+                    clothes=['female_casualsuit02', 'shoes06'])),
 }
 
 
@@ -59,12 +62,97 @@ def mpfb_body(spec):
     for key, value in spec['macro'].items():
         HumanObjectProperties.set_value(key, value, entity_reference=body)
     TargetService.reapply_macro_details(body)
-    activate(body)
-    if body.data.shape_keys:
-        bpy.ops.object.shape_key_remove(all=True, apply_mix=True)
-    for mod in list(body.modifiers):
-        body.modifiers.remove(mod)
-    return body
+    return body, HumanService
+
+
+MH = '/opt/chars/mh/data'
+
+
+def mhmat(path):
+    out = {}
+    for line in open(path, encoding='utf-8', errors='ignore'):
+        parts = line.strip().split(None, 1)
+        if len(parts) == 2 and not parts[0].startswith('#'):
+            out[parts[0]] = parts[1]
+    return out
+
+
+def mh_material(mhmat_path, name):
+    """A plain glTF-friendly material from a MakeHuman .mhmat: colour, normal, cut-out alpha."""
+    info = mhmat(mhmat_path)
+    folder = os.path.dirname(mhmat_path)
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    b = nt.nodes['Principled BSDF']
+    b.inputs['Roughness'].default_value = 0.6
+    tex = info.get('diffuseTexture')
+    if tex and os.path.exists(os.path.join(folder, tex)):
+        node = N(nt, 'TexImage', image=bpy.data.images.load(os.path.join(folder, tex)))
+        nt.links.new(node.outputs['Color'], b.inputs['Base Color'])
+        if info.get('transparent', '').lower() == 'true' or 'alphaToCoverage' in info or \
+                any(k in name for k in ('hair', 'eyebrow', 'eyelash')):
+            cut = N(nt, 'Math', operation='ROUND')
+            nt.links.new(node.outputs['Alpha'], cut.inputs[0])
+            nt.links.new(cut.outputs[0], b.inputs['Alpha'])
+            if hasattr(m, 'surface_render_method'):
+                m.surface_render_method = 'DITHERED'
+    elif 'diffuseColor' in info:
+        b.inputs['Base Color'].default_value = (*[float(x) for x in info['diffuseColor'].split()[:3]], 1)
+    nrm = info.get('normalmapTexture')
+    if nrm and os.path.exists(os.path.join(folder, nrm)):
+        image = bpy.data.images.load(os.path.join(folder, nrm))
+        image.colorspace_settings.name = 'Non-Color'
+        node = N(nt, 'TexImage', image=image)
+        nm = N(nt, 'NormalMap', {'Color': node.outputs['Color']})
+        nt.links.new(nm.outputs['Normal'], b.inputs['Normal'])
+    if 'hair' in name:
+        b.inputs['Roughness'].default_value = 0.42
+    if 'eye' in name and 'brow' not in name and 'lash' not in name:
+        b.inputs['Roughness'].default_value = 0.05
+    m['bake'] = False
+    return m
+
+
+def add_assets(body, service, spec):
+    """Fit the CC0 MakeHuman assets to this body, as MPFB does, and return them as plain meshes."""
+    a = spec['assets']
+    wanted = [('Eyes', MH + '/eyes/high-poly/high-poly.mhclo', MH + '/eyes/materials/%s.mhmat' % a['eyes']),
+              ('Eyebrows', MH + '/eyebrows/%s/%s.mhclo' % (a['eyebrows'], a['eyebrows']), None),
+              ('Eyelashes', MH + '/eyelashes/%s/%s.mhclo' % (a['eyelashes'], a['eyelashes']), None),
+              ('Teeth', MH + '/teeth/teeth_base/teeth_base.mhclo', None),
+              ('Tongue', MH + '/tongue/tongue01/tongue01.mhclo', None),
+              ('Hair', MH + '/hair/%s/%s.mhclo' % (a['hair'], a['hair']), None)]
+    wanted += [('Clothes', MH + '/clothes/%s/%s.mhclo' % (c, c), None) for c in a['clothes']]
+    out = []
+    for kind, path, material in wanted:
+        before = set(bpy.data.objects)
+        service.add_mhclo_asset(path, body, asset_type=kind, subdiv_levels=0)
+        made = [o for o in bpy.data.objects if o not in before and o.type == 'MESH']
+        if not made:
+            print('ASSET MISSING', path)
+            continue
+        obj = made[0]
+        mat_path = material or os.path.splitext(path)[0] + '.mhmat'
+        if not os.path.exists(mat_path):
+            mat_path = None
+        out.append((kind, obj, mat_path))
+    return out
+
+
+def freeze(obj, name, material):
+    """Apply an asset's modifiers and give it a plain material."""
+    dg = bpy.context.evaluated_depsgraph_get()
+    mesh = bpy.data.meshes.new_from_object(obj.evaluated_get(dg))
+    plain = link(bpy.data.objects.new(name, mesh))
+    plain.matrix_world = obj.matrix_world.copy()
+    bpy.data.objects.remove(obj)
+    activate(plain)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    plain.data.materials.clear()
+    if material:
+        plain.data.materials.append(material)
+    return plain
 
 
 def groups_of(obj):
@@ -126,7 +214,7 @@ def paint_masks(body, j, spec):
     data = []
     for v in body.data.vertices:
         p = v.co
-        face_front = max(0.0, min(1.0, (eye.y + 0.02 - p.y) / 0.05))
+        face_front = max(0.0, min(1.0, (eye.y + 0.045 - p.y) / 0.03))
         cheek = max(0.0, 1 - min((p - (j['eyeL'] + Vector((0.012, -0.005, -0.04)))).length,
                                  (p - (j['eyeR'] + Vector((-0.012, -0.005, -0.04)))).length) / 0.035)
         nose_flush = max(0.0, 1 - (p - nose).length / 0.025)
@@ -138,8 +226,9 @@ def paint_masks(body, j, spec):
                                        / 0.06))
         flush = min(1.0, (0.8 * cheek + nose_flush + 0.7 * ear) * face_front + 0.4 * knuckle +
                     0.6 * ear)
-        lips = max(0.0, 1 - (Vector((p.x * 0.55, p.y, (p.z - mouth.z) * 1.6)) -
-                             Vector((0, mouth.y, 0))).length / 0.016) * face_front
+        lips = max(0.0, 1 - (Vector((p.x * 0.5, 0, (p.z - mouth.z) * 1.25))).length / 0.02) * (
+            1.0 if p.y < mouth.y + 0.012 else 0.0)
+        lips = min(1.0, lips ** 0.6 * 1.4)
         jaw = (p.z < mouth.z + 0.012 and p.z > mouth.z - 0.075 and p.y < eye.y + 0.075 and
                (p - mouth).length < 0.095)
         upper_lip = (abs(p.z - mouth.z - 0.016) < 0.012 and abs(p.x) < 0.03 and face_front > 0.3)
@@ -183,6 +272,14 @@ def skin_material(spec):
     mole = m.math('MULTIPLY', m.ramp(mole_cell, [(0.985, 0.0), (0.987, 1.0)]),
                   m.ramp(m.voronoi(22, 'F1'), [(0.0, 1.0), (0.05, 0.0)]))
     base = m.mix(base, '#3a2218', m.math('MULTIPLY', mole, 0.7))
+    # Small moles and freckles everywhere, in two sizes and several browns.
+    for scale, rate, size, amount in ((90, 0.035, 0.07, 0.55), (300, 0.06, 0.12, 0.35)):
+        cell = m.voronoi(scale, 'F1', out='Color')
+        pick = N(m.nt, 'SeparateColor', {'Color': cell})
+        spot = m.math('MULTIPLY', m.ramp(pick.outputs[0], [(1 - rate, 0.0), (1 - rate + 0.002, 1.0)]),
+                      m.ramp(m.voronoi(scale, 'F1'), [(0.0, 1.0), (size, 0.0)]))
+        tone = m.ramp(pick.outputs[1], [(0.0, '#4a2a1c'), (1.0, '#8a5a3c')])
+        base = m.mix(base, tone, m.math('MULTIPLY', spot, amount))
     base = m.mix(base, spec['lips'], lips)
     if spec['stubble']:
         hairs = m.ramp(m.voronoi(3200, 'F1'), [(0.0, 1.0), (0.3, 0.0)])
@@ -516,50 +613,60 @@ def regions(j, spec, bones):
 def build(model_id):
     spec = CAST[model_id]
     core.reset(sum(map(ord, model_id)))
-    body = mpfb_body(spec)
+    body, service = mpfb_body(spec)
+    assets = add_assets(body, service, spec)
+    activate(body)
+    if body.data.shape_keys:
+        bpy.ops.object.shape_key_remove(all=True, apply_mix=True)
     groups = groups_of(body)
     j = joints_from(body, groups)
-    keep_only(body, set(groups['body']))
+    # The masks hide the helpers and the skin under the clothes: apply them.
+    for mod in list(body.modifiers):
+        if mod.type == 'MASK':
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+        else:
+            body.modifiers.remove(mod)
     body.vertex_groups.clear()
+    body.parent = None
     body.name = model_id
     shade(body)
     height = max(v.co.z for v in body.data.vertices)
     paint_masks(body, j, spec)
     body.data.materials.clear()
     body.data.materials.append(skin_material(spec))
-    bm = bmesh.new()
-    bm.from_mesh(body.data)
-    bvh = BVHTree.FromBMesh(bm)
-    bm.free()
-    scalp = scalp_vertices(body, j)
-    # Arms hang from MakeHuman's rest pose: work out how far to drop them.
+    parts = []
+    for kind, obj, mat_path in assets:
+        name = '%s_%s' % (model_id, kind.lower())
+        mat = mh_material(mat_path, kind.lower()) if mat_path else None
+        parts.append((kind, freeze(obj, name, mat)))
     arm = (j['elL'] - j['shL']).normalized()
     rest = math.acos(max(-1, min(1, arm.dot(Vector((0, 0, -1))))))
     human.REST_DOWN = rest - 0.06
     s = dict(name=model_id, height=height)
     rig = human.build_rig(s, j)
     rig.bind_auto(body)
-    top_r, bottom_r, shoe_r = regions(j, spec, dominant_bones(body))
-    clothes = [garment(body, j, spec['top'][0], spec['top'][1], top_r),
-               garment(body, j, spec['bottom'][0], spec['bottom'][1], bottom_r),
-               garment(body, j, 'shoes', spec['shoes'], shoe_r)]
-    for c in clothes:
-        for mod in list(c.modifiers):
-            if mod.type == 'ARMATURE':
-                mod.object = rig.obj
-    hair, cap = grow_hair(body, j, spec, bvh, scalp)
-    rigid = eyes(j, spec) + brows_and_lashes(j, spec, bvh) + hair
-    clothes.append(cap)
-    for p in rigid:
-        rig.bind_rigid(p, p['bone'])
+    clothes, rigid = [], []
+    for kind, obj in parts:
+        obj.vertex_groups.clear()
+        if kind in ('Clothes', 'Hair') and not (kind == 'Hair' and spec['hair'] != 'long'):
+            rig.transfer_weights(body, obj)
+            # Cloth near the hands must not follow them: only the body moves clothes and hair.
+            for group in list(obj.vertex_groups):
+                if group.name.split('.')[0].rstrip('0123456789') in (
+                        'Hand', 'ForeArm', 'Index', 'Middle', 'Ring', 'Pinky', 'Thumb'):
+                    obj.vertex_groups.remove(group)
+            activate(obj)
+            bpy.ops.object.vertex_group_normalize_all(lock_active=False)
+            clothes.append(obj)
+        else:
+            rig.bind_rigid(obj, 'Jaw' if kind in ('Tongue',) else 'Head')
+            rigid.append(obj)
     human.animate(rig, s, height / 1.75)
     return rig, body, clothes, rigid
 
 
 def bake_all(model_id, body, clothes):
     bake_atlas(body, 4096, name=model_id + '_skin', do_unwrap=False, ao_samples=16)
-    for c in clothes:
-        bake_atlas(c, 1024, name=model_id + '_' + c.data.materials[0].name, do_unwrap=False)
     # Skin lets light in: only the renders here use it, the web player draws the baked colour.
     for mat in body.data.materials:
         b = mat.node_tree.nodes.get('Principled BSDF')
@@ -636,7 +743,7 @@ def main(argv):
         core.export(os.path.join(out, 'real-' + model_id + '.glb'))
         eye = None
         for o in rigid:
-            if o.name.startswith('sphere'):
+            if o.name.endswith('_eyes'):
                 eye = sum((v.co for v in o.data.vertices), Vector()) / len(o.data.vertices)
                 break
         height = max(v.co.z for v in body.data.vertices)
