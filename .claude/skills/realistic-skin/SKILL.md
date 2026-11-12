@@ -80,24 +80,58 @@ What each tradition teaches, and what the shader takes from it.
 
 ## 1d. The face and body, part by part
 
-**Lips.** The vermilion is skin with the blood showing, never a separate pink. The border is a
-soft transition, sharp only in places (cupid's bow peaks, the centre of the lower lip); there is no
-dark outline round the lips. The darkest line is where the lips meet. Fine vertical lines follow the
-lip's curve. Highlights: centre of the lower lip, the bow peaks, a thin strip along the upper border;
-soft, with only a few tiny sharp glints on a wet lower lip. Upper lip usually darker (it faces down),
-lower lip lighter and fuller. Shader: `lips_shape`; the parting must sit on the geometry's seam
-(measured: 11 mm under the upper-teeth helper), lip colour ×0.72, edge softness 1.8 mm,
-creases very faint.
+**Lips (study).** The lips are a different tissue from the skin round them:
+- *Colour.* The vermilion is thin, unkeratinised-looking skin over dense capillaries: the blood
+  shows, never a separate pink. Redder at the centre of each lip, fading at the corners; the upper
+  lip usually darker (it faces down), the lower lighter and fuller. The border is a soft
+  transition, sharp only in places (cupid's bow peaks, centre of the lower lip): no dark outline.
+  The darkest line is the parting.
+- *Surface.* No pores, no hair, none of the skin's crossing lines. Fine **vertical furrows**
+  (sulci labiorum, the "lip prints" of forensic cheiloscopy: complete or partial verticals,
+  branched, crossing, reticular) run perpendicular to the parting, closer and deeper near it and
+  fading towards the border, ~1 mm apart with finer ones between. Smooth, wet, slightly swollen
+  ridges between the furrows. Small drier patches, paler and flaky, mostly on the lower lip.
+- *Light.* Glossier than skin (roughness ~0.28 wet, ~0.45 dry); highlights on the centre of the
+  lower lip, the bow peaks, a thin strip along the upper border: soft, with only a few tiny sharp
+  glints. Strong subsurface (translucent, red).
+- *Build.* `lips_shape` (mask, cupid's bow, parting) and `lip_surface` (furrows from a voronoi
+  edge squashed ×0.07 in height so the cells run vertically, at 820 and 2000 per metre, wandering
+  by a 0.3 mm noise offset, deeper near the parting; swell, dry flakes, centre redness). In the lip
+  mask the skin's height, colour and roughness are *replaced*, not added to. Parting on the
+  geometry's seam (11 mm under the upper-teeth helper), lip colour ×0.88.
+- *Failure seen.* Lips that carried the skin's crossing fine lines and pores read as "skin painted
+  pink" and too textured.
 
-**Eyes.** The sclera is not white: warm grey-ivory, pinker and veined towards the corners, bluish in
-children and yellower with age. Thin veins sit at the surface, thicker ones are deeper and washed
-out. The **limbal ring** (dark ring round the iris) reads as youth and makes the eye look alive. The
-iris sits behind a refracting cornea (index ~1.376), so it has depth and parallax; the cornea is
-wet, a sharp highlight. The **caruncle** in the inner corner is pink and wet. A **tear line**
-(meniscus) runs along the lower lid, thicker at the bottom, catching a thin bright line. The lid
-edges are pink; the skin of the lids is thin and violet-veined. The upper lid casts a shadow on the
-eyeball: never light the top of the iris evenly. In our pipeline the MakeHuman CC0 eyes carry the
-iris; still to do: a tear-line strip mesh, a caruncle tint and an eyeball shadow term.
+**Eyes (study).** What makes an eye look alive, and how we build it:
+- *Anatomy and numbers.* Eyeball ~24 mm across; the cornea is a smaller, steeper sphere
+  (radius ~7.8 mm vs ~12 mm) that **stands proud of the eyeball** by about 0.5-1 mm, ~11.5-12 mm
+  wide; refractive index ~1.376. The iris lies behind it, so it shows depth and parallax and the
+  pupil looks magnified. Iris radius ~5.9 mm; pupil 2-8 mm (calm interior light ~3.5-4.5 mm).
+- *Cornea and tear film = life.* A perfectly smooth wet surface over the whole eye: sharp
+  catchlights (one big, shaped like the key light), reflections of the room, and the bright
+  meniscus (tear line) along the lower lid, thicker at the bottom. Dry, matte eyes look dead.
+  Build: the MakeHuman eye already has a cornea shell over the eyeball, mapped to a transparent
+  texture corner (u > 0.85, v < 0.15) — it was invisible. `split_eyes` moves it to its own object
+  with `cornea_material` (transmission 1, roughness 0, IOR 1.376) and bulges its front cap outward
+  (6.5% of the eye radius at the centre of the iris, fading to 0 at 30° off axis).
+- *Iris.* Radial stroma fibres (noise on seamless polar coordinates, stretched along the radius),
+  crypts (dark pits), a lighter collarette ring round the pupil, darker outer rim, and a dark
+  **limbal ring** at the edge (strong in the young, fading with age); the pupil pure black and big
+  enough (r ≈ 0.35 of the iris). `eye_material` builds all of it from the eye UVs (iris centres
+  (0.7052, 0.6955) and (0.2892, 0.2834), radius 0.112) and bakes to a 1024 texture.
+- *Sclera.* Never white: ivory, slightly cool/grey next to the limbus, warmer and pinker towards
+  the corners; fine red vessels near the surface that thicken and multiply away from the iris
+  (thin ones stay sharp, deeper ones blur). Wet: roughness ~0.1.
+- *Shadow.* The upper lid and lashes shade the top of the eyeball and iris: never light the eye
+  evenly. Baking the eyeball's AO under the lids (with the cornea hidden from the bake) writes
+  that shadow into the texture.
+- *Inner corner.* The caruncle and plica: wet red-pink, the reddest point of the eye, spreading
+  softly onto the side of the nose. `eye_area` paints it on the skin (core `#b84e4a`, wet).
+- *Lid margins.* An even, slightly darker lash line along both lids (no patchiness), the soft
+  fold of the upper lid above it, and the pink, mirror-smooth tear line on the lower margin.
+- *Common failures.* Paper-white sclera, tiny pupil, no limbal ring, no cornea (flat painted
+  iris), no catchlight, evenly lit top of the eye, no wet line: each one alone makes the eye read
+  as a doll's.
 
 **Nose.** The most sebaceous area: bigger pores, visible **sebaceous filaments** (grey-yellow, light,
 not black dots), oilier (lower roughness), redder at the tip and alae; the alar crease and nostril

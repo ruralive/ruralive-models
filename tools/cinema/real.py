@@ -31,7 +31,7 @@ CAST = {
         macro=dict(gender=0.0, age=0.523, muscle=0.58, weight=0.5, height=0.55, proportions=0.6,
                    african=0.85, asian=0.05, caucasian=0.1),
         skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
-        freckles=0.0, stubble=0.0, body_hair=0.35, grime=0.5, hair='coils', hair_color='#120c0a',
+        freckles=0.0, stubble=0.0, body_hair=0.35, grime=0.5, brow=0.45, hair='coils', hair_color='#120c0a',
         outfit=(('wool', '#7e3526'), ('wool', '#3b4632')),
         assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
                     clothes=['female_casualsuit01', 'shoes05'])),
@@ -39,15 +39,15 @@ CAST = {
         macro=dict(gender=1.0, age=0.654, muscle=0.55, weight=0.6, height=0.6, proportions=0.5,
                    african=0.0, asian=0.0, caucasian=1.0),
         skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
-        freckles=0.15, stubble=0.75, body_hair=0.85, grime=0.7, hair='short', hair_color='#5a4b40',
+        freckles=0.15, stubble=0.75, body_hair=0.85, grime=0.7, brow=0.75, hair='short', hair_color='#5a4b40',
         outfit=(('linen', '#c4b38c'), ('wool', '#4a3626')),
-        assets=dict(eyes='grey', eyebrows='eyebrow001', eyelashes='eyelashes01', hair='short02',
+        assets=dict(eyes='grey', eyebrows='eyebrow009', eyelashes='eyelashes01', hair='short02',
                     clothes=['male_casualsuit04', 'shoes02'])),
     'mei': dict(
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#a35a58', iris='#2a1a12',
-        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, hair='long', hair_color='#0e0b0b',
+        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, brow=0.3, hair='long', hair_color='#0e0b0b',
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit01', 'shoes06'])),
@@ -232,6 +232,132 @@ def freeze(obj, name, material):
     if material:
         plain.data.materials.append(material)
     return plain
+
+
+# ----------------------------------------------------------------------------- eyes
+# The MakeHuman CC0 eye mesh is an eyeball plus a slightly larger cornea shell over it, both UV
+# mapped onto one texture: the two eyeballs round the iris centres below, the shells onto a
+# transparent corner (u > 0.85, v < 0.15). We keep the geometry and write our own materials.
+IRIS_UV = ((0.7052, 0.6955), (0.2892, 0.2834))
+IRIS_R = 0.112          # iris radius in UV units (about 5.9 mm on the eye)
+
+
+def eye_material(spec):
+    """Iris and sclera from the eye's UVs, baked later like the skin.
+    Iris: radial stroma fibres, crypts, a lighter collarette round the pupil, a dark limbal ring.
+    Sclera: ivory, a cool tint by the limbus, warmer and pinker towards the corners, fine red
+    vessels that thicken and multiply away from the iris."""
+    m = Mat('eye')
+    nt = m.nt
+    mm = m.math
+    uv = N(nt, 'TexCoord').outputs['UV']
+    (u0, v0), (u1, v1) = IRIS_UV
+    sep_uv = N(nt, 'SeparateXYZ', {'Vector': uv})
+    first = mm('GREATER_THAN', sep_uv.outputs['X'], 0.5)     # which eye this texel belongs to
+    cu = mm('MULTIPLY_ADD', first, u0 - u1, u1)
+    cv = mm('MULTIPLY_ADD', first, v0 - v1, v1)
+    du = mm('SUBTRACT', sep_uv.outputs['X'], cu)
+    dv = mm('SUBTRACT', sep_uv.outputs['Y'], cv)
+    d = mm('SQRT', mm('ADD', mm('MULTIPLY', du, du), mm('MULTIPLY', dv, dv)))
+    ang = mm('ARCTAN2', dv, du)
+    r = mm('DIVIDE', d, IRIS_R)
+    # Colour ramps clamp their input to 0..1: feed them r/3 (stops below are r/3 too).
+    r3 = mm('DIVIDE', r, 3.0)
+    # Polar coordinates without a seam: a circle of radius 8 for the angle, r for depth.
+    ring = lambda k_: N(nt, 'CombineXYZ', {'X': mm('MULTIPLY', mm('COSINE', ang), k_),
+                                          'Y': mm('MULTIPLY', mm('SINE', ang), k_),
+                                          'Z': r}).outputs['Vector']
+    iris_col = core.rgb(spec['iris'])
+    light = tuple(min(1, c * 1.9 + 0.08) for c in iris_col)
+    dark = tuple(c * 0.45 for c in iris_col)
+    fibres = m.noise(9, 6, 0.65, 0.0, co=ring(8.0))
+    crypts = m.ramp(m.voronoi(6, 'F1', co=ring(2.0)), [(0.0, 1.0), (0.22, 0.0)])
+    iris = m.ramp(fibres, [(0.3, '#%02x%02x%02x' % tuple(int(255 * c) for c in dark)),
+                           (0.55, spec['iris']),
+                           (0.8, '#%02x%02x%02x' % tuple(int(255 * c) for c in light))])
+    collarette = m.ramp(r3, [(0.1200, 0.0), (0.1500, 1.0), (0.2000, 0.0)])
+    iris = m.mix(iris, '#%02x%02x%02x' % tuple(int(255 * c) for c in light),
+                 mm('MULTIPLY', collarette, 0.45))
+    iris = m.mix(iris, '#%02x%02x%02x' % tuple(int(255 * c) for c in dark),
+                 mm('MULTIPLY', crypts, 0.5))
+    limbal = m.ramp(r3, [(0.2667, 0.0), (0.3233, 1.0), (0.3500, 0.6), (0.3800, 0.0)])
+    iris = m.mix(iris, '#1a1412', mm('MULTIPLY', limbal, 0.8))
+    pupil = m.ramp(r3, [(0.1100, 1.0), (0.1233, 0.0)])
+    iris = m.mix(iris, '#030303', pupil)
+    # Sclera: never paper white.
+    sclera = m.ramp(r3, [(0.3500, '#d6dade'), (0.4667, '#e9e2d8'), (0.7667, '#e8d2c8'), (1.0000, '#dcb8b0')])
+    sclera = m.mix(sclera, '#e6ddd0', mm('MULTIPLY', m.noise(30, 3, 0.5), 0.3))
+    vessels = m.ramp(m.noise(18, 4, 0.55, 2.2), [(0.488, 0.0), (0.5, 1.0), (0.512, 0.0)])
+    fine = m.ramp(m.noise(45, 3, 0.5, 2.5), [(0.494, 0.0), (0.5, 1.0), (0.506, 0.0)])
+    away = m.ramp(r3, [(0.4333, 0.0), (0.8667, 1.0)])
+    vein = mm('MULTIPLY', mm('MAXIMUM', vessels, mm('MULTIPLY', fine, 0.6)), away)
+    sclera = m.mix(sclera, '#a8302c', mm('MULTIPLY', vein, 0.55))
+    on_iris = m.ramp(r3, [(0.3600, 1.0), (0.3867, 0.0)])
+    col = m.mix(sclera, iris, on_iris)
+    rough = mm('ADD', 0.12, mm('MULTIPLY', on_iris, -0.06))
+    height = mm('ADD', mm('MULTIPLY', fibres, mm('MULTIPLY', on_iris, 0.4)),
+                mm('MULTIPLY', vein, 0.15))
+    m.set(color=col, rough=rough, height=height, bump=0.25, bump_distance=0.0004)
+    return m.m
+
+
+def cornea_material():
+    """The clear, wet cornea and tear film: refracts the iris (index 1.376) and carries the
+    catchlights that make an eye look alive."""
+    m = bpy.data.materials.new('cornea')
+    m.use_nodes = True
+    b = m.node_tree.nodes['Principled BSDF']
+    b.inputs['Base Color'].default_value = (1, 1, 1, 1)
+    b.inputs['Roughness'].default_value = 0.0
+    b.inputs['IOR'].default_value = 1.376
+    b.inputs['Transmission Weight'].default_value = 1.0
+    b.inputs['Specular IOR Level'].default_value = 0.7
+    if hasattr(m, 'surface_render_method'):
+        m.surface_render_method = 'BLENDED'
+    m['bake'] = False
+    return m
+
+
+def split_eyes(obj, spec, model_id):
+    """Give the eyeball our iris and sclera, move the cornea shell to its own object, and bulge it
+    a little in front of the iris, as a real cornea stands proud of the eyeball."""
+    import bmesh
+    obj.data.materials.clear()
+    obj.data.materials.append(eye_material(spec))
+    obj.data.materials.append(cornea_material())
+    uv = obj.data.uv_layers.active.data
+    for poly in obj.data.polygons:
+        us = [uv[i].uv for i in poly.loop_indices]
+        poly.material_index = 1 if all(u.x > 0.85 and u.y < 0.15 for u in us) else 0
+    activate(obj)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='DESELECT')
+    obj.active_material_index = 1
+    bpy.ops.object.material_slot_select()
+    bpy.ops.mesh.separate(type='SELECTED')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    cornea = next(o for o in bpy.context.selected_objects if o != obj)
+    cornea.name = model_id + '_cornea'
+    for o, keep in ((obj, 0), (cornea, 1)):
+        mats = list(o.data.materials)
+        o.data.materials.clear()
+        o.data.materials.append(mats[keep])
+        for poly in o.data.polygons:
+            poly.material_index = 0
+    # Bulge: per eye, push the front cap of the shell outwards, most at the centre of the iris.
+    ball = [v.co.copy() for v in obj.data.vertices]
+    for sign in (1, -1):
+        pts = [p for p in ball if p.x * sign > 0]
+        c = sum(pts, Vector()) / len(pts)
+        radius = sum((p - c).length for p in pts) / len(pts)
+        for v in cornea.data.vertices:
+            if v.co.x * sign <= 0:
+                continue
+            dirn = (v.co - c).normalized()
+            front = -dirn.y
+            cap = max(0.0, (front - 0.86) / 0.14)
+            v.co += dirn * (radius * 0.065 * cap ** 0.8)
+    return obj, cornea
 
 
 def groups_of(obj):
@@ -458,6 +584,42 @@ def lips_shape(m, j):
     return mask, parting, mm('MULTIPLY', crease, mask)
 
 
+def lip_surface(m, j, spec):
+    """Height, colour and roughness of the lips alone (mixed in by the lip mask)."""
+    mm = m.math
+    mouth = j['mouth']
+    pos = N(m.nt, 'SeparateXYZ', {'Vector': N(m.nt, 'TexCoord').outputs['Object']})
+    dz = mm('ABSOLUTE', mm('SUBTRACT', pos.outputs['Z'], mouth.z))
+    near = m.ramp(mm('DIVIDE', dz, 0.012), [(0.05, 1.0), (0.85, 0.15)])
+    # Furrows: cell edges of a voronoi squashed hard in height, so they run vertically; a little
+    # distortion lets them wander and branch. Two sizes: ~1.2 mm and ~0.5 mm apart.
+    warp = N(m.nt, 'Mapping', {'Vector': m.co})
+    warp.inputs['Scale'].default_value = (1.0, 1.0, 0.07)
+    # Offset by a small noise (up to ~0.3 mm) so the furrows wander instead of running straight.
+    jitter = N(m.nt, 'VectorMath', {0: m.noise(900, 2, 0.5, 0.0, color=True),
+                                    1: (0.0003, 0.0003, 0.0)}, operation='MULTIPLY')
+    wob_v = N(m.nt, 'VectorMath', {0: warp.outputs['Vector'], 1: jitter.outputs['Vector']},
+              operation='ADD')
+    big = m.ramp(m.voronoi(820, 'DISTANCE_TO_EDGE', co=wob_v.outputs['Vector']),
+                 [(0.0, 1.0), (0.06, 0.0)])
+    small = m.ramp(m.voronoi(2000, 'DISTANCE_TO_EDGE', co=warp.outputs['Vector']),
+                   [(0.0, 1.0), (0.05, 0.0)])
+    furrow = mm('MULTIPLY', mm('MAXIMUM', big, mm('MULTIPLY', small, 0.45)), near)
+    swell = m.noise(140, 3, 0.5)
+    height = mm('SUBTRACT', mm('MULTIPLY', swell, 0.12), mm('MULTIPLY', furrow, 0.7))
+    # Dry patches: paler, rougher, a few lifted flakes.
+    dry = m.ramp(m.noise(260, 3, 0.6), [(0.6, 0.0), (0.75, 1.0)])
+    flake = m.ramp(m.voronoi(1800, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.05, 0.0)])
+    height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', dry, flake), 0.15))
+    col = m.mix(spec['lips'], m.mix(spec['lips'], spec['skin'], 0.35), mm('MULTIPLY', dry, 0.4))
+    col = m.mix(col, m.mix(spec['lips'], '#2a1210', 0.35), mm('MULTIPLY', furrow, 0.35))
+    # Blood shows more at the centre of each lip, less at the corners.
+    centre = m.ramp(mm('ABSOLUTE', mm('DIVIDE', pos.outputs['X'], 0.024)), [(0.0, 1.0), (1.0, 0.0)])
+    col = m.mix(col, m.mix(spec['lips'], '#b03a3a', 0.25), mm('MULTIPLY', centre, 0.25))
+    rough = mm('ADD', 0.28, mm('ADD', mm('MULTIPLY', dry, 0.2), mm('MULTIPLY', furrow, 0.1)))
+    return height, col, rough
+
+
 def blob(m, centre, radius, squash=(1.0, 1.0, 1.0)):
     """1 at a point of the body, fading to 0 at radius (object space), optionally squashed."""
     rel = N(m.nt, 'VectorMath', {0: N(m.nt, 'TexCoord').outputs['Object'], 1: tuple(centre)},
@@ -661,6 +823,71 @@ def skin_chroma(m, spec, j, base, flush):
     return base
 
 
+def ellipse(m, centre, ax, az):
+    """Normalised elliptic distance in the face plane (x, z) from centre: 1 on the ellipse."""
+    rel = N(m.nt, 'VectorMath', {0: N(m.nt, 'TexCoord').outputs['Object'], 1: tuple(centre)},
+            operation='SUBTRACT')
+    sq = N(m.nt, 'VectorMath', {0: rel.outputs['Vector'], 1: (1.0 / ax, 0.0, 1.0 / az)},
+           operation='MULTIPLY')
+    return N(m.nt, 'VectorMath', {0: sq.outputs['Vector']}, operation='LENGTH').outputs['Value']
+
+
+def eye_area(m, spec, j, base, height, rough):
+    """Round each eye: the wet red of the inner corner (caruncle and the fold where the lids meet
+    the nose), an even, slightly darker lash line along both lid margins, and the soft fold of the
+    upper lid."""
+    mm = m.math
+    pos = N(m.nt, 'SeparateXYZ', {'Vector': N(m.nt, 'TexCoord').outputs['Object']})
+    for sd in 'LR':
+        c = j['eye' + sd]
+        inward = -1.0 if sd == 'L' else 1.0
+        # Only the front of the face, not the skin behind the eyeball.
+        front = mm('DIVIDE', mm('SUBTRACT', c.y - 0.004, pos.outputs['Y']), 0.004, clamp=True)
+        # Inner corner: a small wet red-pink core and a softer pink spreading onto the nose.
+        corner = c + Vector((inward * 0.0155, -0.007, -0.001))
+        core = mm('MULTIPLY', blob(m, corner, 0.0055), front)
+        spread = mm('MULTIPLY', blob(m, corner + Vector((inward * 0.003, 0, 0)), 0.013,
+                                     (1.0, 1.0, 1.3)), front)
+        base = m.mix(base, m.mix(spec['flush'], '#d06a64', 0.5), mm('MULTIPLY', spread, 0.3))
+        base = m.mix(base, '#b84e4a', mm('MULTIPLY', core, 0.7))
+        rough = mm('SUBTRACT', rough, mm('MULTIPLY', core, 0.3))
+        # Lash line: an even band on both lid margins where the lashes root.
+        d = ellipse(m, c + Vector((0, 0, 0.0005)), 0.0148, 0.0068)
+        band = mm('MULTIPLY', mm('SUBTRACT', 1.0, mm('DIVIDE', mm('ABSOLUTE', mm('SUBTRACT', d, 1.0)),
+                                                    0.2), clamp=True), front)
+        base = m.mix(base, m.mix(spec['skin2'], '#3a2620', 0.55), mm('MULTIPLY', band, 0.45))
+        # Tear line: the wet meniscus along the lower lid margin, thicker at the bottom: a pink,
+        # mirror-smooth strip that catches a thin bright line of light.
+        lower = mm('DIVIDE', mm('SUBTRACT', c.z - 0.001, pos.outputs['Z']), 0.002, clamp=True)
+        tear_d = ellipse(m, c + Vector((0, 0, 0.0005)), 0.0142, 0.0062)
+        tear = mm('MULTIPLY', mm('MULTIPLY', mm('SUBTRACT', 1.0, mm('DIVIDE', mm(
+            'ABSOLUTE', mm('SUBTRACT', tear_d, 0.97)), 0.07), clamp=True), lower), front)
+        base = m.mix(base, '#e2a49c', mm('MULTIPLY', tear, 0.45))
+        rough = mm('SUBTRACT', rough, mm('MULTIPLY', tear, 0.45))
+        # Brow: hair-coloured skin and fine roots under the eyebrow cards, so the brow reads full
+        # and dense (thicker on men; a medieval man never plucked).
+        outer = -inward
+        brow_c = c + Vector((outer * 0.004, -0.008, 0.018))
+        brow_d = ellipse(m, brow_c, 0.023, 0.0055)
+        tilt = mm('DIVIDE', mm('SUBTRACT', pos.outputs['X'], brow_c.x), 0.023 * outer)
+        arch = mm('SUBTRACT', 1.0, mm('MULTIPLY', mm('MAXIMUM', tilt, 0.0), 0.5))
+        brow = mm('MULTIPLY', mm('MULTIPLY', mm('SUBTRACT', 1.0, brow_d, clamp=True), arch), front)
+        roots = m.ramp(m.voronoi(2200, 'F1'), [(0.0, 1.0), (0.4, 0.0)])
+        bcol = m.mix(spec['hair_color'], spec['skin2'], 0.35)
+        base = m.mix(base, bcol, mm('MULTIPLY', brow, 0.55 * spec.get('brow', 0.4)))
+        base = m.mix(base, spec['hair_color'], mm('MULTIPLY', mm('MULTIPLY', brow, roots),
+                                                  0.8 * spec.get('brow', 0.4)))
+        # Upper-lid fold: a soft darker crease above the lid, sunken a little.
+        dz = mm('SUBTRACT', pos.outputs['Z'], c.z + 0.002)
+        upper = mm('DIVIDE', dz, 0.003, clamp=True)
+        fold_d = ellipse(m, c + Vector((inward * -0.001, 0, 0.002)), 0.0175, 0.0115)
+        fold = mm('MULTIPLY', mm('MULTIPLY', mm('SUBTRACT', 1.0, mm('DIVIDE', mm(
+            'ABSOLUTE', mm('SUBTRACT', fold_d, 1.0)), 0.13), clamp=True), upper), front)
+        base = m.mix(base, m.mix(spec['skin2'], '#5a3a40', 0.3), mm('MULTIPLY', fold, 0.35))
+        height = mm('SUBTRACT', height, mm('MULTIPLY', fold, 0.7))
+    return base, height, rough
+
+
 def porosity(m, j, lips):
     """0 (smooth: eyelids, under the eyes, lips) .. 1 (the nose): how open and deep the pores are.
     The body sits at 0.4; nose, inner cheeks, forehead and chin rise; temples, jaw sides and the
@@ -767,6 +994,7 @@ def skin_material(spec, j):
     height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.15),
                                                m.math('MULTIPLY', parting, 0.5)))
     base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush, lips)
+    base, height, rough = eye_area(m, spec, j, base, height, rough)
     # Scalp under the hair: hair-coloured skin, dense roots, a hairline broken up by noise.
     scalp = N(m.nt, 'Attribute', attribute_name='scalp').outputs['Fac']
     edge = m.ramp(m.noise(70, 3, 0.6), [(0.3, 0.0), (0.7, 1.0)])
@@ -791,6 +1019,17 @@ def skin_material(spec, j):
         base = m.mix(base, m.mix(spec['hair_color'], spec['skin2'], 0.35),
                      m.math('MULTIPLY', m.math('MULTIPLY', fur, strands), 0.35))
         height = m.math('ADD', height, m.math('MULTIPLY', m.math('MULTIPLY', fur, strands), 0.12))
+    # Lips have their own surface (see the skill, "Lips (study)"): no pores and none of the skin's
+    # crossing lines; vertical furrows perpendicular to the parting, closer and deeper near it and
+    # fading at the vermilion border, branching here and there; smooth, wet ridges between them;
+    # small drier patches, most on the lower lip.
+    lip_h, lip_col, lip_rough = lip_surface(m, j, spec)
+    keep = m.math('SUBTRACT', 1.0, lips)
+    height = m.math('ADD', m.math('MULTIPLY', height, keep), m.math('MULTIPLY', lip_h, lips))
+    base = m.mix(base, lip_col, lips)
+    rough = m.math('ADD', m.math('MULTIPLY', rough, keep), m.math('MULTIPLY', lip_rough, lips))
+    base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.45))
+    height = m.math('SUBTRACT', height, m.math('MULTIPLY', parting, 0.5))
     m.set(color=base, rough=rough, height=height, bump=0.55, bump_distance=0.0007)
     return m.m
 
@@ -1171,7 +1410,12 @@ def build(model_id):
             name = model_id + '_boots'
         else:
             mat = mh_material(mat_path, kind.lower()) if mat_path else None
-        parts.append((kind, freeze(obj, name, mat)))
+        frozen = freeze(obj, name, mat)
+        if kind == 'Eyes':
+            ball, cornea = split_eyes(frozen, spec, model_id)
+            parts += [('Eyes', ball), ('Cornea', cornea)]
+            continue
+        parts.append((kind, frozen))
     arm = (j['elL'] - j['shL']).normalized()
     rest = math.acos(max(-1, min(1, arm.dot(Vector((0, 0, -1))))))
     human.REST_DOWN = rest - 0.06
@@ -1200,8 +1444,18 @@ def build(model_id):
     return rig, body, clothes, rigid
 
 
-def bake_all(model_id, body, clothes):
+def bake_all(model_id, body, clothes, rigid=()):
     bake_atlas(body, 4096, name=model_id + '_skin', do_unwrap=False, ao_samples=16)
+    # The eyes bake under their lids (the lids' occlusion is the shadow on the top of the eyeball);
+    # the clear cornea is hidden meanwhile so it does not occlude the eyeball it covers.
+    corneas = [o for o in rigid if o.name.endswith('_cornea')]
+    for o in corneas:
+        o.hide_render = True
+    for o in rigid:
+        if o.name.endswith('_eyes'):
+            bake_atlas(o, 1024, name=model_id + '_eyes', do_unwrap=False, ao_samples=16)
+    for o in corneas:
+        o.hide_render = False
     for c in clothes:
         if c.name.endswith('_outfit') or c.name.endswith('_boots'):
             bake_atlas(c, 2048, name=model_id + '_outfit', do_unwrap=False, ao_samples=8)
@@ -1280,7 +1534,7 @@ def main(argv):
     os.makedirs(shots, exist_ok=True)
     for model_id in ids:
         rig, body, clothes, rigid = build(model_id)
-        bake_all(model_id, body, clothes)
+        bake_all(model_id, body, clothes, rigid)
         rig.obj.name = model_id + '-rig'
         core.export(os.path.join(out, 'real-' + model_id + '.glb'))
         eye = None
