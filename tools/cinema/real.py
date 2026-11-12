@@ -704,7 +704,7 @@ def skin_material(spec, j):
         tone = m.ramp(pick.outputs[1], [(0.0, '#4a2a1c'), (1.0, '#8a5a3c')])
         base = m.mix(base, tone, m.math('MULTIPLY', spot, amount))
     # The lip colour is richer at the centre and fades a touch into the skin at the corners.
-    base = m.mix(base, spec['lips'], m.math('MULTIPLY', lips, 0.72))
+    base = m.mix(base, spec['lips'], m.math('MULTIPLY', lips, 0.88))
     base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.45))
     base = m.mix(base, spec['skin2'], m.math('MULTIPLY', crease, 0.15))
     if spec['stubble']:
@@ -712,11 +712,11 @@ def skin_material(spec, j):
         # cheeks, a grey-blue shadow of hair under the skin and short dark hairs on top.
         patch = m.ramp(m.noise(28, 3, 0.6, 0.6), [(0.35, 0.45), (0.65, 1.0)])
         grow = m.math('MULTIPLY', stubble, patch)
-        base = m.mix(base, m.mix(spec['skin2'], '#4a5058', 0.45), m.math('MULTIPLY', grow, 0.22))
-        hairs = m.ramp(m.voronoi(3600, 'F1'), [(0.0, 1.0), (0.22, 0.0)])
-        fine = m.ramp(m.voronoi(6000, 'F1'), [(0.0, 1.0), (0.18, 0.0)])
+        base = m.mix(base, m.mix(spec['skin2'], '#4a5058', 0.5), m.math('MULTIPLY', grow, 0.42))
+        hairs = m.ramp(m.voronoi(1800, 'F1'), [(0.0, 1.0), (0.4, 0.0)])
+        fine = m.ramp(m.voronoi(3400, 'F1'), [(0.0, 1.0), (0.35, 0.0)])
         dots = m.math('MULTIPLY', grow, m.math('MAXIMUM', hairs, m.math('MULTIPLY', fine, 0.7)))
-        base = m.mix(base, m.mix(spec['hair_color'], '#1a1410', 0.4), m.math('MULTIPLY', dots, 0.45))
+        base = m.mix(base, m.mix(spec['hair_color'], '#1a1410', 0.4), m.math('MULTIPLY', dots, 0.6))
         height = m.math('ADD', height, m.math('MULTIPLY', dots, 0.2))
     base = m.mix(base, spec['skin2'], m.math('MULTIPLY', pores, 0.3))
     rough = m.math('ADD', m.math('ADD', 0.5, m.math('MULTIPLY', pores, 0.12)),

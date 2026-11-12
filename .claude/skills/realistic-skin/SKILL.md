@@ -235,8 +235,13 @@ python3 tools/cinema/real.py /tmp/chars/out /tmp/chars/shots tomas amara mei > /
 - Measure the colour like a painter: `python3 tools/cinema/skin_check.py shots/<id>-portrait.jpg
   /tmp/<id>-skin.png` posterizes the face skin into 10 colours and prints its hue families, the
   warmth of light vs shadow skin and the hue spread. The flat, plastic baseline measured 95% one hue
-  family with a 3.6° spread; aim for clearly several families, a spread of 8° or more, and lights
-  warmer than shadows.
+  family with a 3.6° spread; the layered version 4.0° with visibly more warm/cool zones in the
+  posterized panel. Hue spread alone under-reads multiply tints (they shift value and saturation
+  more than hue): judge the posterized panel (several distinct zones: golden forehead, red cheeks
+  and ears, cooler jaw) and the light-vs-shadow saturation, compare before/after, and always look.
+- Lip colour ×0.72 read as no lips at all after moving them onto the parting; ×0.88 is the floor.
+  Stubble with hair dots at 3600/6000 cells per metre is sub-pixel at portrait distance and vanishes:
+  use 1800/3400 and a shadow of ×0.4.
 - Look at `/tmp/chars/shots/<id>-portrait.jpg` and `-full.jpg` yourself before sending them:
   lips outline crisp; forehead warmer and lower face cooler than the cheeks; veins only faintly
   visible at temples and wrists; no single flat hue across the cheek; moles and blemishes
