@@ -46,11 +46,11 @@ CAST = {
     'mei': dict(
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
-        skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#b0565c', iris='#2a1a12',
+        skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#a35a58', iris='#2a1a12',
         freckles=0.05, stubble=0.0, hair='long', hair_color='#0e0b0b',
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
-                    clothes=['female_casualsuit02', 'shoes06'])),
+                    clothes=['female_casualsuit01', 'shoes06'])),
 }
 
 
@@ -297,9 +297,9 @@ def paint_masks(body, j, spec):
                                        / 0.06))
         flush = min(1.0, (0.8 * cheek + 0.3 * nose_flush + 0.5 * ear) * face_front +
                     0.4 * knuckle + 0.5 * ear)
-        lips = max(0.0, 1 - (Vector((p.x * 0.5, 0, (p.z - j['mouth'].z) * 1.25))).length / 0.02) * (
+        lips = max(0.0, 1 - (Vector((p.x * 0.85, 0, (p.z - j['mouth'].z) * 2.1))).length / 0.02) * (
             1.0 if p.y < j['mouth'].y - 0.004 else 0.0)
-        lips = min(1.0, lips ** 0.6 * 1.4)
+        lips = min(1.0, lips * 2.5) * 0.85
         jaw = (p.z < mouth.z + 0.012 and p.z > mouth.z - 0.075 and p.y < eye.y + 0.075 and
                (p - mouth).length < 0.095)
         upper_lip = (abs(p.z - mouth.z - 0.016) < 0.012 and abs(p.x) < 0.03 and face_front > 0.3)
