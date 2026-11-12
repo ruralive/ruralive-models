@@ -1043,6 +1043,8 @@ def animate(rig, s, k):
         rig.clip('Moonwalk', 2.4, moonwalk)
         rig.clip('Reach', 6.0, reach)
         rig.clip('Tumble', 10.0, tumble)
+    if s.get('more_clips'):
+        s['more_clips'](rig, k, idle)
     rig.clip('Walk in Place', 1.05 * heavy ** 0.5, walk)
     rig.clip('Run in Place', 0.68, run)
     rig.clip('Idle', 4.0, idle)

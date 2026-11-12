@@ -1,6 +1,6 @@
 # Farm and worksite
 
-28 original stylized models under [CC0 1.0](../../LICENSE). Meshes, textures, rigs where applicable, and animation clips are embedded in each GLB. See the [manifest](manifest.json) for the full file and clip list.
+28 original stylized models under the [Ruralive Models Licence](../../LICENSE). Meshes, textures, rigs where applicable, and animation clips are embedded in each GLB. See the [manifest](manifest.json) for the full file and clip list.
 
 - **Construction:** tower crane, dump truck, forklift, road roller, bulldozer and wheel loader. Actions include hook lowering, bed tipping, fork lifting, rolling and bucket dumping.
 - **Farm and storage:** tractor, farmyard barn with opening doors, cow, pig, sheep, goat, hen, duck, goose, two crates and a coin-filled treasure chest.

@@ -1,6 +1,6 @@
 # Motion props
 
-Twelve original, stylized CC0 props. Each GLB contains textured geometry and a named animation. The cycles run from four to twelve seconds at their authored playback speed.
+Twelve original, stylized props. Each GLB contains textured geometry and a named animation. The cycles run from four to twelve seconds at their authored playback speed.
 
 | Prop | Action |
 | --- | --- |
@@ -17,7 +17,7 @@ Twelve original, stylized CC0 props. Each GLB contains textured geometry and a n
 | Umbrella | Ribs unfold, hold and fold around the shaft |
 | Fairground carousel | The platform turns while its horses rise and fall at staggered phases |
 
-[File manifest](manifest.json) · [CC0 license](../../LICENSE)
+[File manifest](manifest.json) · [Licence](../../LICENSE)
 
 Rebuild with Python, NumPy and Pillow from the repository root.
 

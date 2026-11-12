@@ -89,6 +89,17 @@ CAST = {
                                     shoe_color='#2a2b2e', accent='#f4f1ea',
                                     visor_color='#d9dde2', hard_color='#ece9e2',
                                     suit_kind='orange'),
+    # more suits, each its own design
+    'z2-spacesuit': dict(height=1.8, eva=True, top_color='#8d949c', shoe_color='#2a2d33',
+                         accent='#35ffd0', visor_color='#7fe9ff', hard_color='#3a3f47'),
+    'mark-3-spacesuit': dict(height=1.84, eva=True, top_color='#ecebe6', shoe_color='#d9d7d0',
+                             accent='#2f5fd0', visor_color='#f2b545', girth=1.15,
+                             shoulders=1.1),
+    'gemini-spacesuit': dict(height=1.76, eva=True, top_color='#f0efe9', shoe_color='#1d1f24',
+                             accent='#1d1f24', visor_color='#e9eef2', girth=0.9),
+    'mercury-spacesuit': dict(height=1.74, eva=True, top_color='#c4c9cf', shoe_color='#22252a',
+                              accent='#c4c9cf', visor_color='#dfe6ec', hard_color='#d9dde1',
+                              girth=0.88, suit_kind='silver'),
     # Story Worlds cast
     'lyra': dict(height=1.7, shoulders=0.9, hips=1.0, girth=0.86, bust=0.75, skin='#b98562',
                  hair='ponytail', hair_color='#101018', top='suit', top_color='#d9dde2',
@@ -131,7 +142,8 @@ def _materials(spec):
     s = dict(spec)
     kind = s.pop('top_mat_kind', None)
     if s.get('eva'):
-        s['top_mat'] = M.cloth(s['top_color'], 'top', 150, 0.8, 0.5)
+        s['top_mat'] = M.foil(s['top_color'], 'top', 0.35) if s.get('suit_kind') == 'silver' \
+            else M.cloth(s['top_color'], 'top', 150, 0.8, 0.5)
         s['shoes_mat'] = M.cloth(s['shoe_color'], 'shoes', 120, 0.85, 0.5)
         s['glove_mat'] = M.cloth(s['shoe_color'], 'gloves', 200, 0.8, 0.4)
         return s

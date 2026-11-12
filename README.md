@@ -1,43 +1,33 @@
 # Ruralive models
 
-Free 3D models for the Realistic 3D Model node in Ruralive Set Film. The app downloads each file once to the viewer's browser the first time it is used.
+Original 3D models for Ruralive Set Film: a cast that can act, creatures, spacecraft, places
+and props, all animated. The app downloads each file once to the viewer's browser the first
+time it is used.
 
-The sourced models below are packed into single `.glb` files at 1K texture resolution. [`CREDITS.md`](CREDITS.md) lists every model with its authors, licence and source, and [`models.json`](models.json) holds the same data for the app.
+Every model here was made for Ruralive, by Ruralive and with AI tools working to its direction,
+from the scripts in [`tools/`](tools/). Nothing is scanned, downloaded or adapted from another
+source.
 
-## Rigged versions
+## What is here
 
-The [rigged/](rigged/) folder contains self-contained animated GLBs. See [the animation guide](animations/README.md) for the rig types, clips and tests.
+| Folder | Models |
+|---|---|
+| [`cinema/`](cinema/) | The cinema set: people, astronauts, animals, creatures and monsters, spacecraft, trees, plants and rocks. Baked PBR textures, one rig per model and a library of clips. See its [README](cinema/README.md) and [manifest](cinema/manifest.json) |
+| [`rigged/expansion/`](rigged/expansion/) | 37 stylised animated models: vehicles, people, animals, plants, planets and landscapes |
+| [`rigged/farm-and-worksite/`](rigged/farm-and-worksite/) | Construction equipment, farm animals, crates and rigged characters |
+| [`rigged/motion-props/`](rigged/motion-props/) | Twelve props with articulated loops, such as a drawbridge, a locomotive and a carousel |
+| [`rigged/places/`](rigged/places/) | Islands, birds, house sections and a stone well |
+| [`rigged/story-worlds/`](rigged/story-worlds/) | Sets, props and cast for *The Echo of Vael* and *The Margin of Mira* |
 
-## Original animated expansion
+## Provenance
 
-Browse the [37 CC0 animated models](rigged/expansion/) and their [manifest](rigged/expansion/manifest.json). Each file embeds its textures and animation.
-
-Browse the [islands, flying birds, furnished house sections and stone well](rigged/places/) in the CC0 [places manifest](rigged/places/manifest.json). The house sections are separate models with an open front and furnished rooms.
-
-Browse the [motion props](rigged/motion-props/) for twelve CC0 models with articulated loops, including a drawbridge, excavator, locomotive and carousel.
-
-Browse the [farm and worksite collection](rigged/farm-and-worksite/) for construction equipment, farm animals, storage props and rigged characters with multiple animation clips.
-
-## Sources
-
-| Source | Models | Licence |
-|---|---|---|
-| [Poly Haven](https://polyhaven.com/models) | Trees, plants, grass, rocks, ground cover, street rat | [CC0 1.0](https://polyhaven.com/license) |
-| [NASA 3D Resources](https://github.com/nasa/NASA-3D-Resources) | Astronaut, spacesuits, rovers, spacecraft, telescopes, Mission Control | No copyright, under [NASA's media usage guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/) |
-| [Khronos glTF Sample Assets](https://github.com/KhronosGroup/glTF-Sample-Assets) | Barramundi Fish | CC0 1.0 |
-| [Quaternius Animated Animal Pack](https://poly.pizza/bundle/Animated-Animal-Pack-ILAPXeUYiS) | Deer, stag, horses, donkey, cow, bull, alpaca, fox, wolf, husky, Shiba Inu | CC0 1.0 |
-| [Quaternius Universal Animation Library Standard](https://opengameart.org/content/universal-animation-library) | Humanoid Idle, Walk and Dance motion on the rigged astronaut and spacesuits | CC0 1.0 |
-
-Thanks to Poly Haven, Quaternius and their artists. CC0 does not require credit, but we give it anyway.
+Earlier revisions of this repository also carried models from Poly Haven, NASA 3D Resources,
+the Khronos glTF sample assets and Quaternius. They have been removed, together with the
+scripts that fetched them, and each has an original replacement in `cinema/` under the same
+file name. The removed files remain in the git history of those earlier revisions under their
+own terms.
 
 ## Licence
 
-The Poly Haven and Khronos models, the Quaternius motion and the build scripts are under [CC0 1.0](LICENSE). Only CC0 models are accepted from those sources, so they require no credit.
-
-**NASA models, including their rigged versions, are not under that licence.** NASA describes them as free and without copyright, and they come with its own conditions: use must not suggest that NASA endorses a product or film, and NASA's names, logos and insignia, some of which may appear on the models, have their own rules. Read [NASA's guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/) before commercial use.
-
-These files come with no warranty and grant no trademark rights. If you use these models, check the original source for its current terms.
-
-## Updating
-
-Edit the lists in `tools/build_models.py` and push to `main`. The **Build models** workflow downloads the models again and commits the results.
+All rights reserved; see the [Ruralive Models Licence](LICENSE). The models are for Ruralive's
+own applications and may not be reused elsewhere without written permission.

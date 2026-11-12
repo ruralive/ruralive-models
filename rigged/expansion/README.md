@@ -1,6 +1,6 @@
 # Animated model expansion
 
-37 original, stylized 3D assets for general scenes, released under [CC0 1.0](../../LICENSE). The [manifest](manifest.json) lists each file, its default animation and its size.
+37 original, stylized 3D assets for general scenes, under the [Ruralive Models Licence](../../LICENSE). The [manifest](manifest.json) lists each file, its default animation and its size.
 
 | Category | Models |
 | --- | --- |

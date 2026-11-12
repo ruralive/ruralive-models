@@ -1,4 +1,4 @@
-"""Original CC0 props with articulated, closed animation cycles."""
+"""Original props with articulated, closed animation cycles."""
 import json
 import math
 from pathlib import Path
@@ -304,7 +304,7 @@ def main():
         entries.append({"file":file,"bytes":(out/file).stat().st_size,
                         "animation":model.g["animations"][0]["name"]})
     (out/"manifest.json").write_text(json.dumps(
-        {"license":"CC0-1.0","models":entries},indent=2)+"\n")
+        {"license":"LicenseRef-Ruralive-Models-1.0","models":entries},indent=2)+"\n")
 
 
 if __name__=="__main__":

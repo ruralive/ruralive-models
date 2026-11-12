@@ -12,7 +12,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import core  # noqa: E402
 
-MODULES = ['people', 'creatures', 'monsters', 'nature', 'worlds', 'vehicles', 'machines', 'props', 'places',
+MODULES = ['people', 'creatures', 'monsters', 'melt', 'shards', 'space', 'nature', 'nature', 'worlds', 'vehicles', 'machines', 'props', 'places',
            'story', 'studio']
 
 

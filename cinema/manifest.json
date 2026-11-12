@@ -1,5 +1,5 @@
 {
- "license": "CC0-1.0",
+ "license": "LicenseRef-Ruralive-Models-1.0",
  "generator": "tools/cinema",
  "models": [
   {
@@ -22,6 +22,321 @@
    "animation": "Hover"
   },
   {
+   "file": "animal-alpaca.glb",
+   "bytes": 2028952,
+   "id": "animal-alpaca",
+   "set": "creatures",
+   "triangles": 132356,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Idle",
+    "Forage",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Idle": 5,
+    "Forage": 4.5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-bull.glb",
+   "bytes": 1798152,
+   "id": "animal-bull",
+   "set": "creatures",
+   "triangles": 117804,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Forage",
+    "Idle",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Forage": 4.5,
+    "Idle": 5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-cow.glb",
+   "bytes": 1927316,
+   "id": "animal-cow",
+   "set": "creatures",
+   "triangles": 121040,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Forage",
+    "Idle",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Forage": 4.5,
+    "Idle": 5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-deer.glb",
+   "bytes": 1593184,
+   "id": "animal-deer",
+   "set": "creatures",
+   "triangles": 75844,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Gallop",
+    "Idle",
+    "Forage",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-donkey.glb",
+   "bytes": 1580796,
+   "id": "animal-donkey",
+   "set": "creatures",
+   "triangles": 98960,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-fox.glb",
+   "bytes": 1594928,
+   "id": "animal-fox",
+   "set": "creatures",
+   "triangles": 53680,
+   "bones": 26,
+   "animations": [
+    "Trot",
+    "Walk in Place",
+    "Gallop",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Trot": 0.708,
+    "Walk in Place": 1.25,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Trot"
+  },
+  {
+   "file": "animal-horse.glb",
+   "bytes": 1478252,
+   "id": "animal-horse",
+   "set": "creatures",
+   "triangles": 98152,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Gallop",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-husky.glb",
+   "bytes": 1606152,
+   "id": "animal-husky",
+   "set": "creatures",
+   "triangles": 89540,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Gallop",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-shiba-inu.glb",
+   "bytes": 1368800,
+   "id": "animal-shiba-inu",
+   "set": "creatures",
+   "triangles": 56240,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Gallop",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-stag.glb",
+   "bytes": 1528700,
+   "id": "animal-stag",
+   "set": "creatures",
+   "triangles": 79632,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Gallop",
+    "Idle",
+    "Forage",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "animal-white-horse.glb",
+   "bytes": 1688344,
+   "id": "animal-white-horse",
+   "set": "creatures",
+   "triangles": 98152,
+   "bones": 26,
+   "animations": [
+    "Gallop",
+    "Walk in Place",
+    "Trot",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Gallop": 0.542,
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Gallop"
+  },
+  {
+   "file": "animal-wolf.glb",
+   "bytes": 1558092,
+   "id": "animal-wolf",
+   "set": "creatures",
+   "triangles": 102460,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Gallop",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "apollo-lunar-module.glb",
+   "bytes": 1522016,
+   "id": "apollo-lunar-module",
+   "set": "space",
+   "triangles": 1512,
+   "bones": 3,
+   "animations": [
+    "Signal Sweep",
+    "Touchdown"
+   ],
+   "seconds": {
+    "Signal Sweep": 10,
+    "Touchdown": 8
+   },
+   "animation": "Signal Sweep"
+  },
+  {
+   "file": "bark-debris-01.glb",
+   "bytes": 730876,
+   "id": "bark-debris-01",
+   "set": "nature",
+   "triangles": 8280,
+   "bones": 1,
+   "animations": [
+    "Turntable"
+   ],
+   "seconds": {
+    "Turntable": 16
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "barramundi-fish.glb",
+   "bytes": 625748,
+   "id": "barramundi-fish",
+   "set": "nature",
+   "triangles": 20720,
+   "bones": 5,
+   "animations": [
+    "Swim"
+   ],
+   "seconds": {
+    "Swim": 1.417
+   },
+   "animation": "Swim"
+  },
+  {
    "file": "bloom-titan.glb",
    "bytes": 2825320,
    "id": "bloom-titan",
@@ -39,6 +354,40 @@
     "Bloom": 8
    },
    "animation": "Sway"
+  },
+  {
+   "file": "boulder-01.glb",
+   "bytes": 556108,
+   "id": "boulder-01",
+   "set": "nature",
+   "triangles": 1280,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "cassini.glb",
+   "bytes": 1119168,
+   "id": "cassini",
+   "set": "space",
+   "triangles": 3912,
+   "bones": 3,
+   "animations": [
+    "Orbital Turn",
+    "Dish Sweep"
+   ],
+   "seconds": {
+    "Orbital Turn": 24,
+    "Dish Sweep": 8
+   },
+   "animation": "Orbital Turn"
   },
   {
    "file": "caveman.glb",
@@ -165,6 +514,29 @@
     "Float": 8
    },
    "animation": "Walk in Place"
+  },
+  {
+   "file": "chestnut-horse.glb",
+   "bytes": 1497072,
+   "id": "chestnut-horse",
+   "set": "creatures",
+   "triangles": 98152,
+   "bones": 26,
+   "animations": [
+    "Trot",
+    "Walk in Place",
+    "Gallop",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Trot": 0.708,
+    "Walk in Place": 1.25,
+    "Gallop": 0.542,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Trot"
   },
   {
    "file": "cinema-astronaut-black.glb",
@@ -374,6 +746,44 @@
    "animation": "Float"
   },
   {
+   "file": "coastal-cliff-01.glb",
+   "bytes": 2229788,
+   "id": "coastal-cliff-01",
+   "set": "nature",
+   "triangles": 12600,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "crested-dinosaur.glb",
+   "bytes": 2780276,
+   "id": "crested-dinosaur",
+   "set": "creatures",
+   "triangles": 135332,
+   "bones": 26,
+   "animations": [
+    "Trot",
+    "Walk in Place",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Trot": 1.083,
+    "Walk in Place": 1.875,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Trot"
+  },
+  {
    "file": "crystal-golem.glb",
    "bytes": 1362532,
    "id": "crystal-golem",
@@ -391,6 +801,244 @@
     "Awaken": 7
    },
    "animation": "Idle"
+  },
+  {
+   "file": "dandelion-01.glb",
+   "bytes": 410508,
+   "id": "dandelion-01",
+   "set": "nature",
+   "triangles": 920,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "dead-tree-trunk.glb",
+   "bytes": 458548,
+   "id": "dead-tree-trunk",
+   "set": "nature",
+   "triangles": 872,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "farm-cow.glb",
+   "bytes": 1898336,
+   "id": "farm-cow",
+   "set": "creatures",
+   "triangles": 121196,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Forage",
+    "Idle",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Forage": 4.5,
+    "Idle": 5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "farm-goat.glb",
+   "bytes": 1474660,
+   "id": "farm-goat",
+   "set": "creatures",
+   "triangles": 84304,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Forage",
+    "Idle",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Forage": 4.5,
+    "Idle": 5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "farm-pig.glb",
+   "bytes": 1175176,
+   "id": "farm-pig",
+   "set": "creatures",
+   "triangles": 167118,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Forage",
+    "Idle",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Forage": 4.5,
+    "Idle": 5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "farm-sheep.glb",
+   "bytes": 2285484,
+   "id": "farm-sheep",
+   "set": "creatures",
+   "triangles": 156704,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Forage",
+    "Idle",
+    "Trot"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Forage": 4.5,
+    "Idle": 5,
+    "Trot": 0.708
+   },
+   "animation": "Walk in Place"
+  },
+  {
+   "file": "fern-02.glb",
+   "bytes": 581144,
+   "id": "fern-02",
+   "set": "nature",
+   "triangles": 5852,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "fir-tree-01.glb",
+   "bytes": 1212908,
+   "id": "fir-tree-01",
+   "set": "nature",
+   "triangles": 1912,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "flower-gazania.glb",
+   "bytes": 406800,
+   "id": "flower-gazania",
+   "set": "nature",
+   "triangles": 1536,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "gemini-spacesuit.glb",
+   "bytes": 2086064,
+   "id": "gemini-spacesuit",
+   "set": "people",
+   "triangles": 91652,
+   "bones": 53,
+   "animations": [
+    "Float",
+    "Moonwalk",
+    "Reach",
+    "Tumble",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver"
+   ],
+   "seconds": {
+    "Float": 8,
+    "Moonwalk": 2.417,
+    "Reach": 6,
+    "Tumble": 10,
+    "Walk in Place": 1,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2
+   },
+   "animation": "Float"
   },
   {
    "file": "glow-sprite.glb",
@@ -414,6 +1062,57 @@
    "animation": "Bob"
   },
   {
+   "file": "grass-bermuda-01.glb",
+   "bytes": 620812,
+   "id": "grass-bermuda-01",
+   "set": "nature",
+   "triangles": 5760,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "grass-medium-01.glb",
+   "bytes": 552688,
+   "id": "grass-medium-01",
+   "set": "nature",
+   "triangles": 3240,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "grass-medium-02.glb",
+   "bytes": 538140,
+   "id": "grass-medium-02",
+   "set": "nature",
+   "triangles": 2712,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
    "file": "hive-crawler.glb",
    "bytes": 2199776,
    "id": "hive-crawler",
@@ -431,6 +1130,23 @@
     "Rear Up": 4
    },
    "animation": "Crawl"
+  },
+  {
+   "file": "hubble.glb",
+   "bytes": 2332932,
+   "id": "hubble",
+   "set": "space",
+   "triangles": 2700,
+   "bones": 4,
+   "animations": [
+    "Orbital Turn",
+    "Scan the Sky"
+   ],
+   "seconds": {
+    "Orbital Turn": 30,
+    "Scan the Sky": 12
+   },
+   "animation": "Orbital Turn"
   },
   {
    "file": "humanoid-bear.glb",
@@ -685,6 +1401,38 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "ingenuity-helicopter.glb",
+   "bytes": 642544,
+   "id": "ingenuity-helicopter",
+   "set": "space",
+   "triangles": 1636,
+   "bones": 3,
+   "animations": [
+    "Rotor Hover"
+   ],
+   "seconds": {
+    "Rotor Hover": 3
+   },
+   "animation": "Rotor Hover"
+  },
+  {
+   "file": "island-tree-01.glb",
+   "bytes": 1574164,
+   "id": "island-tree-01",
+   "set": "nature",
+   "triangles": 3264,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
+  },
+  {
    "file": "ismael.glb",
    "bytes": 2654728,
    "id": "ismael",
@@ -746,6 +1494,40 @@
     "Float": 8
    },
    "animation": "Walk in Place"
+  },
+  {
+   "file": "jacaranda-tree.glb",
+   "bytes": 1825812,
+   "id": "jacaranda-tree",
+   "set": "nature",
+   "triangles": 5736,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "james-webb.glb",
+   "bytes": 1837560,
+   "id": "james-webb",
+   "set": "space",
+   "triangles": 1280,
+   "bones": 4,
+   "animations": [
+    "Orbital Turn",
+    "Scan the Sky"
+   ],
+   "seconds": {
+    "Orbital Turn": 30,
+    "Scan the Sky": 12
+   },
+   "animation": "Orbital Turn"
   },
   {
    "file": "lyra.glb",
@@ -937,6 +1719,75 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "mark-3-spacesuit.glb",
+   "bytes": 2115812,
+   "id": "mark-3-spacesuit",
+   "set": "people",
+   "triangles": 95364,
+   "bones": 53,
+   "animations": [
+    "Float",
+    "Moonwalk",
+    "Reach",
+    "Tumble",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver"
+   ],
+   "seconds": {
+    "Float": 8,
+    "Moonwalk": 2.417,
+    "Reach": 6,
+    "Tumble": 10,
+    "Walk in Place": 1.125,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2
+   },
+   "animation": "Float"
+  },
+  {
    "file": "maw-worm.glb",
    "bytes": 2878404,
    "id": "maw-worm",
@@ -956,6 +1807,501 @@
     "Strike": 2.417
    },
    "animation": "Sway"
+  },
+  {
+   "file": "melting-candy.glb",
+   "bytes": 2842100,
+   "id": "melting-candy",
+   "set": "melt",
+   "triangles": 118260,
+   "bones": 53,
+   "animations": [
+    "Wobble",
+    "Hands Over Head",
+    "Melt",
+    "Stagger",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver",
+    "Float"
+   ],
+   "seconds": {
+    "Wobble": 4,
+    "Hands Over Head": 5,
+    "Melt": 7,
+    "Stagger": 0.917,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2,
+    "Float": 8
+   },
+   "animation": "Wobble"
+  },
+  {
+   "file": "melting-dancer.glb",
+   "bytes": 2723512,
+   "id": "melting-dancer",
+   "set": "melt",
+   "triangles": 112996,
+   "bones": 53,
+   "animations": [
+    "Wobble",
+    "Hands Over Head",
+    "Melt",
+    "Stagger",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver",
+    "Float"
+   ],
+   "seconds": {
+    "Wobble": 4,
+    "Hands Over Head": 5,
+    "Melt": 7,
+    "Stagger": 0.917,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2,
+    "Float": 8
+   },
+   "animation": "Wobble"
+  },
+  {
+   "file": "melting-ember.glb",
+   "bytes": 3045816,
+   "id": "melting-ember",
+   "set": "melt",
+   "triangles": 114304,
+   "bones": 53,
+   "animations": [
+    "Wobble",
+    "Hands Over Head",
+    "Melt",
+    "Stagger",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver",
+    "Float"
+   ],
+   "seconds": {
+    "Wobble": 4,
+    "Hands Over Head": 5,
+    "Melt": 7,
+    "Stagger": 0.917,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2,
+    "Float": 8
+   },
+   "animation": "Wobble"
+  },
+  {
+   "file": "melting-ghost.glb",
+   "bytes": 2613860,
+   "id": "melting-ghost",
+   "set": "melt",
+   "triangles": 109844,
+   "bones": 53,
+   "animations": [
+    "Wobble",
+    "Hands Over Head",
+    "Melt",
+    "Stagger",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver",
+    "Float"
+   ],
+   "seconds": {
+    "Wobble": 4,
+    "Hands Over Head": 5,
+    "Melt": 7,
+    "Stagger": 0.917,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2,
+    "Float": 8
+   },
+   "animation": "Wobble"
+  },
+  {
+   "file": "melting-grasper.glb",
+   "bytes": 2880260,
+   "id": "melting-grasper",
+   "set": "melt",
+   "triangles": 120396,
+   "bones": 53,
+   "animations": [
+    "Wobble",
+    "Hands Over Head",
+    "Melt",
+    "Stagger",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver",
+    "Float"
+   ],
+   "seconds": {
+    "Wobble": 4,
+    "Hands Over Head": 5,
+    "Melt": 7,
+    "Stagger": 0.917,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2,
+    "Float": 8
+   },
+   "animation": "Wobble"
+  },
+  {
+   "file": "melting-one.glb",
+   "bytes": 2801272,
+   "id": "melting-one",
+   "set": "melt",
+   "triangles": 114180,
+   "bones": 53,
+   "animations": [
+    "Wobble",
+    "Hands Over Head",
+    "Melt",
+    "Stagger",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver",
+    "Float"
+   ],
+   "seconds": {
+    "Wobble": 4,
+    "Hands Over Head": 5,
+    "Melt": 7,
+    "Stagger": 0.917,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2,
+    "Float": 8
+   },
+   "animation": "Wobble"
+  },
+  {
+   "file": "mercury-spacesuit.glb",
+   "bytes": 2574496,
+   "id": "mercury-spacesuit",
+   "set": "people",
+   "triangles": 91428,
+   "bones": 53,
+   "animations": [
+    "Float",
+    "Moonwalk",
+    "Reach",
+    "Tumble",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver"
+   ],
+   "seconds": {
+    "Float": 8,
+    "Moonwalk": 2.417,
+    "Reach": 6,
+    "Tumble": 10,
+    "Walk in Place": 1,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2
+   },
+   "animation": "Float"
   },
   {
    "file": "mira-director-child.glb",
@@ -1084,6 +2430,27 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "mira-studio-cat.glb",
+   "bytes": 1266252,
+   "id": "mira-studio-cat",
+   "set": "creatures",
+   "triangles": 25004,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 1.25,
+    "Trot": 0.708,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
+  },
+  {
    "file": "mira.glb",
    "bytes": 2882504,
    "id": "mira",
@@ -1145,6 +2512,172 @@
     "Float": 8
    },
    "animation": "Walk in Place"
+  },
+  {
+   "file": "mission-control.glb",
+   "bytes": 671172,
+   "id": "mission-control",
+   "set": "space",
+   "triangles": 5136,
+   "bones": 2,
+   "animations": [
+    "Room Details"
+   ],
+   "seconds": {
+    "Room Details": 6
+   },
+   "animation": "Room Details"
+  },
+  {
+   "file": "moon-rock-01.glb",
+   "bytes": 289460,
+   "id": "moon-rock-01",
+   "set": "nature",
+   "triangles": 1280,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "moon-rock-02.glb",
+   "bytes": 350140,
+   "id": "moon-rock-02",
+   "set": "nature",
+   "triangles": 1280,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "moss-01.glb",
+   "bytes": 457316,
+   "id": "moss-01",
+   "set": "nature",
+   "triangles": 2080,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "mountainside.glb",
+   "bytes": 2013940,
+   "id": "mountainside",
+   "set": "nature",
+   "triangles": 28800,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "namaqualand-boulder-02.glb",
+   "bytes": 545588,
+   "id": "namaqualand-boulder-02",
+   "set": "nature",
+   "triangles": 1280,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "nettle-plant.glb",
+   "bytes": 588116,
+   "id": "nettle-plant",
+   "set": "nature",
+   "triangles": 2760,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "perseverance-rover.glb",
+   "bytes": 879444,
+   "id": "perseverance-rover",
+   "set": "space",
+   "triangles": 5616,
+   "bones": 11,
+   "animations": [
+    "Drive",
+    "Survey"
+   ],
+   "seconds": {
+    "Drive": 4,
+    "Survey": 10
+   },
+   "animation": "Drive"
+  },
+  {
+   "file": "pine-roots.glb",
+   "bytes": 600524,
+   "id": "pine-roots",
+   "set": "nature",
+   "triangles": 5856,
+   "bones": 1,
+   "animations": [
+    "Turntable"
+   ],
+   "seconds": {
+    "Turntable": 16
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "pine-tree-01.glb",
+   "bytes": 1331224,
+   "id": "pine-tree-01",
+   "set": "nature",
+   "triangles": 1480,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
   },
   {
    "file": "plus-size-construction-worker.glb",
@@ -1273,6 +2806,23 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "potted-plant-01.glb",
+   "bytes": 428168,
+   "id": "potted-plant-01",
+   "set": "nature",
+   "triangles": 932,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
    "file": "producer-vale.glb",
    "bytes": 2961412,
    "id": "producer-vale",
@@ -1336,6 +2886,91 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "quiver-tree-01.glb",
+   "bytes": 746728,
+   "id": "quiver-tree-01",
+   "set": "nature",
+   "triangles": 2832,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "rock-face-01.glb",
+   "bytes": 2147532,
+   "id": "rock-face-01",
+   "set": "nature",
+   "triangles": 12600,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "rock-moss-set-01.glb",
+   "bytes": 674860,
+   "id": "rock-moss-set-01",
+   "set": "nature",
+   "triangles": 5120,
+   "bones": 1,
+   "animations": [
+    "Turntable",
+    "Tumble"
+   ],
+   "seconds": {
+    "Turntable": 16,
+    "Tumble": 8
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "sand-rocks-small-01.glb",
+   "bytes": 555484,
+   "id": "sand-rocks-small-01",
+   "set": "nature",
+   "triangles": 6368,
+   "bones": 1,
+   "animations": [
+    "Turntable"
+   ],
+   "seconds": {
+    "Turntable": 16
+   },
+   "animation": "Turntable"
+  },
+  {
+   "file": "saturn-v.glb",
+   "bytes": 527304,
+   "id": "saturn-v",
+   "set": "space",
+   "triangles": 4896,
+   "bones": 2,
+   "animations": [
+    "Liftoff",
+    "Engines",
+    "Orbital Turn"
+   ],
+   "seconds": {
+    "Liftoff": 8,
+    "Engines": 2,
+    "Orbital Turn": 30
+   },
+   "animation": "Liftoff"
+  },
+  {
    "file": "shadow-wraith.glb",
    "bytes": 1590296,
    "id": "shadow-wraith",
@@ -1353,6 +2988,79 @@
     "Scream": 3
    },
    "animation": "Hover"
+  },
+  {
+   "file": "shard-head.glb",
+   "bytes": 807464,
+   "id": "shard-head",
+   "set": "shards",
+   "triangles": 1756,
+   "bones": 23,
+   "animations": [
+    "Hover",
+    "Lick",
+    "Shatter",
+    "Chomp",
+    "Laugh"
+   ],
+   "seconds": {
+    "Hover": 5,
+    "Lick": 4,
+    "Shatter": 5,
+    "Chomp": 1.583,
+    "Laugh": 3
+   },
+   "animation": "Hover"
+  },
+  {
+   "file": "shard-serpent.glb",
+   "bytes": 1037484,
+   "id": "shard-serpent",
+   "set": "shards",
+   "triangles": 3192,
+   "bones": 31,
+   "animations": [
+    "Swim",
+    "Hover",
+    "Lick",
+    "Shatter",
+    "Chomp",
+    "Laugh"
+   ],
+   "seconds": {
+    "Swim": 4,
+    "Hover": 5,
+    "Lick": 4,
+    "Shatter": 5,
+    "Chomp": 1.583,
+    "Laugh": 3
+   },
+   "animation": "Swim"
+  },
+  {
+   "file": "shard-walker.glb",
+   "bytes": 898548,
+   "id": "shard-walker",
+   "set": "shards",
+   "triangles": 1796,
+   "bones": 29,
+   "animations": [
+    "Strut",
+    "Idle",
+    "Lick",
+    "Shatter",
+    "Chomp",
+    "Laugh"
+   ],
+   "seconds": {
+    "Strut": 1.208,
+    "Idle": 5,
+    "Lick": 4,
+    "Shatter": 5,
+    "Chomp": 1.583,
+    "Laugh": 3
+   },
+   "animation": "Strut"
   },
   {
    "file": "short-stocky-person.glb",
@@ -1416,6 +3124,40 @@
     "Float": 8
    },
    "animation": "Walk in Place"
+  },
+  {
+   "file": "shrub-01.glb",
+   "bytes": 641248,
+   "id": "shrub-01",
+   "set": "nature",
+   "triangles": 4212,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "shrub-02.glb",
+   "bytes": 637400,
+   "id": "shrub-02",
+   "set": "nature",
+   "triangles": 3492,
+   "bones": 3,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 4,
+    "Gust": 2
+   },
+   "animation": "Wind"
   },
   {
    "file": "sky-leviathan.glb",
@@ -1500,6 +3242,38 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "space-shuttle.glb",
+   "bytes": 765976,
+   "id": "space-shuttle",
+   "set": "space",
+   "triangles": 2528,
+   "bones": 4,
+   "animations": [
+    "Glide",
+    "Open Bay"
+   ],
+   "seconds": {
+    "Glide": 8,
+    "Open Bay": 10
+   },
+   "animation": "Glide"
+  },
+  {
+   "file": "space-station.glb",
+   "bytes": 1393908,
+   "id": "space-station",
+   "set": "space",
+   "triangles": 5948,
+   "bones": 6,
+   "animations": [
+    "Orbital Rotation"
+   ],
+   "seconds": {
+    "Orbital Rotation": 20
+   },
+   "animation": "Orbital Rotation"
+  },
+  {
    "file": "star-jelly.glb",
    "bytes": 1413576,
    "id": "star-jelly",
@@ -1517,6 +3291,27 @@
     "Bloom": 7
    },
    "animation": "Swim"
+  },
+  {
+   "file": "street-rat.glb",
+   "bytes": 1062808,
+   "id": "street-rat",
+   "set": "creatures",
+   "triangles": 7896,
+   "bones": 26,
+   "animations": [
+    "Walk in Place",
+    "Trot",
+    "Idle",
+    "Forage"
+   ],
+   "seconds": {
+    "Walk in Place": 0.625,
+    "Trot": 0.375,
+    "Idle": 5,
+    "Forage": 4.5
+   },
+   "animation": "Walk in Place"
   },
   {
    "file": "tall-athletic-person.glb",
@@ -1834,6 +3629,38 @@
    "animation": "Walk in Place"
   },
   {
+   "file": "tree-small-02.glb",
+   "bytes": 519428,
+   "id": "tree-small-02",
+   "set": "nature",
+   "triangles": 2852,
+   "bones": 4,
+   "animations": [
+    "Wind",
+    "Gust"
+   ],
+   "seconds": {
+    "Wind": 7,
+    "Gust": 3.5
+   },
+   "animation": "Wind"
+  },
+  {
+   "file": "tree-stump-01.glb",
+   "bytes": 684136,
+   "id": "tree-stump-01",
+   "set": "nature",
+   "triangles": 796,
+   "bones": 1,
+   "animations": [
+    "Turntable"
+   ],
+   "seconds": {
+    "Turntable": 12
+   },
+   "animation": "Turntable"
+  },
+  {
    "file": "tripod-colossus.glb",
    "bytes": 1628812,
    "id": "tripod-colossus",
@@ -1851,6 +3678,23 @@
     "Scan": 7
    },
    "animation": "Stride"
+  },
+  {
+   "file": "viking-lander.glb",
+   "bytes": 916432,
+   "id": "viking-lander",
+   "set": "space",
+   "triangles": 1388,
+   "bones": 3,
+   "animations": [
+    "Signal Sweep",
+    "Touchdown"
+   ],
+   "seconds": {
+    "Signal Sweep": 10,
+    "Touchdown": 8
+   },
+   "animation": "Signal Sweep"
   },
   {
    "file": "void-stalker.glb",
@@ -1872,6 +3716,44 @@
     "Screech": 3
    },
    "animation": "Stalk"
+  },
+  {
+   "file": "voyager.glb",
+   "bytes": 562876,
+   "id": "voyager",
+   "set": "space",
+   "triangles": 2152,
+   "bones": 3,
+   "animations": [
+    "Orbital Turn",
+    "Dish Sweep"
+   ],
+   "seconds": {
+    "Orbital Turn": 24,
+    "Dish Sweep": 8
+   },
+   "animation": "Orbital Turn"
+  },
+  {
+   "file": "wild-rabbit.glb",
+   "bytes": 1256356,
+   "id": "wild-rabbit",
+   "set": "creatures",
+   "triangles": 17200,
+   "bones": 26,
+   "animations": [
+    "Hop",
+    "Idle",
+    "Forage",
+    "Walk in Place"
+   ],
+   "seconds": {
+    "Hop": 0.583,
+    "Idle": 5,
+    "Forage": 4.5,
+    "Walk in Place": 1.25
+   },
+   "animation": "Hop"
   },
   {
    "file": "woman-in-dress.glb",
@@ -1998,6 +3880,75 @@
     "Float": 8
    },
    "animation": "Walk in Place"
+  },
+  {
+   "file": "z2-spacesuit.glb",
+   "bytes": 2100876,
+   "id": "z2-spacesuit",
+   "set": "people",
+   "triangles": 92940,
+   "bones": 53,
+   "animations": [
+    "Float",
+    "Moonwalk",
+    "Reach",
+    "Tumble",
+    "Walk in Place",
+    "Run in Place",
+    "Idle",
+    "Wave",
+    "Dance",
+    "Jump",
+    "Squat",
+    "Talk",
+    "Clap",
+    "Cheer",
+    "Look Around",
+    "Point",
+    "Sit",
+    "Look Up",
+    "Sad",
+    "Cry",
+    "Surprise",
+    "Love",
+    "Terror",
+    "Angry",
+    "Laugh",
+    "Embrace",
+    "Kneel",
+    "Shiver"
+   ],
+   "seconds": {
+    "Float": 8,
+    "Moonwalk": 2.417,
+    "Reach": 6,
+    "Tumble": 10,
+    "Walk in Place": 1.042,
+    "Run in Place": 0.667,
+    "Idle": 4,
+    "Wave": 2.792,
+    "Dance": 1.917,
+    "Jump": 1.583,
+    "Squat": 2.583,
+    "Talk": 4,
+    "Clap": 2,
+    "Cheer": 1.208,
+    "Look Around": 5,
+    "Point": 3,
+    "Sit": 4,
+    "Look Up": 5,
+    "Sad": 6,
+    "Cry": 4,
+    "Surprise": 3,
+    "Love": 4,
+    "Terror": 4,
+    "Angry": 2,
+    "Laugh": 3,
+    "Embrace": 5,
+    "Kneel": 6,
+    "Shiver": 2
+   },
+   "animation": "Float"
   }
  ]
 }
