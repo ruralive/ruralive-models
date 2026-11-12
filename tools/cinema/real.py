@@ -31,7 +31,7 @@ CAST = {
         macro=dict(gender=0.0, age=0.523, muscle=0.58, weight=0.5, height=0.55, proportions=0.6,
                    african=0.85, asian=0.05, caucasian=0.1),
         skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
-        freckles=0.0, stubble=0.0, hair='coils', hair_color='#120c0a',
+        freckles=0.0, stubble=0.0, body_hair=0.35, hair='coils', hair_color='#120c0a',
         outfit=(('wool', '#7e3526'), ('wool', '#3b4632')),
         assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
                     clothes=['female_casualsuit01', 'shoes05'])),
@@ -39,7 +39,7 @@ CAST = {
         macro=dict(gender=1.0, age=0.654, muscle=0.55, weight=0.6, height=0.6, proportions=0.5,
                    african=0.0, asian=0.0, caucasian=1.0),
         skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
-        freckles=0.15, stubble=0.75, hair='short', hair_color='#5a4b40',
+        freckles=0.15, stubble=0.75, body_hair=0.85, hair='short', hair_color='#5a4b40',
         outfit=(('linen', '#c4b38c'), ('wool', '#4a3626')),
         assets=dict(eyes='grey', eyebrows='eyebrow001', eyelashes='eyelashes01', hair='short02',
                     clothes=['male_casualsuit04', 'shoes02'])),
@@ -47,7 +47,7 @@ CAST = {
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#a35a58', iris='#2a1a12',
-        freckles=0.05, stubble=0.0, hair='long', hair_color='#0e0b0b',
+        freckles=0.05, stubble=0.0, body_hair=0.2, hair='long', hair_color='#0e0b0b',
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit01', 'shoes06'])),
@@ -299,6 +299,28 @@ def beard_zone(p, j, eye, lips):
     return under_top * above_neck * front * off_lips * soul
 
 
+def arm_hair(p, j, side):
+    """How much fine hair grows at p on one arm, 0..1."""
+    sh, el, wr = j['sh' + side], j['el' + side], j['wr' + side]
+    best = 0.0
+    for a, b, lo, hi in ((sh, el, 0.35, 0.45), (el, wr, 0.75, 1.0)):
+        ab = b - a
+        t = max(0.0, min(1.0, (p - a).dot(ab) / ab.length_squared))
+        r = (p - (a + ab * t)).length
+        if r > 0.07:
+            continue
+        # Outer and upper side of the limb carries more hair than the inner side.
+        out = (p - (a + ab * t)).normalized()
+        outward = Vector((1.0 if side == 'L' else -1.0, 0.0, 0.6)).normalized()
+        dorsal = 0.45 + 0.55 * max(0.0, out.dot(outward))
+        along = lo + (hi - lo) * math.sin(math.pi * min(1.0, t * 1.15))
+        best = max(best, along * dorsal)
+    # The back of the hand, just past the wrist.
+    hand = wr + j['d' + side] * 0.04
+    best = max(best, 0.4 * max(0.0, 1 - (p - hand).length / 0.04))
+    return best
+
+
 def paint_masks(body, j, spec):
     """Vertex colours the skin shader reads: R flush, G lips, B stubble, A freckle zone."""
     eye = (j['eyeL'] + j['eyeR']) / 2
@@ -327,6 +349,13 @@ def paint_masks(body, j, spec):
         freckle_zone = 1.0 if (p.z > j['chest'].z - 0.05) else 0.25
         data += [flush, lips, stubble, freckle_zone]
     layer.data.foreach_set('color', data)
+    # A second mask for the fine hair of the arms: thickest on the outer forearm, lighter on the
+    # upper arm, a little on the back of the hand.
+    hz = body.data.attributes.new('hairzone', 'FLOAT', 'POINT')
+    values = []
+    for v in body.data.vertices:
+        values.append(spec.get('body_hair', 0.0) * max(arm_hair(v.co, j, sd) for sd in 'LR'))
+    hz.data.foreach_set('value', values)
 
 
 def lips_shape(m, j):
@@ -499,6 +528,20 @@ def skin_material(spec, j):
     height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.5),
                                                m.math('MULTIPLY', parting, 0.8)))
     base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush)
+    if spec.get('body_hair'):
+        # Fine arm hair: soft darker patches made of short strokes laid along the arm.
+        zone = N(m.nt, 'Attribute', attribute_name='hairzone').outputs['Fac']
+        streak = N(m.nt, 'Mapping', {'Vector': m.co})
+        streak.inputs['Scale'].default_value = (0.25, 0.25, 1.0)
+        strands = m.ramp(m.noise(900, 2, 0.5, 0.3, co=streak.outputs['Vector']),
+                         [(0.58, 0.0), (0.68, 1.0)])
+        patch = m.ramp(m.noise(18, 3, 0.6), [(0.3, 0.4), (0.7, 1.0)])
+        fur = m.math('MULTIPLY', zone, patch)
+        base = m.mix(base, m.mix(spec['skin2'], spec['hair_color'], 0.25),
+                     m.math('MULTIPLY', fur, 0.18))
+        base = m.mix(base, m.mix(spec['hair_color'], spec['skin2'], 0.35),
+                     m.math('MULTIPLY', m.math('MULTIPLY', fur, strands), 0.35))
+        height = m.math('ADD', height, m.math('MULTIPLY', m.math('MULTIPLY', fur, strands), 0.12))
     m.set(color=base, rough=rough, height=height, bump=0.55, bump_distance=0.0007)
     return m.m
 
@@ -708,6 +751,8 @@ def grow_hair(body, j, spec, bvh, scalp):
         cap.modifiers.remove(mod)
     if cap.data.color_attributes.get('masks'):
         cap.data.color_attributes.remove(cap.data.color_attributes['masks'])
+    if cap.data.attributes.get('hairzone'):
+        cap.data.attributes.remove(cap.data.attributes['hairzone'])
     cap['bone'] = 'Head'
     hair = join(cards, 'hair')
     hair['bone'] = 'Head'
@@ -772,6 +817,8 @@ def garment(body, j, kind, color, region):
         color, 'shoes', 0.45))
     if dup.data.color_attributes.get('masks'):
         dup.data.color_attributes.remove(dup.data.color_attributes['masks'])
+    if dup.data.attributes.get('hairzone'):
+        dup.data.attributes.remove(dup.data.attributes['hairzone'])
     return dup
 
 
