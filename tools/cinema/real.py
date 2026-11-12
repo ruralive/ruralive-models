@@ -305,26 +305,85 @@ def beard_zone(p, j, eye, lips):
     return under_top * above_neck * front * off_lips * soul
 
 
-def arm_hair(p, j, side):
-    """How much fine hair grows at p on one arm, 0..1."""
-    sh, el, wr = j['sh' + side], j['el' + side], j['wr' + side]
+def limb(p, a, b, reach):
+    """(t along a->b, distance from the segment) or None when p is too far from it."""
+    ab = b - a
+    t = max(0.0, min(1.0, (p - a).dot(ab) / ab.length_squared))
+    r = (p - (a + ab * t)).length
+    return (t, r) if r < reach else None
+
+
+def body_hair(p, n, j, side):
+    """How much fine body hair grows at p (normal n) on one side, 0..1. Hair grows on the outer
+    forearm most, the upper arm less, the back of the hand and the first finger joints a little;
+    on the front and outside of the shins and thighs, and the top of the big toe. Palms and soles
+    never have any."""
+    sx = 1.0 if side == 'L' else -1.0
+    out_arm = Vector((sx, 0.0, 0.6)).normalized()
+    out_leg = Vector((sx * 0.5, -1.0, 0.0)).normalized()
+    sh, el, wr, d = j['sh' + side], j['el' + side], j['wr' + side], j['d' + side]
     best = 0.0
-    for a, b, lo, hi in ((sh, el, 0.35, 0.45), (el, wr, 0.75, 1.0)):
-        ab = b - a
-        t = max(0.0, min(1.0, (p - a).dot(ab) / ab.length_squared))
-        r = (p - (a + ab * t)).length
-        if r > 0.07:
+    for a, b, lo, hi, out, reach in ((sh, el, 0.35, 0.45, out_arm, 0.07),
+                                     (el, wr, 0.75, 1.0, out_arm, 0.07),
+                                     (j['hip' + side], j['kn' + side], 0.35, 0.55, out_leg, 0.11),
+                                     (j['kn' + side], j['an' + side], 0.7, 0.95, out_leg, 0.08)):
+        hit = limb(p, a, b, reach)
+        if not hit:
             continue
-        # Outer and upper side of the limb carries more hair than the inner side.
-        out = (p - (a + ab * t)).normalized()
-        outward = Vector((1.0 if side == 'L' else -1.0, 0.0, 0.6)).normalized()
-        dorsal = 0.45 + 0.55 * max(0.0, out.dot(outward))
+        t, _ = hit
+        dorsal = 0.35 + 0.65 * max(0.0, n.dot(out))
         along = lo + (hi - lo) * math.sin(math.pi * min(1.0, t * 1.15))
         best = max(best, along * dorsal)
-    # The back of the hand, just past the wrist.
-    hand = wr + j['d' + side] * 0.04
-    best = max(best, 0.4 * max(0.0, 1 - (p - hand).length / 0.04))
+    # Back of the hand and the first joints of the fingers: only on the back.
+    hit = limb(p, wr, wr + d * 0.17, 0.05)
+    if hit:
+        t, _ = hit
+        back = max(0.0, n.dot(out_arm))
+        amount = 0.45 * max(0.0, 1 - abs(t - 0.3) / 0.3) + 0.35 * max(0.0, 1 - abs(t - 0.62) / 0.08)
+        best = max(best, amount * back ** 1.5)
+    # The top of the big toe and the foot just behind it.
+    toe = j['toe' + side] + Vector((-sx * 0.015, -0.02, 0.01))
+    best = max(best, 0.4 * max(0.0, 1 - (p - toe).length / 0.03) * max(0.0, n.z))
     return best
+
+
+def nape_hair(p, j):
+    """Fine hair at the back of the neck, under the hairline, thinning downwards."""
+    neck, head = j['neck'], j['head']
+    if p.y < neck.y + 0.01:
+        return 0.0
+    top, bottom = head.z + 0.01, neck.z - 0.02
+    v = max(0.0, min(1.0, (p.z - bottom) / (top - bottom)))
+    side = max(0.0, 1 - abs(p.x) / 0.06)
+    return v ** 1.5 * side * min(1.0, (p.y - neck.y - 0.01) / 0.02)
+
+
+def paint_scalp(body, j, hair):
+    """Mark the skin that lies under the hair, so the shader paints a scalp there: the colour of
+    the hair, roots and a soft hairline. Where cards lift off the head, hair shows, not bare skin
+    (the game-art way to hide the gap between the hair and the face)."""
+    attr = body.data.attributes.new('scalp', 'FLOAT', 'POINT')
+    if hair is None:
+        return
+    deps = bpy.context.evaluated_depsgraph_get()
+    tree = BVHTree.FromObject(hair, deps)
+    to_hair = hair.matrix_world.inverted() @ body.matrix_world
+    turn = to_hair.to_3x3()
+    eye = (j['eyeL'] + j['eyeR']) / 2
+    values = []
+    for v in body.data.vertices:
+        p = v.co
+        if p.z < eye.z + 0.005 and not (p.y > eye.y + 0.07 and p.z > j['neck'].z + 0.03):
+            values.append(0.0)
+            continue
+        origin, ray = to_hair @ p, (turn @ v.normal).normalized()
+        hits = 0
+        for wobble in (Vector((0, 0, 0)), Vector((0.3, 0, 0)), Vector((-0.3, 0, 0)),
+                       Vector((0, 0, 0.3)), Vector((0, 0, -0.3))):
+            hit = tree.ray_cast(origin + ray * 0.0005, (ray + wobble).normalized(), 0.05)
+            hits += hit[0] is not None
+        values.append(hits / 5.0)
+    attr.data.foreach_set('value', values)
 
 
 def paint_masks(body, j, spec):
@@ -360,7 +419,9 @@ def paint_masks(body, j, spec):
     hz = body.data.attributes.new('hairzone', 'FLOAT', 'POINT')
     values = []
     for v in body.data.vertices:
-        values.append(spec.get('body_hair', 0.0) * max(arm_hair(v.co, j, sd) for sd in 'LR'))
+        values.append(max(spec.get('body_hair', 0.0) * max(body_hair(v.co, v.normal, j, sd)
+                                                            for sd in 'LR'),
+                          max(0.45, spec.get('body_hair', 0.0)) * nape_hair(v.co, j)))
     hz.data.foreach_set('value', values)
 
 
@@ -631,6 +692,16 @@ def skin_material(spec, j):
     height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.15),
                                                m.math('MULTIPLY', parting, 0.5)))
     base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush, lips)
+    # Scalp under the hair: hair-coloured skin, dense roots, a hairline broken up by noise.
+    scalp = N(m.nt, 'Attribute', attribute_name='scalp').outputs['Fac']
+    edge = m.ramp(m.noise(70, 3, 0.6), [(0.3, 0.0), (0.7, 1.0)])
+    cover = m.math('MULTIPLY', m.ramp(scalp, [(0.15, 0.0), (0.75, 1.0)]),
+                   m.math('ADD', 0.55, m.math('MULTIPLY', edge, 0.45)))
+    roots = m.ramp(m.voronoi(2600, 'F1'), [(0.0, 1.0), (0.35, 0.0)])
+    base = m.mix(base, m.mix(spec['hair_color'], spec['skin2'], 0.25), m.math('MULTIPLY', cover, 0.8))
+    base = m.mix(base, m.mix(spec['hair_color'], '#000000', 0.3),
+                 m.math('MULTIPLY', m.math('MULTIPLY', cover, roots), 0.6))
+    rough = m.math('ADD', rough, m.math('MULTIPLY', cover, 0.2))
     if spec.get('body_hair'):
         # Fine arm hair: soft darker patches made of short strokes laid along the arm.
         zone = N(m.nt, 'Attribute', attribute_name='hairzone').outputs['Fac']
@@ -856,6 +927,8 @@ def grow_hair(body, j, spec, bvh, scalp):
         cap.data.color_attributes.remove(cap.data.color_attributes['masks'])
     if cap.data.attributes.get('hairzone'):
         cap.data.attributes.remove(cap.data.attributes['hairzone'])
+    if cap.data.attributes.get('scalp'):
+        cap.data.attributes.remove(cap.data.attributes['scalp'])
     cap['bone'] = 'Head'
     hair = join(cards, 'hair')
     hair['bone'] = 'Head'
@@ -922,6 +995,8 @@ def garment(body, j, kind, color, region):
         dup.data.color_attributes.remove(dup.data.color_attributes['masks'])
     if dup.data.attributes.get('hairzone'):
         dup.data.attributes.remove(dup.data.attributes['hairzone'])
+    if dup.data.attributes.get('scalp'):
+        dup.data.attributes.remove(dup.data.attributes['scalp'])
     return dup
 
 
@@ -1007,6 +1082,7 @@ def build(model_id):
     shade(body)
     height = max(v.co.z for v in body.data.vertices)
     paint_masks(body, j, spec)
+    paint_scalp(body, j, next((o for k, o, _ in assets if k == 'Hair'), None))
     body.data.materials.clear()
     body.data.materials.append(skin_material(spec, j))
     parts = []
