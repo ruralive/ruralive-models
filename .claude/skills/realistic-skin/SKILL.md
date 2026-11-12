@@ -42,6 +42,26 @@ Rules that follow:
   because of the beard under the skin. Ears and nose tip are the reddest; eyelids and the
   hollows under the eyes are violet.
 
+## 1b. What painters and hyperrealists do (and how it maps to the shader)
+
+Studied: Sabrillu's coloured-pencil skin tutorial, Ioanna Ladopoulou's skin-tones tutorial,
+Eternal3D's "How artists paint realistic skin", James Gurney's face colour zones (via Sefki
+Ibrahim's digital-face write-up), and how hyperrealists build skin: Ron Mueck (tinted silicone
+layered in depth, then veins and blemishes painted on top), oil glazers such as Roberto Bernardi
+(many thin transparent glazes, each dried before the next, for optical depth).
+
+| Painter's rule | Shader translation |
+|---|---|
+| Skin is never one colour; posterize a photo and blues, greens, purples, yellows appear. | Separate noise per chromophore, out of step; measure with `skin_check.py` (section 8). |
+| Light areas warm and rosy, shadow areas cool (blue, green, grey). Balance warm and cool. | `convex` (pointiness high) gets a warm `#fff0e6` multiply; `concave` a cool `#e0e8de` one. |
+| Darks stay saturated (reddish Van Dyke brown); black "kills" skin colour. | Concave also gets `#e8c4b4`; `skin2` shadow tones are saturated browns, never grey. |
+| Three values (highlight, midtone, shadow), built light to dark in thin even layers. | Base ramp `skin2`→`skin`, then many low-opacity MULTIPLY layers (glazes), never one opaque coat. |
+| Too pink? Add its complement, green, rather than grey. | `mute`: faint green patches, stronger inside the flush zones. |
+| Forehead yellow, middle red, lower third blue-green; subtler on women. | Face thirds in `skin_chroma`; the lower third scales with `stubble` (0.45 women, up to 0.9 men). |
+| Edges soft; details (pores, freckles, wrinkles, scars, follicles) suggested, never overdone. | Every mask has a soft falloff; marks are rare; amounts stay low (0.1–0.5). |
+| Mueck: colour in depth first, surface detail last. | Order: base → chromophores → pigment → lips/hair → imperfections → grime. |
+| Lighting changes the read: warm sun, cool interior, candle. | Check renders under warm and cool light; the albedo must survive both. |
+
 ## 2. Layer order in the shader
 
 Order matters; later layers sit on top. In `skin_material`:
@@ -133,6 +153,11 @@ python3 tools/cinema/real.py /tmp/chars/out /tmp/chars/shots tomas amara mei > /
 ```
 - Takes ~6–7 min per character (skin bake 4096, outfit 2048, renders). Watch for `^BUILT` or
   `Traceback` in the log.
+- Measure the colour like a painter: `python3 tools/cinema/skin_check.py shots/<id>-portrait.jpg
+  /tmp/<id>-skin.png` posterizes the face skin into 10 colours and prints its hue families, the
+  warmth of light vs shadow skin and the hue spread. The flat, plastic baseline measured 95% one hue
+  family with a 3.6° spread; aim for clearly several families, a spread of 8° or more, and lights
+  warmer than shadows.
 - Look at `/tmp/chars/shots/<id>-portrait.jpg` and `-full.jpg` yourself before sending them:
   lips outline crisp; forehead warmer and lower face cooler than the cheeks; veins only faintly
   visible at temples and wrists; no single flat hue across the cheek; moles and blemishes

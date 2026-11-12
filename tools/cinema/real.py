@@ -546,6 +546,19 @@ def skin_chroma(m, spec, j, base, flush):
     under = any_of(m, *[blob(m, j['eye' + sd] + Vector((0, -0.006, -0.016)), 0.02, (0.8, 1.0, 1.6))
                         for sd in 'LR'])
     base = tint('#d4c4dc', mm('MULTIPLY', under, 0.6))
+    # Painters' temperature rule: the planes that face out (cheekbones, brow, nose bridge,
+    # knuckles) read warm and rosy; the hollows and creases read cool, green-grey, and their darks
+    # stay saturated reddish brown rather than grey (black "kills" skin colour). Pointiness gives
+    # convex vs concave while baking in Cycles.
+    curve = m.geometry.outputs['Pointiness']
+    convex = m.ramp(curve, [(0.5, 0.0), (0.56, 1.0)])
+    concave = m.ramp(curve, [(0.44, 1.0), (0.5, 0.0)])
+    base = tint('#fff0e6', mm('MULTIPLY', convex, 0.5))
+    base = tint('#e0e8de', mm('MULTIPLY', concave, 0.45))
+    base = tint('#e8c4b4', mm('MULTIPLY', concave, 0.25))
+    # Green is red's complement: faint green patches stop the reds from going one flat pink.
+    mute = m.ramp(m.noise(11, 3, 0.6, 0.7), [(0.55, 0.0), (0.75, 1.0)])
+    base = tint('#eef4e6', mm('MULTIPLY', mute, mm('ADD', 0.15, mm('MULTIPLY', flush, 0.5))))
     return base
 
 
