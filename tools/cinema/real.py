@@ -356,7 +356,7 @@ def split_eyes(obj, spec, model_id):
             dirn = (v.co - c).normalized()
             front = -dirn.y
             cap = max(0.0, (front - 0.86) / 0.14)
-            v.co += dirn * (radius * 0.065 * cap ** 0.8)
+            v.co += dirn * (radius * 0.04 * cap ** 0.8)
     return obj, cornea
 
 
@@ -606,17 +606,17 @@ def lip_surface(m, j, spec):
                    [(0.0, 1.0), (0.05, 0.0)])
     furrow = mm('MULTIPLY', mm('MAXIMUM', big, mm('MULTIPLY', small, 0.45)), near)
     swell = m.noise(140, 3, 0.5)
-    height = mm('SUBTRACT', mm('MULTIPLY', swell, 0.12), mm('MULTIPLY', furrow, 0.7))
+    height = mm('SUBTRACT', mm('MULTIPLY', swell, 0.04), mm('MULTIPLY', furrow, 0.8))
     # Dry patches: paler, rougher, a few lifted flakes.
-    dry = m.ramp(m.noise(260, 3, 0.6), [(0.6, 0.0), (0.75, 1.0)])
+    dry = m.ramp(m.noise(260, 3, 0.6), [(0.7, 0.0), (0.82, 1.0)])
     flake = m.ramp(m.voronoi(1800, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.05, 0.0)])
-    height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', dry, flake), 0.15))
+    height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', dry, flake), 0.05))
     col = m.mix(spec['lips'], m.mix(spec['lips'], spec['skin'], 0.35), mm('MULTIPLY', dry, 0.4))
-    col = m.mix(col, m.mix(spec['lips'], '#2a1210', 0.35), mm('MULTIPLY', furrow, 0.35))
+    col = m.mix(col, m.mix(spec['lips'], '#2a1210', 0.4), mm('MULTIPLY', furrow, 0.5))
     # Blood shows more at the centre of each lip, less at the corners.
     centre = m.ramp(mm('ABSOLUTE', mm('DIVIDE', pos.outputs['X'], 0.024)), [(0.0, 1.0), (1.0, 0.0)])
     col = m.mix(col, m.mix(spec['lips'], '#b03a3a', 0.25), mm('MULTIPLY', centre, 0.25))
-    rough = mm('ADD', 0.28, mm('ADD', mm('MULTIPLY', dry, 0.2), mm('MULTIPLY', furrow, 0.1)))
+    rough = mm('ADD', 0.34, mm('ADD', mm('MULTIPLY', dry, 0.15), mm('MULTIPLY', furrow, 0.12)))
     return height, col, rough
 
 
@@ -874,9 +874,9 @@ def eye_area(m, spec, j, base, height, rough):
         brow = mm('MULTIPLY', mm('MULTIPLY', mm('SUBTRACT', 1.0, brow_d, clamp=True), arch), front)
         roots = m.ramp(m.voronoi(2200, 'F1'), [(0.0, 1.0), (0.4, 0.0)])
         bcol = m.mix(spec['hair_color'], spec['skin2'], 0.35)
-        base = m.mix(base, bcol, mm('MULTIPLY', brow, 0.55 * spec.get('brow', 0.4)))
+        base = m.mix(base, bcol, mm('MULTIPLY', brow, 0.3 * spec.get('brow', 0.4)))
         base = m.mix(base, spec['hair_color'], mm('MULTIPLY', mm('MULTIPLY', brow, roots),
-                                                  0.8 * spec.get('brow', 0.4)))
+                                                  0.35 * spec.get('brow', 0.4)))
         # Upper-lid fold: a soft darker crease above the lid, sunken a little.
         dz = mm('SUBTRACT', pos.outputs['Z'], c.z + 0.002)
         upper = mm('DIVIDE', dz, 0.003, clamp=True)

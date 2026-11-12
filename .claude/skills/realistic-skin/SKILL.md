@@ -99,6 +99,8 @@ What each tradition teaches, and what the shader takes from it.
   by a 0.3 mm noise offset, deeper near the parting; swell, dry flakes, centre redness). In the lip
   mask the skin's height, colour and roughness are *replaced*, not added to. Parting on the
   geometry's seam (11 mm under the upper-teeth helper), lip colour ×0.88.
+- *Failure seen.* Dry flakes and swell bump at full strength sparkled as white specks; keep
+  flakes ×0.05, swell ×0.04, roughness ≥0.34.
 - *Failure seen.* Lips that carried the skin's crossing fine lines and pores read as "skin painted
   pink" and too textured.
 
@@ -113,7 +115,7 @@ What each tradition teaches, and what the shader takes from it.
   Build: the MakeHuman eye already has a cornea shell over the eyeball, mapped to a transparent
   texture corner (u > 0.85, v < 0.15) — it was invisible. `split_eyes` moves it to its own object
   with `cornea_material` (transmission 1, roughness 0, IOR 1.376) and bulges its front cap outward
-  (6.5% of the eye radius at the centre of the iris, fading to 0 at 30° off axis).
+  (4% of the eye radius at the centre of the iris — 6.5% bent the pupil off-centre, fading to 0 at 30° off axis).
 - *Iris.* Radial stroma fibres (noise on seamless polar coordinates, stretched along the radius),
   crypts (dark pits), a lighter collarette ring round the pupil, darker outer rim, and a dark
   **limbal ring** at the edge (strong in the young, fading with age); the pupil pure black and big
