@@ -62,6 +62,72 @@ layered in depth, then veins and blemishes painted on top), oil glazers such as 
 | Mueck: colour in depth first, surface detail last. | Order: base → chromophores → pigment → lips/hair → imperfections → grime. |
 | Lighting changes the read: warm sun, cool interior, candle. | Check renders under warm and cool light; the albedo must survive both. |
 
+## 1c. Five centuries of realist and hyperrealist flesh
+
+What each tradition teaches, and what the shader takes from it.
+
+| Who / when | How they made flesh | Shader lesson |
+|---|---|---|
+| Cennini (c. 1400), Italian tempera and fresco | Flesh over a **terre verte / verdaccio** (green-grey) underlayer; then thin red accents on cheeks and lips, verdaccio shadows, several flesh tones, the green left partly open at the edges. | Keep a faint green under-layer that shows in the half-tones and hollows (`concave` cool tint, `mute`), and put reds on top as accents. |
+| Titian, Rubens (16th–17th c.) | Warm-cool optical mixing; Rubens's pearly cool half-tones between warm lights and warm reflected shadows; flesh built in thin layers and glazes over a toned ground. | Warm light, **cool half-tone at the turn of form**, warm (saturated) core shadows. Chromophore noises out of step so warm and cool sit side by side, not averaged. |
+| Rembrandt, Velázquez (17th c.) | Impasto in the lights and transparent darks; Velázquez's economy: a few exact notes of colour at the right edges. | Texture and roughness live in the lights (pores, bump); darks stay smooth and saturated. Less but exact. |
+| Ingres, Bouguereau (19th c. academics) | Bouguereau: glazes mostly in backgrounds and drapery; **flesh opaque**, translucence from careful modelling of value and colour notes; later works scumble thin light paint over a darker undertone, giving cool, soft, translucent half-tones. Ingres: porcelain smoothness, very soft edges. | A light, slightly cool layer over a darker warmer undertone reads as translucency. Skin is mostly soft-edged; hard edges only at the lip parting, nostrils and lids. |
+| Sargent, Zorn (late 19th c.) | Sargent's *Madame X*: lead white, rose madder, vermilion, **viridian**, bone black: a green in the flesh. Zorn: ochre, vermilion or cadmium red, ivory black, white. Black with ochre gives the muted greens of shadow skin. | Even the most limited palette has red, yellow and a cool/green note. Never only browns. |
+| Lucian Freud (20th c.) | Cremnitz white, heavy and worked; flesh full of greys, greens, violets; every bulge and vein mapped. | Older or rougher skin: more grey-green and violet, more relief, visible veins. |
+| Antonio López, Chuck Close, photorealists (1960s on) | Close: the face as a grid of cells, each a small mix of colours that blend at a distance. | The fine **chromatic grain** (separate red, yellow and blue noise at pore scale) that blends into skin colour at a distance. |
+| Hyperrealist painters (Alyssa Monks, Jason de Graaf, Roberto Bernardi and others) | Dozens of thin transparent glazes, each dried before the next; skin, sweat and reflections built up optically. | Many low-opacity MULTIPLY layers, never one opaque coat; a specular breakup layer for sweat and oil. |
+| Ron Mueck, Sam Jinks, Patricia Piccinini (sculptors) | Pigment-tinted silicone **layered in depth** (gel-coat first), then veins, blemishes, freckles painted, and single hairs punched in. | The order in section 2: colour in depth first, surface marks after, hair last. |
+
+## 1d. The face and body, part by part
+
+**Lips.** The vermilion is skin with the blood showing, never a separate pink. The border is a
+soft transition, sharp only in places (cupid's bow peaks, the centre of the lower lip); there is no
+dark outline round the lips. The darkest line is where the lips meet. Fine vertical lines follow the
+lip's curve. Highlights: centre of the lower lip, the bow peaks, a thin strip along the upper border;
+soft, with only a few tiny sharp glints on a wet lower lip. Upper lip usually darker (it faces down),
+lower lip lighter and fuller. Shader: `lips_shape`; the parting must sit on the geometry's seam
+(measured: 11 mm under the upper-teeth helper), lip colour ×0.72, edge softness 1.8 mm,
+creases very faint.
+
+**Eyes.** The sclera is not white: warm grey-ivory, pinker and veined towards the corners, bluish in
+children and yellower with age. Thin veins sit at the surface, thicker ones are deeper and washed
+out. The **limbal ring** (dark ring round the iris) reads as youth and makes the eye look alive. The
+iris sits behind a refracting cornea (index ~1.376), so it has depth and parallax; the cornea is
+wet, a sharp highlight. The **caruncle** in the inner corner is pink and wet. A **tear line**
+(meniscus) runs along the lower lid, thicker at the bottom, catching a thin bright line. The lid
+edges are pink; the skin of the lids is thin and violet-veined. The upper lid casts a shadow on the
+eyeball: never light the top of the iris evenly. In our pipeline the MakeHuman CC0 eyes carry the
+iris; still to do: a tear-line strip mesh, a caruncle tint and an eyeball shadow term.
+
+**Nose.** The most sebaceous area: bigger pores, visible **sebaceous filaments** (grey-yellow, light,
+not black dots), oilier (lower roughness), redder at the tip and alae; the alar crease and nostril
+rims are the darkest small details. Translucent at the tip and the nostril edges in backlight.
+
+**Ears.** Thin cartilage under thin skin: strongly translucent, they glow red against a back light,
+redder at the rim and lobe, cooler and darker in the concha; few pores, a little fine hair on the
+tragus in older men.
+
+**Hands.** Knuckles red and wrinkled (concentric folds over the joints), back of the hand thin with
+blue-green veins and a little hair on the back and the first finger joints; palms yellow-pink, full
+of deep creases, no hair, more matte; fingertips red, nails pink over the bed with a white free edge
+and a lighter half-moon, cuticles a little dry; dirt sits in the creases and under and around nails.
+
+**Arms and legs.** Outer forearm hairiest; inner arm paler with veins; elbows rough, darker and
+creased. Shins: bony, a little shinier, hairier on the front and outside; knees red and creased;
+thighs paler and smoother.
+
+**Bare feet.** Soles and heels thick yellow horn, calluses (rougher, paler, sometimes cracked at the
+heel), redness at the toes, the ball of the foot and the heel; the top of the foot thin with veins and
+tendons; a little hair on the big toe and its joint; for a period or outdoor character, dirt on the
+soles, round the nails and in the toe creases.
+
+**Body hair.** Vellus hair is everywhere and catches back-light as a soft halo (peach fuzz on
+cheeks, especially on women). Terminal hair: forearms (outer), back of hands, first finger joints,
+shins and thighs, big toe, chest and belly in men, **nape of the neck** under the hairline (fine,
+in the hair colour, thinning downwards). Under hair cards always paint a **scalp**: hair-coloured
+skin with roots and a broken-up hairline, so lifted cards never show bare skin
+(`paint_scalp` + the scalp layer in `skin_material`).
+
 ## 2. Layer order in the shader
 
 Order matters; later layers sit on top. In `skin_material`:
@@ -122,8 +188,10 @@ Too clean = CG. For a period piece (medieval) push them further; for a glossy fu
   lips, thinner under the lower lip. Patchy growth (noise 28), a grey-blue shadow under the skin
   ×0.22, short dark hairs from two voronoi scales (3600, 6000) in the hair colour ×0.45, tiny
   height. Keep it soft: "manchas muito suaves".
-- **Arm hair** (`arm_hair`, strength `spec['body_hair']`, men ~0.85, women 0.2–0.35): densest on
-  the outer forearm, lighter on the upper arm, a little on the back of the hand. Patches (noise 18)
+- **Body hair** (`body_hair` + `nape_hair`, attribute `hairzone`, strength `spec['body_hair']`,
+  men ~0.85, women 0.2–0.35; the nape at least 0.45 for everyone): outer forearm densest, upper arm
+  lighter, back of the hand and first finger joints (back side only, from the vertex normal), front
+  and outside of shins and thighs, the big toe, the nape under the hairline. Patches (noise 18)
   of a slightly darker tone, plus short strokes from noise stretched along the arm.
 - Real hair (head, brows, lashes) uses MakeHuman CC0 cards with ROUND alpha (glTF MASK), not
   particles: particles don't export to glTF/three.js.
@@ -164,3 +232,22 @@ python3 tools/cinema/real.py /tmp/chars/out /tmp/chars/shots tomas amara mei > /
   present but rare; stubble soft; no plastic sheen.
 - Compare the three skin tones side by side (contact sheet); the chromophores should read on all
   of them, much less on the darkest.
+
+## 9. Sources studied
+
+- Sabrillu, *How to draw skin tones with coloured pencils* (posterize to find hidden colours; cool
+  blue/green in shadows, warm rosy lights; work light to dark in thin layers; dark accents last).
+- Ioanna Ladopoulou, *Drawing skin tones with colored pencils* (three values; add reds to warm,
+  greens and blues to mute and give dimension; black kills colour; green to correct too-pink).
+- Eternal3D, *How artists paint realistic skin* (reds, blues, yellows, greens from blood flow;
+  undertones; cool shadows; soft edges; restraint with details; light changes the read).
+- Gurney's face colour zones via Sefki Ibrahim's digital-face write-up (texturing.xyz); 80.lv
+  real-time skin texturing; The Rookies digital-double (red scatters furthest: 1.0/0.35/0.2).
+- Cennini's verdaccio and terre verte flesh; Mark Walker, *Bouguereau at Work* (Art Renewal
+  Center); Sargent's *Madame X* palette; the Zorn palette.
+- Eye rendering notes (Unreal photorealistic character docs: limbus, wet sclera, iris depth;
+  procedural meniscus thicker at the lower lid; surface vs deep sclera veins).
+- Lips: vermilion border is a transition; darkest line at the parting; highlight zones
+  (painters-online *How to paint mouths*, drawing guides). Nose: sebaceous filaments are light
+  grey-yellow, nose pores larger. Ears and nose: high translucency, red glow in back light.
+- mavenart.com's guide could not be read (the site blocks automated readers).
