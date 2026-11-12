@@ -524,6 +524,38 @@ def skin_imperfections(m, spec, j, base, height, rough, flush, lips):
     rough = mm('ADD', rough, mm('MULTIPLY', dry, 0.12))
     flake = m.ramp(m.voronoi(900, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.05, 0.0)])
     height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', flake, dry), 0.25))
+    # Nose: the oiliest skin. Tiny blackheads (rare, very small, dark), more of the pale grey-yellow
+    # sebaceous filaments, both only on the nose and the creases beside it.
+    nose = any_of(m, blob(m, eye.lerp(j['mouth'], 0.55) + Vector((0, -0.045, 0.0)), 0.028,
+                          (1.0, 0.8, 0.9)),
+                  blob(m, eye.lerp(j['mouth'], 0.3) + Vector((0, -0.04, 0.0)), 0.02, (1.6, 1.0, 0.8)))
+    black, _ = rare_spots(m, 1900, 0.07, 0.22, 5)
+    filament, _ = rare_spots(m, 1600, 0.16, 0.28, 6)
+    base = m.mix(base, '#2b2219', mm('MULTIPLY', mm('MULTIPLY', black, nose), 0.65))
+    base = m.mix(base, '#cbbd9e', mm('MULTIPLY', mm('MULTIPLY', filament, nose), 0.3))
+    height = mm('SUBTRACT', height, mm('MULTIPLY', mm('MULTIPLY', black, nose), 0.3))
+    # Knuckles: concentric folds over the finger joints, a little darker and redder.
+    knuckles = any_of(m, *[blob(m, j['wr' + sd] + j['d' + sd] * k_, 0.03)
+                           for sd in 'LR' for k_ in (0.095, 0.135, 0.16)])
+    folds = m.ramp(m.wave(900, 3.0, 2.0, 'RINGS', 'SPHERICAL'), [(0.0, 1.0), (0.18, 0.0)])
+    base = m.mix(base, m.mix(spec['skin2'], spec['flush'], 0.4), mm('MULTIPLY', mm(
+        'MULTIPLY', folds, knuckles), 0.35))
+    height = mm('SUBTRACT', height, mm('MULTIPLY', mm('MULTIPLY', folds, knuckles), 0.6))
+    # Bare feet: thick yellowish horn on the soles, paler rough calluses on the heel and the ball of
+    # the foot, fine cracks at the heel.
+    nz = N(m.nt, 'SeparateXYZ', {'Vector': m.geometry.outputs['Normal']}).outputs['Z']
+    pz = N(m.nt, 'SeparateXYZ', {'Vector': m.geometry.outputs['Position']}).outputs['Z']
+    sole = mm('MULTIPLY', m.ramp(nz, [(-0.75, 1.0), (-0.3, 0.0)]),
+              m.ramp(pz, [(0.03, 1.0), (0.06, 0.0)]))
+    heel = any_of(m, *[blob(m, j['an' + sd] + Vector((0, 0.03, -0.07)), 0.045) for sd in 'LR'])
+    ball = any_of(m, *[blob(m, j['toe' + sd] + Vector((0, 0.015, -0.02)), 0.04) for sd in 'LR'])
+    callus = mm('MINIMUM', mm('ADD', sole, mm('MULTIPLY', mm('ADD', heel, ball), 0.6)), 1.0)
+    base = m.mix(base, m.mix(spec['skin'], '#e8d4a0', 0.35), mm('MULTIPLY', callus, 0.4))
+    rough = mm('ADD', rough, mm('MULTIPLY', callus, 0.2))
+    cracks = m.ramp(m.voronoi(160, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.04, 0.0)])
+    crack = mm('MULTIPLY', cracks, heel)
+    base = m.mix(base, '#5a3a2a', mm('MULTIPLY', crack, 0.4))
+    height = mm('SUBTRACT', height, mm('MULTIPLY', crack, 0.6))
     # Grime: a working life before running water. Dirt settles in creases and cavities (pointiness
     # is correct while baking in Cycles), gathers on hands, feet and the neck, and lies in faint
     # smudges elsewhere. Kept off the lips.
@@ -1135,6 +1167,10 @@ def bake_all(model_id, body, clothes):
         b = mat.node_tree.nodes.get('Principled BSDF')
         if b:
             b.inputs['Subsurface Weight'].default_value = 0.35
+            # Peach fuzz: the fine vellus hair all over the skin gives a soft, velvety rim glow.
+            b.inputs['Sheen Weight'].default_value = 0.22
+            b.inputs['Sheen Roughness'].default_value = 0.45
+            b.inputs['Sheen Tint'].default_value = (1.0, 0.93, 0.86, 1.0)
             b.inputs['Subsurface Radius'].default_value = (1.0, 0.35, 0.18)
             b.inputs['Subsurface Scale'].default_value = 0.0035
 

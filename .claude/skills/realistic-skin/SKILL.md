@@ -103,6 +103,9 @@ iris; still to do: a tear-line strip mesh, a caruncle tint and an eyeball shadow
 not black dots), oilier (lower roughness), redder at the tip and alae; the alar crease and nostril
 rims are the darkest small details. Translucent at the tip and the nostril edges in backlight.
 
+Implemented: tiny rare blackheads (voronoi 1900, 7% of cells, dark `#2b2219`, slightly sunken) and
+more frequent pale sebaceous filaments (`#cbbd9e`), both masked to the nose and the creases beside it.
+
 **Ears.** Thin cartilage under thin skin: strongly translucent, they glow red against a back light,
 redder at the rim and lobe, cooler and darker in the concha; few pores, a little fine hair on the
 tragus in older men.
@@ -112,6 +115,8 @@ blue-green veins and a little hair on the back and the first finger joints; palm
 of deep creases, no hair, more matte; fingertips red, nails pink over the bed with a white free edge
 and a lighter half-moon, cuticles a little dry; dirt sits in the creases and under and around nails.
 
+Implemented: concentric folds over the knuckles (spherical wave rings, darker-redder and sunken).
+
 **Arms and legs.** Outer forearm hairiest; inner arm paler with veins; elbows rough, darker and
 creased. Shins: bony, a little shinier, hairier on the front and outside; knees red and creased;
 thighs paler and smoother.
@@ -120,6 +125,12 @@ thighs paler and smoother.
 heel), redness at the toes, the ball of the foot and the heel; the top of the foot thin with veins and
 tendons; a little hair on the big toe and its joint; for a period or outdoor character, dirt on the
 soles, round the nails and in the toe creases.
+
+Implemented: soles found by downward normal near the ground, yellow-pale horn and rougher; calluses
+on heel and ball; fine dark cracks at the heel.
+
+**Peach fuzz.** Vellus hair can't be modelled strand by strand at this scale: in renders use
+Principled **Sheen** (weight 0.22, roughness 0.45, warm white tint) for the soft velvety rim glow.
 
 **Body hair.** Vellus hair is everywhere and catches back-light as a soft halo (peach fuzz on
 cheeks, especially on women). Terminal hair: forearms (outer), back of hands, first finger joints,
