@@ -571,3 +571,86 @@ def cap(color='#d9477a', color2='#ffd9a6', glow=None, name='cap'):
     col = m.mix(col, color2, dots)
     kw = dict(emission=m.mix('#000000', glow, dots), emission_strength=4.0) if glow else {}
     return m.set(color=col, rough=0.45, height=dots, bump=0.4, bump_distance=0.03, **kw)
+
+
+# ----------------------------------------------------------------------------- spacecraft
+def foil(color='#e2a93b', name='foil', rough=0.28):
+    """Crinkled insulation blanket."""
+    m = Mat(name)
+    crease = m.voronoi(38, 'DISTANCE_TO_EDGE')
+    fold = m.noise(14, 4, 0.7, 1.5)
+    col = m.ramp(fold, [(0.25, _shade(color, 0.6)), (0.6, color), (0.9, _shade(color, 1.35))])
+    height = m.math('ADD', m.ramp(crease, [(0.0, 0.0), (0.2, 1.0)]), fold)
+    return m.set(color=col, rough=m.ramp(fold, [(0.2, rough), (0.9, rough + 0.2)]), metal=1.0,
+                 height=height, bump=0.9, bump_distance=0.02)
+
+
+def solar(name='solar', color='#122a5c', scale=7.0):
+    """Photovoltaic cells: a blue grid with bright busbars."""
+    m = Mat(name)
+    comb = __import__('core').N(m.nt, 'CombineXYZ', {'X': m.math('ADD', m.axis('X'), m.axis('Y')),
+                                                    'Y': m.axis('Z'), 'Z': 0.0})
+    cell, gap = m.brick(scale, 0.03, 0.5, 0.5, co=comb.outputs[0], offset=0.0)
+    var = m.noise(30, 2, 0.5)
+    col = m.ramp(var, [(0.3, _shade(color, 0.7)), (0.8, _shade(color, 1.5))])
+    col = m.mix(col, '#c9ced6', gap)
+    return m.set(color=col, rough=m.mix(0.18, 0.4, gap), metal=m.mix(0.6, 1.0, gap),
+                 height=m.math('SUBTRACT', 1.0, gap), bump=0.15, bump_distance=0.005)
+
+
+def hull(color='#e8e7e2', name='hull', panels=0.6, wear=0.3):
+    """Painted spacecraft skin with panel lines and rivets."""
+    m = Mat(name)
+    comb = __import__('core').N(m.nt, 'CombineXYZ', {'X': m.math('ADD', m.axis('X'), m.axis('Y')),
+                                                    'Y': m.axis('Z'), 'Z': 0.0})
+    tone, gap = m.brick(1 / panels, 0.012, 0.5, 0.5, co=comb.outputs[0])
+    grime = m.noise(2.5, 6, 0.65)
+    streak = m.noise(9, 4, 0.7, co=m.stretch(5, 5, 0.3))
+    col = m.ramp(grime, [(0.2, _shade(color, 0.82)), (0.7, color)])
+    col = m.mix(col, _shade(color, 0.9), m.math('SUBTRACT', 1.0, tone))
+    col = m.mix(col, _shade(color, 0.55), m.math('MULTIPLY', m.ramp(streak, [(0.55, 0.0),
+                                                                           (0.85, 1.0)]), wear))
+    col = m.mix(col, _shade(color, 0.3), gap)
+    return m.set(color=col, rough=m.ramp(grime, [(0.2, 0.3), (0.9, 0.55)]), metal=0.15,
+                 height=m.math('SUBTRACT', 1.0, gap), bump=0.25, bump_distance=0.006)
+
+
+# ----------------------------------------------------------------------------- melting ones
+def melt_skin(color='#3f8f9a', blush='#b889b5', deep='#34508a', name='melt', glow=None,
+              rough=0.3):
+    """Wet, marbled skin: one colour bleeding into two others."""
+    m = Mat(name)
+    marble = m.noise(2.6, 7, 0.62, 2.2)
+    blotch = m.noise(5.5, 4, 0.6, 0.8)
+    veins = m.voronoi(26, 'DISTANCE_TO_EDGE')
+    col = m.ramp(marble, [(0.28, deep), (0.48, color), (0.7, _shade(color, 1.25))])
+    col = m.mix(col, blush, m.ramp(blotch, [(0.55, 0.0), (0.78, 0.75)]))
+    col = m.mix(col, deep, m.math('MULTIPLY', m.ramp(veins, [(0.0, 0.5), (0.04, 0.0)]),
+                                  m.ramp(marble, [(0.4, 0.0), (0.7, 1.0)])))
+    pores = m.voronoi(420, 'F1')
+    kw = {}
+    if glow:
+        kw = dict(emission=m.mix('#000000', glow, m.ramp(veins, [(0.0, 1.0), (0.03, 0.0)])),
+                  emission_strength=5.0)
+    return m.set(color=col, rough=m.ramp(blotch, [(0.2, rough * 0.6), (0.9, rough * 1.4)]),
+                 height=m.math('ADD', m.math('MULTIPLY', pores, 0.3), m.ramp(
+                     veins, [(0.0, 0.0), (0.08, 1.0)])), bump=0.25, bump_distance=0.004, **kw)
+
+
+def bloodshot(name='bloodshot', white='#e9dcd6', vein='#b23a3a'):
+    m = Mat(name)
+    veins = m.voronoi(34, 'DISTANCE_TO_EDGE', co=m.stretch(1, 1, 1))
+    web = m.math('MULTIPLY', m.ramp(veins, [(0.0, 1.0), (0.02, 0.0)]),
+                 m.ramp(m.noise(9, 3, 0.6), [(0.4, 0.0), (0.75, 1.0)]))
+    col = m.mix(m.ramp(m.noise(6, 3, 0.5), [(0.3, '#e6c9c4'), (0.8, white)]), vein, web)
+    return m.set(color=col, rough=0.07)
+
+
+def origami(color='#d977a8', name='origami', color2=None):
+    """Stiff folded paper with a faint grain and a second colour bleeding in."""
+    m = Mat(name)
+    grain = m.noise(180, 3, 0.7)
+    wash = m.noise(3.0, 5, 0.6, 1.0)
+    col = m.ramp(wash, [(0.3, _shade(color, 0.72)), (0.6, color),
+                        (0.85, color2 or _shade(color, 1.2))])
+    return m.set(color=col, rough=0.55, height=grain, bump=0.12, bump_distance=0.002)

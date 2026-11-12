@@ -1,4 +1,4 @@
-"""Build the original CC0 Ruralive expansion as self-contained glTF binary files."""
+"""Build the original Ruralive expansion as self-contained glTF binary files."""
 import argparse
 import io
 import json
@@ -715,7 +715,7 @@ def main():
         entries.append({"file":file,"animation":model.g["animations"][0]["name"],
                         "bytes":(args.output/file).stat().st_size})
     (args.output/"manifest.json").write_text(json.dumps(
-        {"license":"CC0-1.0","models":entries}, indent=2)+"\n")
+        {"license":"LicenseRef-Ruralive-Models-1.0","models":entries}, indent=2)+"\n")
 
 
 if __name__=="__main__":

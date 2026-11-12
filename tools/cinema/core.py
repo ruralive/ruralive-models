@@ -820,6 +820,8 @@ class Rig:
         default = self.specs[0][0]
         deform = {s[0] for s in self.specs if s[5]}
         for obj in parts:
+            if obj.get('weighted'):
+                continue
             bone = obj.get('bone') or default
             if bone not in deform:
                 raise ValueError('part %s follows unknown bone %s' % (obj.name, bone))
@@ -831,6 +833,34 @@ class Rig:
         mod = obj.modifiers.new('Armature', 'ARMATURE')
         mod.object = self.obj
         return obj
+
+    def weight_chain(self, obj, names, axis=2):
+        """Blend an object between the bones of a chain by how far along the chain each vertex is."""
+        joints = [self._spec(n)[1] for n in names] + [self._spec(names[-1])[2]]
+        groups = [obj.vertex_groups.get(n) or obj.vertex_groups.new(name=n) for n in names]
+        for v in obj.data.vertices:
+            best, k, f = 1e18, 0, 0.0
+            for i in range(len(names)):
+                a, b = joints[i], joints[i + 1]
+                ab = b - a
+                t = min(1.0, max(0.0, (v.co - a).dot(ab) / max(ab.length_squared, 1e-12)))
+                d = (v.co - (a + ab * t)).length_squared
+                if d < best:
+                    best, k, f = d, i, t
+            # the joint itself is shared half and half, so the bend is smooth
+            if f > 0.5 and k < len(names) - 1:
+                groups[k].add([v.index], 1.5 - f, 'REPLACE')
+                groups[k + 1].add([v.index], f - 0.5, 'REPLACE')
+            elif f <= 0.5 and k > 0:
+                groups[k].add([v.index], 0.5 + f, 'REPLACE')
+                groups[k - 1].add([v.index], 0.5 - f, 'REPLACE')
+            else:
+                groups[k].add([v.index], 1.0, 'REPLACE')
+        obj['weighted'] = True
+        return obj
+
+    def _spec(self, name):
+        return next(s for s in self.specs if s[0] == name)
 
     def transfer_weights(self, source, target):
         """Give target the weights of the nearest surface of source."""

@@ -1,4 +1,4 @@
-"""Original CC0 props and cast for The Echo of Vael and The Margin of Mira."""
+"""Original props and cast for The Echo of Vael and The Margin of Mira."""
 import json
 import math
 from pathlib import Path
@@ -325,7 +325,7 @@ def main():
         clips=[animation["name"] for animation in model.g["animations"]]
         entries.append({"file":file,"bytes":(out/file).stat().st_size,"animation":clips[0],
                         "animations":clips,"armature":bool(model.g.get("skins"))})
-    (out/"manifest.json").write_text(json.dumps({"license":"CC0-1.0","models":entries},indent=2)+"\n")
+    (out/"manifest.json").write_text(json.dumps({"license":"LicenseRef-Ruralive-Models-1.0","models":entries},indent=2)+"\n")
 
 
 if __name__=="__main__":

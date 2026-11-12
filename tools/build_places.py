@@ -1,4 +1,4 @@
-"""Original CC0 places and birds for Ruralive Set Film."""
+"""Original places and birds for Ruralive Set Film."""
 import json
 import math
 from pathlib import Path
@@ -166,7 +166,7 @@ def main():
         file=model.name+".glb"
         entries.append({"file":file,"bytes":(out/file).stat().st_size,
                         "animation":model.g["animations"][0]["name"]})
-    (out/"manifest.json").write_text(json.dumps({"license":"CC0-1.0","models":entries},indent=2)+"\n")
+    (out/"manifest.json").write_text(json.dumps({"license":"LicenseRef-Ruralive-Models-1.0","models":entries},indent=2)+"\n")
 
 
 if __name__=="__main__":

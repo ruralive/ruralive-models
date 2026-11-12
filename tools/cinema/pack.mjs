@@ -6,7 +6,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const require = createRequire(join(root, 'animations/package.json'));
+const require = createRequire(join(root, 'tools/cinema/package.json'));
 const { NodeIO } = require('@gltf-transform/core');
 const { ALL_EXTENSIONS, KHRDracoMeshCompression } = require('@gltf-transform/extensions');
 const { resample, prune, dedup } = require('@gltf-transform/functions');
@@ -52,6 +52,6 @@ for (const file of (await readdir(directory)).filter((f) => f.endsWith('.glb') &
 }
 await writeFile(
   join(directory, 'manifest.json'),
-  JSON.stringify({ license: 'CC0-1.0', generator: 'tools/cinema', models }, null, 1) + '\n',
+  JSON.stringify({ license: 'LicenseRef-Ruralive-Models-1.0', generator: 'tools/cinema', models }, null, 1) + '\n',
 );
 console.log(models.length, 'models,', (models.reduce((n, m) => n + m.bytes, 0) / 1e6).toFixed(1), 'MB');

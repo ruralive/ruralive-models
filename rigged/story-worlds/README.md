@@ -1,7 +1,7 @@
 # Vael and Mira story assets
 
 Original, stylized models for *The Echo of Vael* and *The Margin of Mira*. The
-models are dedicated to the public domain under CC0-1.0. Each GLB contains the
+models are under the [Ruralive Models Licence](../../LICENSE). Each GLB contains the
 mesh, UVs, JPEG textures and its named animation clips. They use Y up and contain
 no external media or compression extensions. Characters have skinned skeletons.
 Vehicles, rooms, props and the cat use rigid animated part hierarchies.

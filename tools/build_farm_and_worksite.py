@@ -1,4 +1,4 @@
-"""Build the original CC0 worksite, farm and character collection."""
+"""Build the original worksite, farm and character collection."""
 import json
 import math
 from pathlib import Path
@@ -403,7 +403,7 @@ def main():
         entries.append({"file":file,"bytes":(out/file).stat().st_size,"animation":clips[0],
                         "animations":clips,"armature":bool(model.g.get("skins"))})
     (out/"manifest.json").write_text(json.dumps(
-        {"license":"CC0-1.0","models":entries},indent=2)+"\n")
+        {"license":"LicenseRef-Ruralive-Models-1.0","models":entries},indent=2)+"\n")
 
 
 if __name__=="__main__":
