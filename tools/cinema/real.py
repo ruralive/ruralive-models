@@ -137,16 +137,16 @@ def fabric_layer(m, kind, color):
         return m.mix(col, c, m.math('MULTIPLY', var, 0.3)), fleck, 0.9
     if kind == 'linen':
         # Hand-spun linen: uneven slubs along the threads, a loose plain weave, sun-faded patches.
-        slub = m.noise(420, 3, 0.7, co=m.stretch(1, 1, 0.08))
-        weave = m.math('MAXIMUM', m.wave(1500, 1.5, 1, direction='X'), m.wave(1500, 1.5, 1, direction='Z'))
+        slub = m.noise(130, 3, 0.7, co=m.stretch(1, 1, 0.08))
+        weave = m.math('MAXIMUM', m.wave(520, 1.5, 1, direction='X'), m.wave(520, 1.5, 1, direction='Z'))
         col = m.ramp(var, [(0.15, dark), (0.6, c), (0.9, light)])
         col = m.mix(col, light, m.math('MULTIPLY', m.ramp(slub, [(0.6, 0.0), (0.8, 1.0)]), 0.5))
         col = m.mix(col, '#6a5a44', m.math('MULTIPLY', m.ramp(m.noise(2.5, 5, 0.7), [(0.6, 0.0), (0.85, 1.0)]), 0.25))
         return col, m.math('ADD', m.math('MULTIPLY', weave, 0.6), m.math('MULTIPLY', slub, 0.4)), 0.92
     if kind == 'wool':
         # Fulled wool: a soft felted surface, carded fibres of mixed tones, worn darker in places.
-        fibres = m.noise(900, 4, 0.75, 1.5)
-        felt = m.noise(120, 5, 0.65)
+        fibres = m.noise(260, 4, 0.75, 1.5)
+        felt = m.noise(40, 5, 0.65)
         col = m.ramp(fibres, [(0.3, dark), (0.55, c), (0.75, light)])
         col = m.mix(col, dark, m.math('MULTIPLY', m.ramp(m.noise(3, 5, 0.7), [(0.55, 0.0), (0.85, 1.0)]), 0.45))
         return col, m.math('ADD', m.math('MULTIPLY', felt, 0.6), m.math('MULTIPLY', fibres, 0.4)), 0.97
@@ -173,7 +173,7 @@ def outfit_material(spec, mhmat_path, waist):
         img.colorspace_settings.name = 'Non-Color'
         shade_ = N(nt, 'TexImage', image=img).outputs['Color']
         col = m.mix(col, shade_, 0.85, 'MULTIPLY')
-    m.set(color=col, rough=rough, height=height, bump=0.12, bump_distance=0.0008)
+    m.set(color=col, rough=rough, height=height, bump=0.35, bump_distance=0.0015)
     nrm = info.get('normalmapTexture')
     if nrm and os.path.exists(os.path.join(folder, nrm)):
         img = bpy.data.images.load(os.path.join(folder, nrm))
@@ -259,7 +259,8 @@ def joints_from(body, groups):
         j['tip' + side] = j['toe' + side] + Vector((0, -0.07, -0.01))
     for side, s in (('L', 'l'), ('R', 'r')):
         j['eye' + side] = c('helper-%s-eye' % s)
-    j['mouth'] = c('joint-mouth')
+    # The lips sit just in front of the upper teeth (MakeHuman's mouth joint is up at the nose).
+    j['mouth'] = c('helper-upper-teeth') + Vector((0, 0, -0.004))
     return j
 
 
@@ -278,8 +279,8 @@ def keep_only(body, keep):
 def paint_masks(body, j, spec):
     """Vertex colours the skin shader reads: R flush, G lips, B stubble, A freckle zone."""
     eye = (j['eyeL'] + j['eyeR']) / 2
-    mouth = j['mouth'] + Vector((0, -0.045, 0.0))
-    nose = eye.lerp(mouth, 0.55) + Vector((0, -0.03, 0))
+    mouth = j['mouth'] + Vector((0, -0.02, 0.0))
+    nose = eye.lerp(mouth, 0.5) + Vector((0, -0.035, 0))
     layer = body.data.color_attributes.new('masks', 'FLOAT_COLOR', 'POINT')
     data = []
     for v in body.data.vertices:
@@ -297,7 +298,7 @@ def paint_masks(body, j, spec):
         flush = min(1.0, (0.8 * cheek + 0.3 * nose_flush + 0.5 * ear) * face_front +
                     0.4 * knuckle + 0.5 * ear)
         lips = max(0.0, 1 - (Vector((p.x * 0.5, 0, (p.z - j['mouth'].z) * 1.25))).length / 0.02) * (
-            1.0 if p.y < j['mouth'].y - 0.012 else 0.0)
+            1.0 if p.y < j['mouth'].y - 0.004 else 0.0)
         lips = min(1.0, lips ** 0.6 * 1.4)
         jaw = (p.z < mouth.z + 0.012 and p.z > mouth.z - 0.075 and p.y < eye.y + 0.075 and
                (p - mouth).length < 0.095)
