@@ -110,7 +110,9 @@ def mh_material(mhmat_path, name):
         nm = N(nt, 'NormalMap', {'Color': node.outputs['Color']})
         nt.links.new(nm.outputs['Normal'], b.inputs['Normal'])
     if 'hair' in name:
-        b.inputs['Roughness'].default_value = 0.42
+        # Strands scatter light: a broad, dim sheen, not the hard white patch of a smooth cap.
+        b.inputs['Roughness'].default_value = 0.62
+        b.inputs['Specular IOR Level'].default_value = 0.25
     if 'eye' in name and 'brow' not in name and 'lash' not in name:
         b.inputs['Roughness'].default_value = 0.05
     m['bake'] = False
@@ -160,8 +162,10 @@ def outfit_material(spec, mhmat_path, waist):
     nt = m.nt
     top_col, top_h, top_r = fabric_layer(m, *spec['outfit'][0])
     bot_col, bot_h, bot_r = fabric_layer(m, *spec['outfit'][1])
-    z = N(nt, 'SeparateXYZ', {'Vector': N(nt, 'TexCoord').outputs['Object']}).outputs['Z']
-    upper = m.ramp(z, [(waist - 0.012, 0.0), (waist + 0.012, 1.0)])
+    # World height, remapped round the waist: a colour ramp clamps its input to 0..1, so a raw height
+    # of a metre or more would never reach the split.
+    z = N(nt, 'SeparateXYZ', {'Vector': m.geometry.outputs['Position']}).outputs['Z']
+    upper = m.math('MULTIPLY_ADD', m.math('SUBTRACT', z, waist), 1 / 0.024, 0.5, clamp=True)
     col = m.mix(bot_col, top_col, upper)
     height = m.mix(bot_h, top_h, upper)
     rough = m.mix(bot_r, top_r, upper)
@@ -309,11 +313,45 @@ def paint_masks(body, j, spec):
     layer.data.foreach_set('color', data)
 
 
-def skin_material(spec):
+def lips_shape(m, j):
+    """The lips drawn per pixel round the mouth, so the bake gives them a crisp outline in the UV
+    texture: a cupid's bow on top, a fuller lower lip, a darker parting line and fine vertical creases.
+    Returns (mask, parting line, creases)."""
+    mouth = j['mouth']
+    half_w, up_h, low_h, soft = 0.025, 0.0085, 0.0105, 0.0011
+    pos = N(m.nt, 'SeparateXYZ', {'Vector': N(m.nt, 'TexCoord').outputs['Object']})
+    x, y, z = pos.outputs['X'], pos.outputs['Y'], pos.outputs['Z']
+    mm = m.math
+    u = mm('DIVIDE', x, half_w)
+    dz = mm('SUBTRACT', z, mouth.z)
+    span = mm('SQRT', mm('MAXIMUM', mm('SUBTRACT', 1.0, mm('MULTIPLY', u, u)), 0.0))
+    au = mm('ABSOLUTE', u)
+    bump = lambda at, w: mm('EXPONENT', mm('MULTIPLY', -1.0, mm('POWER', mm('DIVIDE', mm(
+        'SUBTRACT', au, at), w), 2.0)))
+    # Upper edge: two peaks either side of a small dip in the middle (the cupid's bow).
+    upper = mm('SUBTRACT', mm('MULTIPLY', mm('MULTIPLY', span, up_h),
+                               mm('ADD', 1.0, mm('MULTIPLY', bump(0.2, 0.13), 0.22))),
+               mm('MULTIPLY', bump(0.0, 0.09), 0.0016))
+    lower = mm('MULTIPLY', mm('POWER', span, 0.7), -low_h)
+    inside_up = mm('DIVIDE', mm('SUBTRACT', upper, dz), soft, clamp=True)
+    inside_low = mm('DIVIDE', mm('SUBTRACT', dz, lower), soft, clamp=True)
+    front = mm('DIVIDE', mm('SUBTRACT', mouth.y - 0.004, y), 0.003, clamp=True)
+    mask = mm('MULTIPLY', mm('MULTIPLY', inside_up, inside_low), front)
+    parting = mm('MULTIPLY', mm('EXPONENT', mm('MULTIPLY', -1.0, mm('POWER', mm(
+        'DIVIDE', mm('ADD', dz, 0.0004), 0.0009), 2.0))), mask)
+    stretch = N(m.nt, 'Mapping', {'Vector': N(m.nt, 'TexCoord').outputs['Object']})
+    stretch.inputs['Scale'].default_value = (1.0, 1.0, 0.12)
+    crease = m.ramp(m.voronoi(1400, 'DISTANCE_TO_EDGE', co=stretch.outputs['Vector']),
+                    [(0.0, 1.0), (0.06, 0.0)])
+    return mask, parting, mm('MULTIPLY', crease, mask)
+
+
+def skin_material(spec, j):
     m = Mat('skin', scale=1.0)
     attr = N(m.nt, 'Attribute', attribute_name='masks')
     sep = N(m.nt, 'SeparateColor', {'Color': attr.outputs['Color']})
-    flush, lips, stubble = sep.outputs['Red'], sep.outputs['Green'], sep.outputs['Blue']
+    flush, stubble = sep.outputs['Red'], sep.outputs['Blue']
+    lips, parting, crease = lips_shape(m, j)
     zone = attr.outputs['Alpha']
     # Pores two sizes, cell lines, and the larger soft relief of flesh.
     pores = m.ramp(m.voronoi(2200, 'F1'), [(0.0, 1.0), (0.1, 0.0)])
@@ -351,14 +389,19 @@ def skin_material(spec):
                       m.ramp(m.voronoi(scale, 'F1'), [(0.0, 1.0), (size, 0.0)]))
         tone = m.ramp(pick.outputs[1], [(0.0, '#4a2a1c'), (1.0, '#8a5a3c')])
         base = m.mix(base, tone, m.math('MULTIPLY', spot, amount))
-    base = m.mix(base, spec['lips'], lips)
+    # The lip colour is richer at the centre and fades a touch into the skin at the corners.
+    base = m.mix(base, spec['lips'], m.math('MULTIPLY', lips, 0.9))
+    base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.55))
+    base = m.mix(base, spec['skin2'], m.math('MULTIPLY', crease, 0.25))
     if spec['stubble']:
         hairs = m.ramp(m.voronoi(3200, 'F1'), [(0.0, 1.0), (0.3, 0.0)])
         dots = m.math('MULTIPLY', stubble, m.math('ADD', 0.35, m.math('MULTIPLY', hairs, 0.65)))
         base = m.mix(base, '#2a2420', m.math('MULTIPLY', dots, 0.55))
     base = m.mix(base, spec['skin2'], m.math('MULTIPLY', pores, 0.3))
     rough = m.math('ADD', m.math('ADD', 0.5, m.math('MULTIPLY', pores, 0.12)),
-                   m.math('MULTIPLY', lips, -0.15))
+                   m.math('MULTIPLY', lips, -0.18))
+    height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.5),
+                                               m.math('MULTIPLY', parting, 0.8)))
     m.set(color=base, rough=rough, height=height, bump=0.55, bump_distance=0.0007)
     return m.m
 
@@ -718,7 +761,7 @@ def build(model_id):
     height = max(v.co.z for v in body.data.vertices)
     paint_masks(body, j, spec)
     body.data.materials.clear()
-    body.data.materials.append(skin_material(spec))
+    body.data.materials.append(skin_material(spec, j))
     parts = []
     for kind, obj, mat_path in assets:
         name = '%s_%s' % (model_id, kind.lower())
