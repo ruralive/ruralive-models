@@ -231,11 +231,11 @@ def strip_texture(name, kind, size=(256, 1024), seed=1):
     w, h = size
     img = np.zeros((h, w, 4), np.float32)
     y = np.linspace(0, 1, h)[:, None]
-    strands = 70 if kind == 'hair' else 26
+    strands = 46 if kind == 'hair' else 18
     for _ in range(strands):
         x0 = rnd.uniform(0.04, 0.96) * w
         wobble = rnd.uniform(-6, 6) * np.sin(y * rnd.uniform(2, 7) + rnd.uniform(0, 6))
-        width = rnd.uniform(0.8, 1.9)
+        width = rnd.uniform(3.0, 6.0)
         length = rnd.uniform(0.7, 1.0)
         tone = rnd.uniform(0.75, 1.15)
         xs = np.arange(w)[None, :]
@@ -387,7 +387,12 @@ def grow_hair(body, j, spec, bvh, scalp):
     for v in cap.data.vertices:
         v.co += v.normal * (0.0012 + volume * 0.85)
     cap.data.update()
-    cap_mat = M.fur(spec['hair_color'], name='hair_cap', scale=1.6, rough=0.5)
+    cap_m = Mat('hair_cap')
+    streak = cap_m.noise(900, 2, 0.6, co=cap_m.stretch(1, 0.08, 1))
+    cap_m.set(color=cap_m.ramp(streak, [(0.3, core.rgb(spec['hair_color'])), (0.7, tuple(
+        min(1.0, c * 1.6) for c in core.rgb(spec['hair_color'])))]), rough=0.55, height=streak,
+              bump=0.2, bump_distance=0.001)
+    cap_mat = cap_m.m
     cap.data.materials.clear()
     cap.data.materials.append(cap_mat)
     cap.vertex_groups.clear()
@@ -432,7 +437,7 @@ def fabric(kind, color):
 
 def garment(body, j, kind, color, region):
     """A copy of the body faces in a region, pushed out from the skin, as a fitted garment."""
-    keep = set(i for i, v in enumerate(body.data.vertices) if region(v.co))
+    keep = set(i for i, v in enumerate(body.data.vertices) if region(v))
     dup = body.copy()
     dup.data = body.data.copy()
     link(dup)
@@ -462,49 +467,47 @@ def garment(body, j, kind, color, region):
     return dup
 
 
-def regions(j, spec):
+def dominant_bones(body):
+    names = {g.index: g.name for g in body.vertex_groups}
+    out = []
+    for v in body.data.vertices:
+        best = max(v.groups, key=lambda g: g.weight, default=None)
+        out.append(names[best.group] if best else '')
+    return out
+
+
+def regions(j, spec, bones):
+    """Garment regions by the bone that moves each vertex most, as a game pipeline would."""
     waist = j['hips'].z + 0.075
-    neck = j['neck'].z
+    torso = {'Spine', 'Spine1', 'Spine2', 'Shoulder.L', 'Shoulder.R', 'Hips'}
+    legs = {'Hips', 'UpLeg.L', 'UpLeg.R', 'Leg.L', 'Leg.R'}
+    feet = {'Foot.L', 'Foot.R', 'Toe.L', 'Toe.R'}
+    kind = spec['top'][0]
 
-    def on_arm(p, side, limit):
-        """True when p belongs to the arm past `limit` of the way from shoulder to elbow."""
-        sh, el, wr = j['sh' + side], j['el' + side], j['wr' + side]
-        hand = wr + j['d' + side] * 0.2
-        best, along = 1e9, 0.0
-        for a, b, t0 in ((sh, el, 0.0), (el, wr, 1.0), (wr, hand, 2.0)):
-            ab = b - a
-            t = max(0.0, min(1.0, (p - a).dot(ab) / ab.length_squared))
-            dist = (p - (a + ab * t)).length
-            if dist < best:
-                best, along = dist, t0 + t
-        return best < 0.08 and along > 0.05 and along >= limit
+    def along_upper_arm(v, side):
+        sh, el = j['sh' + side], j['el' + side]
+        axis = el - sh
+        return (v.co - sh).dot(axis) / axis.length_squared
 
-    def top(p):
-        if p.z < waist - (0.03 if spec['top'][0] == 'tee' else 0.0) or p.z > neck - 0.015:
+    def top(v):
+        bone = bones[v.index]
+        if v.co.z < waist - (0.03 if kind == 'tee' else 0.0):
             return False
-        if p.y < j['chest'].y - 0.04 and p.z > neck - (0.075 if spec['top'][0] == 'tank'
-                                                       else 0.055):
+        if v.co.y < j['chest'].y - 0.04 and v.co.z > j['neck'].z - (0.08 if kind == 'tank' else 0.05):
             return False
-        for side in 'LR':
-            sh = j['sh' + side]
-            if spec['top'][0] == 'tank' and abs(p.x) > abs(sh.x) - 0.045 and p.z > sh.z - 0.08:
-                return False
-            if on_arm(p, side, 0.38 if spec['top'][0] == 'tee' else 0.0):
-                return False
-            if abs(p.x) > abs(sh.x) + 0.01 and spec['top'][0] == 'tank':
-                return False
-        return True
+        if bone in torso:
+            if kind == 'tank' and bone.startswith('Shoulder'):
+                return v.co.z < j['shL'].z - 0.02 and abs(v.co.x) < abs(j['shL'].x) - 0.05
+            return v.co.z < j['neck'].z - 0.015
+        if kind == 'tee' and bone.startswith('UpperArm'):
+            return along_upper_arm(v, bone[-1]) < 0.42
+        return False
 
-    def bottom(p):
-        if p.z > waist + 0.01 or p.z < j['anL'].z + 0.02:
-            return False
-        for side in 'LR':
-            if on_arm(p, side, 0.0):
-                return False
-        return True
+    def bottom(v):
+        return bones[v.index] in legs and v.co.z < waist + 0.01 and v.co.z > j['anL'].z + 0.02
 
-    def shoes(p):
-        return p.z < j['anL'].z + 0.035
+    def shoes(v):
+        return bones[v.index] in feet or (bones[v.index] in legs and v.co.z < j['anL'].z + 0.035)
 
     return top, bottom, shoes
 
@@ -536,7 +539,7 @@ def build(model_id):
     s = dict(name=model_id, height=height)
     rig = human.build_rig(s, j)
     rig.bind_auto(body)
-    top_r, bottom_r, shoe_r = regions(j, spec)
+    top_r, bottom_r, shoe_r = regions(j, spec, dominant_bones(body))
     clothes = [garment(body, j, spec['top'][0], spec['top'][1], top_r),
                garment(body, j, spec['bottom'][0], spec['bottom'][1], bottom_r),
                garment(body, j, 'shoes', spec['shoes'], shoe_r)]
