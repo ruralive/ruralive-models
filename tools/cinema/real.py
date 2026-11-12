@@ -117,7 +117,7 @@ def mh_material(mhmat_path, name):
     return m
 
 
-def fabric(m, kind, color):
+def fabric_layer(m, kind, color):
     """A fabric's colour, height and roughness, built inside material m."""
     c = core.rgb(color)
     dark = tuple(x * 0.78 for x in c)
@@ -158,8 +158,8 @@ def outfit_material(spec, mhmat_path, waist):
     """Today's fabrics, top and bottom, over the folds and seams of the original garment."""
     m = Mat('outfit')
     nt = m.nt
-    top_col, top_h, top_r = fabric(m, *spec['outfit'][0])
-    bot_col, bot_h, bot_r = fabric(m, *spec['outfit'][1])
+    top_col, top_h, top_r = fabric_layer(m, *spec['outfit'][0])
+    bot_col, bot_h, bot_r = fabric_layer(m, *spec['outfit'][1])
     z = N(nt, 'SeparateXYZ', {'Vector': N(nt, 'TexCoord').outputs['Object']}).outputs['Z']
     upper = m.ramp(z, [(waist - 0.012, 0.0), (waist + 0.012, 1.0)])
     col = m.mix(bot_col, top_col, upper)
