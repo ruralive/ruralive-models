@@ -346,6 +346,79 @@ def lips_shape(m, j):
     return mask, parting, mm('MULTIPLY', crease, mask)
 
 
+def blob(m, centre, radius, squash=(1.0, 1.0, 1.0)):
+    """1 at a point of the body, fading to 0 at radius (object space), optionally squashed."""
+    rel = N(m.nt, 'VectorMath', {0: N(m.nt, 'TexCoord').outputs['Object'], 1: tuple(centre)},
+            operation='SUBTRACT')
+    sq = N(m.nt, 'VectorMath', {0: rel.outputs['Vector'], 1: squash}, operation='MULTIPLY')
+    dist = N(m.nt, 'VectorMath', {0: sq.outputs['Vector']}, operation='LENGTH').outputs['Value']
+    return m.math('SUBTRACT', 1.0, m.math('DIVIDE', dist, radius), clamp=True)
+
+
+def rare_spots(m, scale, rate, size, seed):
+    """Sparse round spots: a few voronoi cells chosen by their random colour. Returns (spot, pick)."""
+    shift = N(m.nt, 'Mapping', {'Vector': m.co})
+    shift.inputs['Location'].default_value = (seed * 1.7, seed * 3.1, seed * 0.9)
+    cell = m.voronoi(scale, 'F1', out='Color', co=shift.outputs['Vector'])
+    pick = N(m.nt, 'SeparateColor', {'Color': cell})
+    spot = m.math('MULTIPLY', m.ramp(pick.outputs[0], [(1 - rate, 0.0), (1 - rate + 0.002, 1.0)]),
+                  m.ramp(m.voronoi(scale, 'F1', co=shift.outputs['Vector']),
+                         [(0.0, 1.0), (size, 0.0)]))
+    return spot, pick
+
+
+def skin_imperfections(m, spec, j, base, height, rough, flush):
+    """What makes skin look lived in: blemishes and the marks they leave, a scar or two, broken
+    capillaries, blotchy redness, shadows under the eyes, open pores and oil on the T-zone,
+    dry patches. Returns the new (base, height, rough)."""
+    mm = m.math
+    # Blotchy, uneven redness at a hand's scale.
+    blotch = m.ramp(m.noise(9, 3, 0.55, 1.4), [(0.55, 0.0), (0.72, 1.0)])
+    base = m.mix(base, spec['flush'], mm('MULTIPLY', blotch, 0.1))
+    # Active blemishes: small raised red bumps with a paler head, mostly on the face and back.
+    pim, _ = rare_spots(m, 55, 0.02, 0.09, 1)
+    head = m.ramp(m.voronoi(55, 'F1'), [(0.0, 1.0), (0.025, 0.0)])
+    base = m.mix(base, '#a8443a', mm('MULTIPLY', pim, 0.5))
+    base = m.mix(base, '#d8b08a', mm('MULTIPLY', mm('MULTIPLY', pim, head), 0.35))
+    height = mm('ADD', height, mm('MULTIPLY', pim, 0.6))
+    # Old marks: flat, faded brown-red spots left behind.
+    mark, pick = rare_spots(m, 70, 0.03, 0.08, 2)
+    tone = m.ramp(pick.outputs[1], [(0.0, '#8a4a3a'), (1.0, '#6a3e2c')])
+    base = m.mix(base, tone, mm('MULTIPLY', mark, 0.3))
+    # Small healed scars: thin pale lines, a little sunken and shinier.
+    long = N(m.nt, 'Mapping', {'Vector': m.co})
+    long.inputs['Scale'].default_value = (1.0, 1.0, 5.0)
+    long.inputs['Rotation'].default_value = (0.4, 0.2, 0.7)
+    scar_line = m.ramp(m.voronoi(12, 'DISTANCE_TO_EDGE', co=long.outputs['Vector']),
+                       [(0.0, 1.0), (0.012, 0.0)])
+    scar_zone, _ = rare_spots(m, 6, 0.12, 0.6, 3)
+    scar = mm('MULTIPLY', scar_line, mm('MINIMUM', mm('MULTIPLY', scar_zone, 3.0), 1.0))
+    base = m.mix(base, '#e8c8b4', mm('MULTIPLY', scar, 0.35))
+    height = mm('SUBTRACT', height, mm('MULTIPLY', scar, 0.5))
+    rough = mm('SUBTRACT', rough, mm('MULTIPLY', scar, 0.15))
+    # Broken capillaries: thin red threads where the cheeks and nose flush.
+    cap = m.ramp(m.noise(120, 2, 0.5, 2.5), [(0.485, 0.0), (0.5, 1.0), (0.515, 0.0)])
+    base = m.mix(base, '#b0302a', mm('MULTIPLY', mm('MULTIPLY', cap, flush), 0.22))
+    # Darker, thinner skin under the eyes.
+    under = mm('MAXIMUM', *(blob(m, j['eye' + s_] + Vector((0, -0.006, -0.017)), 0.02,
+                                 (0.8, 1.0, 1.6)) for s_ in 'LR'))
+    base = m.mix(base, m.mix(spec['skin2'], '#5a3a48', 0.35), mm('MULTIPLY', under, 0.3))
+    # Open pores and a little oil down the nose and across the forehead.
+    eye = (j['eyeL'] + j['eyeR']) / 2
+    tzone = mm('MAXIMUM', blob(m, eye + Vector((0, -0.04, -0.03)), 0.03, (1.6, 1.0, 0.8)),
+               blob(m, eye + Vector((0, -0.025, 0.05)), 0.05, (0.6, 1.0, 1.2)))
+    big = m.ramp(m.voronoi(1500, 'F1'), [(0.0, 1.0), (0.14, 0.0)])
+    height = mm('SUBTRACT', height, mm('MULTIPLY', mm('MULTIPLY', big, tzone), 0.5))
+    rough = mm('SUBTRACT', rough, mm('MULTIPLY', tzone, 0.12))
+    # Dry, slightly ashy patches here and there (elbows, knees, knuckles end up in some).
+    dry = m.ramp(m.noise(4, 3, 0.6, 0.8), [(0.62, 0.0), (0.75, 1.0)])
+    base = m.mix(base, m.mix(spec['skin'], '#e0d4cc', 0.3), mm('MULTIPLY', dry, 0.18))
+    rough = mm('ADD', rough, mm('MULTIPLY', dry, 0.12))
+    flake = m.ramp(m.voronoi(900, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.05, 0.0)])
+    height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', flake, dry), 0.25))
+    return base, height, rough
+
+
 def skin_material(spec, j):
     m = Mat('skin', scale=1.0)
     attr = N(m.nt, 'Attribute', attribute_name='masks')
@@ -402,6 +475,7 @@ def skin_material(spec, j):
                    m.math('MULTIPLY', lips, -0.18))
     height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.5),
                                                m.math('MULTIPLY', parting, 0.8)))
+    base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush)
     m.set(color=base, rough=rough, height=height, bump=0.55, bump_distance=0.0007)
     return m.m
 
