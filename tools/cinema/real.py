@@ -257,7 +257,7 @@ def skin_material(spec):
     base = m.ramp(m.noise(5, 5, 0.6), [(0.3, spec['skin2']), (0.7, spec['skin'])])
     base = m.mix(base, m.mix(spec['skin'], spec['skin2'], 0.5), m.math(
         'MULTIPLY', m.noise(30, 4, 0.6), 0.25))
-    base = m.mix(base, spec['flush'], m.math('MULTIPLY', flush, 0.55))
+    base = m.mix(base, spec['flush'], m.math('MULTIPLY', flush, 0.28))
     veins = m.ramp(m.noise(14, 3, 0.5, 1.2), [(0.47, 0.0), (0.5, 1.0), (0.53, 0.0)])
     base = m.mix(base, '#5a6a8a', m.math('MULTIPLY', veins, 0.06))
     if spec['freckles']:
@@ -620,6 +620,20 @@ def build(model_id):
         bpy.ops.object.shape_key_remove(all=True, apply_mix=True)
     groups = groups_of(body)
     j = joints_from(body, groups)
+    # A whole-body copy, without the helpers but with the skin under the clothes, gives the
+    # clothes their weights: the visible body has lost exactly the skin they would copy from.
+    full = body.copy()
+    full.data = body.data.copy()
+    link(full)
+    activate(full)
+    for mod in list(full.modifiers):
+        if mod.type == 'MASK' and mod.vertex_group == 'body':
+            bpy.ops.object.modifier_apply(modifier=mod.name)
+        else:
+            full.modifiers.remove(mod)
+    full.vertex_groups.clear()
+    full.parent = None
+    activate(body)
     # The masks hide the helpers and the skin under the clothes: apply them.
     for mod in list(body.modifiers):
         if mod.type == 'MASK':
@@ -644,12 +658,13 @@ def build(model_id):
     human.REST_DOWN = rest - 0.06
     s = dict(name=model_id, height=height)
     rig = human.build_rig(s, j)
-    rig.bind_auto(body)
+    rig.bind_auto(full)
+    rig.transfer_weights(full, body)
     clothes, rigid = [], []
     for kind, obj in parts:
         obj.vertex_groups.clear()
         if kind in ('Clothes', 'Hair') and not (kind == 'Hair' and spec['hair'] != 'long'):
-            rig.transfer_weights(body, obj)
+            rig.transfer_weights(full, obj)
             # Cloth near the hands must not follow them: only the body moves clothes and hair.
             for group in list(obj.vertex_groups):
                 if group.name.split('.')[0].rstrip('0123456789') in (
@@ -661,6 +676,7 @@ def build(model_id):
         else:
             rig.bind_rigid(obj, 'Jaw' if kind in ('Tongue',) else 'Head')
             rigid.append(obj)
+    bpy.data.objects.remove(full)
     human.animate(rig, s, height / 1.75)
     return rig, body, clothes, rigid
 
