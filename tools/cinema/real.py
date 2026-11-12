@@ -32,6 +32,7 @@ CAST = {
                    african=0.85, asian=0.05, caucasian=0.1),
         skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
         freckles=0.0, stubble=0.0, hair='coils', hair_color='#120c0a',
+        outfit=(('rib', '#b5532f'), ('denim', '#6d8bb0')),
         assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
                     clothes=['female_casualsuit01', 'shoes05'])),
     'tomas': dict(
@@ -39,6 +40,7 @@ CAST = {
                    african=0.0, asian=0.0, caucasian=1.0),
         skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
         freckles=0.15, stubble=0.75, hair='short', hair_color='#5a4b40',
+        outfit=(('heather', '#3d4248'), ('denim', '#25304a')),
         assets=dict(eyes='grey', eyebrows='eyebrow001', eyelashes='eyelashes01', hair='short02',
                     clothes=['male_casualsuit04', 'shoes02'])),
     'mei': dict(
@@ -46,6 +48,7 @@ CAST = {
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#b0565c', iris='#2a1a12',
         freckles=0.05, stubble=0.0, hair='long', hair_color='#0e0b0b',
+        outfit=(('heather', '#e9e3d6'), ('twill', '#1c1c21')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit02', 'shoes06'])),
 }
@@ -112,6 +115,58 @@ def mh_material(mhmat_path, name):
         b.inputs['Roughness'].default_value = 0.05
     m['bake'] = False
     return m
+
+
+def fabric(m, kind, color):
+    """A fabric's colour, height and roughness, built inside material m."""
+    c = core.rgb(color)
+    dark = tuple(x * 0.78 for x in c)
+    light = tuple(min(1.0, x * 1.2 + 0.03) for x in c)
+    var = m.noise(4, 4, 0.6)
+    if kind == 'denim':
+        twill = m.noise(1100, 2, 0.5, co=m.stretch(1, 1, 0.2))
+        col = m.ramp(var, [(0.2, dark), (0.55, c), (0.85, light)])
+        col = m.mix(col, tuple(min(1.0, x * 1.9) for x in c), m.math('MULTIPLY', twill, 0.22))
+        return col, twill, 0.8
+    if kind == 'rib':
+        ribs = m.wave(900, 0.0, 0, direction='X')
+        return m.ramp(var, [(0.2, dark), (0.8, c)]), ribs, 0.85
+    if kind == 'heather':
+        fleck = m.noise(1400, 2, 0.6)
+        col = m.ramp(fleck, [(0.35, dark), (0.65, light)])
+        return m.mix(col, c, m.math('MULTIPLY', var, 0.3)), fleck, 0.9
+    weave = m.noise(900, 2, 0.5)
+    return m.ramp(var, [(0.2, dark), (0.8, c)]), weave, 0.75
+
+
+def outfit_material(spec, mhmat_path, waist):
+    """Today's fabrics, top and bottom, over the folds and seams of the original garment."""
+    m = Mat('outfit')
+    nt = m.nt
+    top_col, top_h, top_r = fabric(m, *spec['outfit'][0])
+    bot_col, bot_h, bot_r = fabric(m, *spec['outfit'][1])
+    z = N(nt, 'SeparateXYZ', {'Vector': N(nt, 'TexCoord').outputs['Object']}).outputs['Z']
+    upper = m.ramp(z, [(waist - 0.012, 0.0), (waist + 0.012, 1.0)])
+    col = m.mix(bot_col, top_col, upper)
+    height = m.mix(bot_h, top_h, upper)
+    rough = m.mix(bot_r, top_r, upper)
+    info = mhmat(mhmat_path)
+    folder = os.path.dirname(mhmat_path)
+    ao = info.get('aomapTexture')
+    if ao and os.path.exists(os.path.join(folder, ao)):
+        img = bpy.data.images.load(os.path.join(folder, ao))
+        img.colorspace_settings.name = 'Non-Color'
+        shade_ = N(nt, 'TexImage', image=img).outputs['Color']
+        col = m.mix(col, shade_, 0.85, 'MULTIPLY')
+    m.set(color=col, rough=rough, height=height, bump=0.12, bump_distance=0.0008)
+    nrm = info.get('normalmapTexture')
+    if nrm and os.path.exists(os.path.join(folder, nrm)):
+        img = bpy.data.images.load(os.path.join(folder, nrm))
+        img.colorspace_settings.name = 'Non-Color'
+        nm = N(nt, 'NormalMap', {'Color': N(nt, 'TexImage', image=img).outputs['Color']})
+        bump = next(n for n in nt.nodes if n.type == 'BUMP')
+        nt.links.new(nm.outputs['Normal'], bump.inputs['Normal'])
+    return m.m
 
 
 def add_assets(body, service, spec):
@@ -651,7 +706,11 @@ def build(model_id):
     parts = []
     for kind, obj, mat_path in assets:
         name = '%s_%s' % (model_id, kind.lower())
-        mat = mh_material(mat_path, kind.lower()) if mat_path else None
+        if kind == 'Clothes' and 'suit' in os.path.basename(mat_path or ''):
+            mat = outfit_material(spec, mat_path, j['hips'].z + 0.07)
+            name = model_id + '_outfit'
+        else:
+            mat = mh_material(mat_path, kind.lower()) if mat_path else None
         parts.append((kind, freeze(obj, name, mat)))
     arm = (j['elL'] - j['shL']).normalized()
     rest = math.acos(max(-1, min(1, arm.dot(Vector((0, 0, -1))))))
@@ -683,6 +742,9 @@ def build(model_id):
 
 def bake_all(model_id, body, clothes):
     bake_atlas(body, 4096, name=model_id + '_skin', do_unwrap=False, ao_samples=16)
+    for c in clothes:
+        if c.name.endswith('_outfit'):
+            bake_atlas(c, 2048, name=model_id + '_outfit', do_unwrap=False, ao_samples=8)
     # Skin lets light in: only the renders here use it, the web player draws the baked colour.
     for mat in body.data.materials:
         b = mat.node_tree.nodes.get('Principled BSDF')
