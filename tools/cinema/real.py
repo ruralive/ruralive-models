@@ -280,6 +280,25 @@ def keep_only(body, keep):
 
 
 # ----------------------------------------------------------------------------- skin
+def beard_zone(p, j, eye, lips):
+    """Where a few days of beard grows, with soft edges: moustache, chin, jaw, the lower cheeks
+    rising to the sideburns, and under the jaw down the neck."""
+    def fade(v, width):
+        return max(0.0, min(1.0, v / width))
+    mz = j['mouth'].z
+    side = min(1.0, abs(p.x) / 0.055)
+    # The cheek line climbs from the mouth corners to the sideburns in front of the ears.
+    top = mz + 0.014 + 0.03 * side ** 1.5 + (0.035 if abs(p.x) > 0.062 else 0.0) * fade(
+        abs(p.x) - 0.062, 0.006)
+    under_top = fade(top - p.z, 0.012)
+    above_neck = fade(p.z - (mz - 0.105), 0.03)
+    front = fade(eye.y + 0.075 - p.y, 0.015)
+    # Keep it off the lips and the strip just under the lower lip thinner.
+    off_lips = 1.0 - min(1.0, lips * 1.6)
+    soul = 1.0 - 0.5 * fade(0.012 - abs(p.z - (mz - 0.016)), 0.006) * fade(0.012 - abs(p.x), 0.006)
+    return under_top * above_neck * front * off_lips * soul
+
+
 def paint_masks(body, j, spec):
     """Vertex colours the skin shader reads: R flush, G lips, B stubble, A freckle zone."""
     eye = (j['eyeL'] + j['eyeR']) / 2
@@ -304,10 +323,7 @@ def paint_masks(body, j, spec):
         lips = max(0.0, 1 - (Vector((p.x * 0.85, 0, (p.z - j['mouth'].z) * 2.1))).length / 0.02) * (
             1.0 if p.y < j['mouth'].y - 0.004 else 0.0)
         lips = min(1.0, lips * 2.5) * 0.85
-        jaw = (p.z < mouth.z + 0.012 and p.z > mouth.z - 0.075 and p.y < eye.y + 0.075 and
-               (p - mouth).length < 0.095)
-        upper_lip = (abs(p.z - mouth.z - 0.016) < 0.012 and abs(p.x) < 0.03 and face_front > 0.3)
-        stubble = spec['stubble'] if ((jaw or upper_lip) and lips < 0.3) else 0.0
+        stubble = spec['stubble'] * beard_zone(p, j, eye, lips) if spec['stubble'] else 0.0
         freckle_zone = 1.0 if (p.z > j['chest'].z - 0.05) else 0.25
         data += [flush, lips, stubble, freckle_zone]
     layer.data.foreach_set('color', data)
@@ -467,9 +483,16 @@ def skin_material(spec, j):
     base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.55))
     base = m.mix(base, spec['skin2'], m.math('MULTIPLY', crease, 0.25))
     if spec['stubble']:
-        hairs = m.ramp(m.voronoi(3200, 'F1'), [(0.0, 1.0), (0.3, 0.0)])
-        dots = m.math('MULTIPLY', stubble, m.math('ADD', 0.35, m.math('MULTIPLY', hairs, 0.65)))
-        base = m.mix(base, '#2a2420', m.math('MULTIPLY', dots, 0.55))
+        # Several days of growth, uneven: denser on the chin and moustache, thin patches on the
+        # cheeks, a grey-blue shadow of hair under the skin and short dark hairs on top.
+        patch = m.ramp(m.noise(28, 3, 0.6, 0.6), [(0.35, 0.45), (0.65, 1.0)])
+        grow = m.math('MULTIPLY', stubble, patch)
+        base = m.mix(base, m.mix(spec['skin2'], '#4a5058', 0.45), m.math('MULTIPLY', grow, 0.22))
+        hairs = m.ramp(m.voronoi(3600, 'F1'), [(0.0, 1.0), (0.22, 0.0)])
+        fine = m.ramp(m.voronoi(6000, 'F1'), [(0.0, 1.0), (0.18, 0.0)])
+        dots = m.math('MULTIPLY', grow, m.math('MAXIMUM', hairs, m.math('MULTIPLY', fine, 0.7)))
+        base = m.mix(base, m.mix(spec['hair_color'], '#1a1410', 0.4), m.math('MULTIPLY', dots, 0.45))
+        height = m.math('ADD', height, m.math('MULTIPLY', dots, 0.2))
     base = m.mix(base, spec['skin2'], m.math('MULTIPLY', pores, 0.3))
     rough = m.math('ADD', m.math('ADD', 0.5, m.math('MULTIPLY', pores, 0.12)),
                    m.math('MULTIPLY', lips, -0.18))
