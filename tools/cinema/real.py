@@ -224,10 +224,10 @@ def paint_masks(body, j, spec):
         for side in 'LR':
             knuckle = max(knuckle, max(0.0, 1 - (p - (j['wr' + side] + j['d' + side] * 0.1)).length
                                        / 0.06))
-        flush = min(1.0, (0.8 * cheek + nose_flush + 0.7 * ear) * face_front + 0.4 * knuckle +
-                    0.6 * ear)
-        lips = max(0.0, 1 - (Vector((p.x * 0.5, 0, (p.z - mouth.z) * 1.25))).length / 0.02) * (
-            1.0 if p.y < mouth.y + 0.012 else 0.0)
+        flush = min(1.0, (0.8 * cheek + 0.3 * nose_flush + 0.5 * ear) * face_front +
+                    0.4 * knuckle + 0.5 * ear)
+        lips = max(0.0, 1 - (Vector((p.x * 0.5, 0, (p.z - j['mouth'].z) * 1.25))).length / 0.02) * (
+            1.0 if p.y < j['mouth'].y - 0.012 else 0.0)
         lips = min(1.0, lips ** 0.6 * 1.4)
         jaw = (p.z < mouth.z + 0.012 and p.z > mouth.z - 0.075 and p.y < eye.y + 0.075 and
                (p - mouth).length < 0.095)
