@@ -111,8 +111,13 @@ def mh_material(mhmat_path, name):
         nt.links.new(nm.outputs['Normal'], b.inputs['Normal'])
     if 'hair' in name:
         # Strands scatter light: a broad, dim sheen, not the hard white patch of a smooth cap.
-        b.inputs['Roughness'].default_value = 0.62
-        b.inputs['Specular IOR Level'].default_value = 0.25
+        b.inputs['Roughness'].default_value = 0.75
+        b.inputs['Specular IOR Level'].default_value = 0.08
+        # The MakeHuman hair normal map turns parts of the cap edge-on to the rim light and they
+        # flare white; strands read better without it.
+        for link in list(nt.links):
+            if link.to_node == b and link.to_socket.name == 'Normal':
+                nt.links.remove(link)
     if 'eye' in name and 'brow' not in name and 'lash' not in name:
         b.inputs['Roughness'].default_value = 0.05
     m['bake'] = False
@@ -264,7 +269,8 @@ def joints_from(body, groups):
     for side, s in (('L', 'l'), ('R', 'r')):
         j['eye' + side] = c('helper-%s-eye' % s)
     # The lips sit just in front of the upper teeth (MakeHuman's mouth joint is up at the nose).
-    j['mouth'] = c('helper-upper-teeth') + Vector((0, 0, -0.004))
+    # Measured on the renders: the lip parting sits about 11 mm under the upper-teeth helper.
+    j['mouth'] = c('helper-upper-teeth') + Vector((0, 0, -0.011))
     return j
 
 
@@ -363,7 +369,7 @@ def lips_shape(m, j):
     texture: a cupid's bow on top, a fuller lower lip, a darker parting line and fine vertical creases.
     Returns (mask, parting line, creases)."""
     mouth = j['mouth']
-    half_w, up_h, low_h, soft = 0.025, 0.0085, 0.0105, 0.0011
+    half_w, up_h, low_h, soft = 0.024, 0.0075, 0.0095, 0.0018
     pos = N(m.nt, 'SeparateXYZ', {'Vector': N(m.nt, 'TexCoord').outputs['Object']})
     x, y, z = pos.outputs['X'], pos.outputs['Y'], pos.outputs['Z']
     mm = m.math
@@ -500,19 +506,19 @@ def skin_chroma(m, spec, j, base, flush):
     eye = (j['eyeL'] + j['eyeR']) / 2
     mouth = j['mouth']
     # Large, slow blotches of each chromophore, out of step with each other.
-    for scale, col, amount in ((3.5, '#ffc4b4', 0.35), (2.2, '#fff0c0', 0.4), (2.8, '#e4eedc', 0.3)):
+    for scale, col, amount in ((3.5, '#ffc4b4', 0.55), (2.2, '#fff0c0', 0.6), (2.8, '#e4eedc', 0.5)):
         bl = m.ramp(m.noise(scale, 3, 0.55, 0.5), [(0.4, 0.0), (0.7, 1.0)])
         base = tint(col, mm('MULTIPLY', bl, amount))
     # Fine chromatic grain: tiny red, yellow and blue shifts, cell by cell.
-    for scale, col, amount in ((420, '#ffcfc8', 0.35), (510, '#fff2cc', 0.3), (380, '#dde6f2', 0.25)):
+    for scale, col, amount in ((420, '#ffcfc8', 0.5), (510, '#fff2cc', 0.45), (380, '#dde6f2', 0.4)):
         grain = m.ramp(m.noise(scale, 2, 0.5), [(0.45, 0.0), (0.7, 1.0)])
         base = tint(col, mm('MULTIPLY', grain, amount))
     # The face in thirds.
     forehead = blob(m, eye + Vector((0, -0.01, 0.055)), 0.06, (0.75, 1.0, 1.3))
     lower = blob(m, mouth + Vector((0, -0.01, -0.02)), 0.06, (0.85, 1.0, 1.0))
-    base = tint('#ffe9b8', mm('MULTIPLY', forehead, 0.55))
-    base = tint('#ffb2a6', mm('MULTIPLY', flush, 0.45))
-    base = tint('#d6e2de', mm('MULTIPLY', lower, 0.45 + 0.45 * spec['stubble']))
+    base = tint('#ffe9b8', mm('MULTIPLY', forehead, 0.8))
+    base = tint('#ffb2a6', mm('MULTIPLY', flush, 0.6))
+    base = tint('#d6e2de', mm('MULTIPLY', lower, 0.6 + 0.5 * spec['stubble']))
     # Blood comes up where skin is thin over bone or pressed and used: knuckles, elbows, knees,
     # heels and toes, fingertips, the tip of the nose and the ears (already in the flush mask).
     joints = []
@@ -554,7 +560,7 @@ def skin_chroma(m, spec, j, base, flush):
     convex = m.ramp(curve, [(0.5, 0.0), (0.56, 1.0)])
     concave = m.ramp(curve, [(0.44, 1.0), (0.5, 0.0)])
     base = tint('#fff0e6', mm('MULTIPLY', convex, 0.5))
-    base = tint('#e0e8de', mm('MULTIPLY', concave, 0.45))
+    base = tint('#e0e8de', mm('MULTIPLY', concave, 0.7))
     base = tint('#e8c4b4', mm('MULTIPLY', concave, 0.25))
     # Green is red's complement: faint green patches stop the reds from going one flat pink.
     mute = m.ramp(m.noise(11, 3, 0.6, 0.7), [(0.55, 0.0), (0.75, 1.0)])
@@ -605,9 +611,9 @@ def skin_material(spec, j):
         tone = m.ramp(pick.outputs[1], [(0.0, '#4a2a1c'), (1.0, '#8a5a3c')])
         base = m.mix(base, tone, m.math('MULTIPLY', spot, amount))
     # The lip colour is richer at the centre and fades a touch into the skin at the corners.
-    base = m.mix(base, spec['lips'], m.math('MULTIPLY', lips, 0.9))
-    base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.55))
-    base = m.mix(base, spec['skin2'], m.math('MULTIPLY', crease, 0.25))
+    base = m.mix(base, spec['lips'], m.math('MULTIPLY', lips, 0.72))
+    base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.45))
+    base = m.mix(base, spec['skin2'], m.math('MULTIPLY', crease, 0.15))
     if spec['stubble']:
         # Several days of growth, uneven: denser on the chin and moustache, thin patches on the
         # cheeks, a grey-blue shadow of hair under the skin and short dark hairs on top.
@@ -622,8 +628,8 @@ def skin_material(spec, j):
     base = m.mix(base, spec['skin2'], m.math('MULTIPLY', pores, 0.3))
     rough = m.math('ADD', m.math('ADD', 0.5, m.math('MULTIPLY', pores, 0.12)),
                    m.math('MULTIPLY', lips, -0.18))
-    height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.5),
-                                               m.math('MULTIPLY', parting, 0.8)))
+    height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.15),
+                                               m.math('MULTIPLY', parting, 0.5)))
     base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush, lips)
     if spec.get('body_hair'):
         # Fine arm hair: soft darker patches made of short strokes laid along the arm.

@@ -49,9 +49,11 @@ def report(path, out=None):
         print('  %-7s %5.1f%%' % (name, 100 * counts[name] / total))
     v = hsv[:, 2]
     light, dark = hsv[v > np.quantile(v, 0.7)], hsv[v < np.quantile(v, 0.3)]
-    warm = lambda part: np.mean(np.cos(np.radians(part[:, 0] * 360 - 20)))
-    print('  warmth of lights %.2f, of shadows %.2f (lights should be warmer)' % (
-        warm(light), warm(dark)))
+    hue = lambda part: np.degrees(np.angle(np.mean(np.exp(1j * part[:, 0] * 2 * np.pi)))) % 360
+    print('  mean hue of lights %.1f deg, of shadows %.1f deg; saturation %.2f vs %.2f' % (
+        hue(light), hue(dark), light[:, 1].mean(), dark[:, 1].mean()))
+    print('  (skin hue ~10-30 deg; warmer = nearer red/orange; shadows should drift cooler/greener'
+          ' or more saturated red, never grey)')
     print('  hue spread (std, degrees) %.1f' % np.degrees(np.std(np.unwrap(np.radians(hsv[:, 0] * 360)))))
     if out:
         crop = Image.fromarray((box * 255).astype(np.uint8))
