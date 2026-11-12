@@ -444,10 +444,6 @@ def skin_imperfections(m, spec, j, base, height, rough, flush):
     # Broken capillaries: thin red threads where the cheeks and nose flush.
     cap = m.ramp(m.noise(120, 2, 0.5, 2.5), [(0.485, 0.0), (0.5, 1.0), (0.515, 0.0)])
     base = m.mix(base, '#b0302a', mm('MULTIPLY', mm('MULTIPLY', cap, flush), 0.22))
-    # Darker, thinner skin under the eyes.
-    under = mm('MAXIMUM', *(blob(m, j['eye' + s_] + Vector((0, -0.006, -0.017)), 0.02,
-                                 (0.8, 1.0, 1.6)) for s_ in 'LR'))
-    base = m.mix(base, m.mix(spec['skin2'], '#5a3a48', 0.35), mm('MULTIPLY', under, 0.3))
     # Open pores and a little oil down the nose and across the forehead.
     eye = (j['eyeL'] + j['eyeR']) / 2
     tzone = mm('MAXIMUM', blob(m, eye + Vector((0, -0.04, -0.03)), 0.03, (1.6, 1.0, 0.8)),
@@ -462,6 +458,80 @@ def skin_imperfections(m, spec, j, base, height, rough, flush):
     flake = m.ramp(m.voronoi(900, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.05, 0.0)])
     height = mm('ADD', height, mm('MULTIPLY', mm('MULTIPLY', flake, dry), 0.25))
     return base, height, rough
+
+
+def luminance(hex_colour):
+    r, g, b = core.rgb(hex_colour)
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def any_of(m, *masks):
+    out = masks[0]
+    for k in masks[1:]:
+        out = m.math('MAXIMUM', out, k)
+    return out
+
+
+def skin_chroma(m, spec, j, base, flush):
+    """The colours under the skin. Skin is not one colour: melanin (brown) sits on top, blood in the
+    dermis (red where it carries oxygen, blue-purple where it does not), carotene and the thick
+    horny layer (yellow), and veins seen through fat and tissue (blue-green, never true blue).
+    Each acts as an absorber, so each is a gentle multiply. On darker skin melanin hides most of
+    them, so they are scaled by how light the skin is. Portrait painters split the face in three:
+    a golden forehead, a red middle (cheeks, nose, ears), a cool blue-green-grey lower third."""
+    mm = m.math
+    k = 0.45 + 0.55 * min(1.0, luminance(spec['skin']) / 0.5)
+    tint = lambda col, fac: m.mix(base, col, mm('MULTIPLY', fac, k), 'MULTIPLY')
+    eye = (j['eyeL'] + j['eyeR']) / 2
+    mouth = j['mouth']
+    # Large, slow blotches of each chromophore, out of step with each other.
+    for scale, col, amount in ((3.5, '#ffc4b4', 0.35), (2.2, '#fff0c0', 0.4), (2.8, '#e4eedc', 0.3)):
+        bl = m.ramp(m.noise(scale, 3, 0.55, 0.5), [(0.4, 0.0), (0.7, 1.0)])
+        base = tint(col, mm('MULTIPLY', bl, amount))
+    # Fine chromatic grain: tiny red, yellow and blue shifts, cell by cell.
+    for scale, col, amount in ((420, '#ffcfc8', 0.35), (510, '#fff2cc', 0.3), (380, '#dde6f2', 0.25)):
+        grain = m.ramp(m.noise(scale, 2, 0.5), [(0.45, 0.0), (0.7, 1.0)])
+        base = tint(col, mm('MULTIPLY', grain, amount))
+    # The face in thirds.
+    forehead = blob(m, eye + Vector((0, -0.01, 0.055)), 0.06, (0.75, 1.0, 1.3))
+    lower = blob(m, mouth + Vector((0, -0.01, -0.02)), 0.06, (0.85, 1.0, 1.0))
+    base = tint('#ffe9b8', mm('MULTIPLY', forehead, 0.55))
+    base = tint('#ffb2a6', mm('MULTIPLY', flush, 0.45))
+    base = tint('#d6e2de', mm('MULTIPLY', lower, 0.45 + 0.45 * spec['stubble']))
+    # Blood comes up where skin is thin over bone or pressed and used: knuckles, elbows, knees,
+    # heels and toes, fingertips, the tip of the nose and the ears (already in the flush mask).
+    joints = []
+    for sd in 'LR':
+        joints += [blob(m, j['el' + sd], 0.05), blob(m, j['kn' + sd] + Vector((0, -0.04, 0)), 0.06),
+                   blob(m, j['an' + sd], 0.07), blob(m, j['tip' + sd], 0.06),
+                   blob(m, j['wr' + sd] + j['d' + sd] * 0.12, 0.06)]
+    red_parts = any_of(m, *joints)
+    base = tint('#ffaa9c', mm('MULTIPLY', red_parts, 0.5))
+    # Thick, yellow horn on palms, soles and heels.
+    yellow_parts = any_of(m, *[blob(m, j['wr' + sd] + j['d' + sd] * 0.07, 0.05) for sd in 'LR'],
+                          *[blob(m, j['an' + sd] + Vector((0, 0.01, -0.06)), 0.07) for sd in 'LR'])
+    base = tint('#ffe2a0', mm('MULTIPLY', yellow_parts, 0.35))
+    # Veins: blue-green threads, clear where the skin is thin (temples, eyelids, inner wrist and
+    # forearm, back of the hand, the top of the chest and the feet), barely there elsewhere.
+    vein_zone = any_of(
+        m, *[blob(m, j['eye' + sd] + Vector((0.035 if sd == 'L' else -0.035, 0.01, 0.01)), 0.03)
+             for sd in 'LR'],
+        *[blob(m, j['eye' + sd], 0.018) for sd in 'LR'],
+        *[blob(m, j['el' + sd].lerp(j['wr' + sd], 0.65), 0.09, (1.0, 1.0, 1.0)) for sd in 'LR'],
+        *[blob(m, j['wr' + sd] + j['d' + sd] * 0.05, 0.05) for sd in 'LR'],
+        blob(m, j['chest'] + Vector((0, -0.08, 0.06)), 0.12, (0.7, 1.0, 1.2)),
+        *[blob(m, j['an' + sd] + Vector((0, -0.05, -0.02)), 0.06) for sd in 'LR'])
+    pattern = N(m.nt, 'Mapping', {'Vector': m.co})
+    pattern.inputs['Scale'].default_value = (1.0, 1.0, 0.45)
+    vein = m.ramp(m.noise(16, 4, 0.55, 1.6, co=pattern.outputs['Vector']),
+                  [(0.475, 0.0), (0.5, 1.0), (0.525, 0.0)])
+    vein_amount = mm('MULTIPLY', vein, mm('ADD', 0.12, mm('MULTIPLY', vein_zone, 0.6)))
+    base = tint('#a8bcc8', vein_amount)
+    # Deoxygenated blood pools under the eyes: a violet-blue cast.
+    under = any_of(m, *[blob(m, j['eye' + sd] + Vector((0, -0.006, -0.016)), 0.02, (0.8, 1.0, 1.6))
+                        for sd in 'LR'])
+    base = tint('#d4c4dc', mm('MULTIPLY', under, 0.6))
+    return base
 
 
 def skin_material(spec, j):
@@ -485,8 +555,7 @@ def skin_material(spec, j):
     base = m.mix(base, m.mix(spec['skin'], spec['skin2'], 0.5), m.math(
         'MULTIPLY', m.noise(30, 4, 0.6), 0.25))
     base = m.mix(base, spec['flush'], m.math('MULTIPLY', flush, 0.28))
-    veins = m.ramp(m.noise(14, 3, 0.5, 1.2), [(0.47, 0.0), (0.5, 1.0), (0.53, 0.0)])
-    base = m.mix(base, '#5a6a8a', m.math('MULTIPLY', veins, 0.06))
+    base = skin_chroma(m, spec, j, base, flush)
     if spec['freckles']:
         fr = m.voronoi(260, 'F1', out='Color')
         fr_mask = m.math('MULTIPLY', m.ramp(N(m.nt, 'SeparateColor', {'Color': fr}).outputs[0],
