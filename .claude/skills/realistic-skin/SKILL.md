@@ -139,12 +139,31 @@ in the hair colour, thinning downwards). Under hair cards always paint a **scalp
 skin with roots and a broken-up hairline, so lifted cards never show bare skin
 (`paint_scalp` + the scalp layer in `skin_material`).
 
+## 1e. Porosity map: smooth and porous zones
+
+Skin texture is not uniform; a single pore pattern at one depth everywhere reads as CG.
+- Measured: facial features (pores, follicles) ~200-300 per cm2, i.e. 0.6-0.7 mm apart; pore
+  openings 40-80 um; enlarged pores most prominent on the nose and forehead, then the cheeks
+  (the malar region has thinner epidermis and more large pores); the chin couples sebum, roughness,
+  pores and comedones; counts rise with age. Eyelid skin is the thinnest, with few lipids: almost
+  poreless, fine crossing wrinkles. Lips: no pores, vertical lines. Neck: fine crosshatch.
+- Texture runs finer on thin skin and softer on stretched or fatty skin; mask delicate edges
+  (lid margins, lip border, nostrils).
+- `porosity(m, j, lips)` gives 0..1: body 0.4; nose +0.6; inner cheeks +0.45; forehead +0.35;
+  chin +0.3; eyelids/under-eye −0.45; temples −0.15; neck −0.12; lips 0; with a slow random
+  wobble (×0.85–1.15).
+- Pores: voronoi 1500 per metre (≈0.67 mm apart), radius 0.04–0.11 cell scaled by porosity, depth
+  ×porosity. Micro grain (3200) ×porosity. Skin lines (1100) deeper where porous; very fine
+  crossing lines (2600) where smooth. Flesh relief ×(0.12 + 0.15·porosity).
+- Before this map the big pores sat 0.45 mm apart (about twice the real density) at one depth
+  everywhere: the face read as uniformly rough and the grain slightly too big.
+
 ## 2. Layer order in the shader
 
 Order matters; later layers sit on top. In `skin_material`:
 
-1. **Relief / height**: pores at two scales (voronoi F1 2200 and 5200), fine cell lines
-   (voronoi distance-to-edge 650), soft flesh relief (noise 60).
+1. **Relief / height** driven by the porosity map (section 1e): pores, micro grain, skin lines,
+   fine lines on smooth skin, soft flesh relief.
 2. **Base tone**: noise ramp between `skin2` (shadow tone) and `skin` (light tone), plus mid mottling.
 3. **Flush** (vertex mask R): cheeks, nose, ears, knuckles, mixed toward `flush` at 0.28.
 4. **Chromophores** (`skin_chroma`): blotches, chromatic grain, face thirds, red joints, yellow

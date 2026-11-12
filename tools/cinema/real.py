@@ -516,7 +516,7 @@ def skin_imperfections(m, spec, j, base, height, rough, flush, lips):
     tzone = mm('MAXIMUM', blob(m, eye + Vector((0, -0.04, -0.03)), 0.03, (1.6, 1.0, 0.8)),
                blob(m, eye + Vector((0, -0.025, 0.05)), 0.05, (0.6, 1.0, 1.2)))
     big = m.ramp(m.voronoi(1500, 'F1'), [(0.0, 1.0), (0.14, 0.0)])
-    height = mm('SUBTRACT', height, mm('MULTIPLY', mm('MULTIPLY', big, tzone), 0.5))
+    height = mm('SUBTRACT', height, mm('MULTIPLY', mm('MULTIPLY', big, tzone), 0.2))
     rough = mm('SUBTRACT', rough, mm('MULTIPLY', tzone, 0.12))
     # Dry, slightly ashy patches here and there (elbows, knees, knuckles end up in some).
     dry = m.ramp(m.noise(4, 3, 0.6, 0.8), [(0.62, 0.0), (0.75, 1.0)])
@@ -661,6 +661,37 @@ def skin_chroma(m, spec, j, base, flush):
     return base
 
 
+def porosity(m, j, lips):
+    """0 (smooth: eyelids, under the eyes, lips) .. 1 (the nose): how open and deep the pores are.
+    The body sits at 0.4; nose, inner cheeks, forehead and chin rise; temples, jaw sides and the
+    neck fall a little."""
+    mm = m.math
+    eye = (j['eyeL'] + j['eyeR']) / 2
+    mouth = j['mouth']
+    nose = any_of(m, blob(m, eye.lerp(mouth, 0.55) + Vector((0, -0.045, 0.0)), 0.03, (1.0, 0.8, 0.9)),
+                  blob(m, eye.lerp(mouth, 0.3) + Vector((0, -0.04, 0.0)), 0.022, (1.6, 1.0, 0.8)))
+    malar = any_of(m, *[blob(m, j['eye' + sd] + Vector((0.006 if sd == 'L' else -0.006, -0.02, -0.035)),
+                             0.03) for sd in 'LR'])
+    forehead = blob(m, eye + Vector((0, -0.025, 0.05)), 0.05, (0.7, 1.0, 1.3))
+    chin = blob(m, mouth + Vector((0, -0.012, -0.035)), 0.025)
+    eyes = any_of(m, *[blob(m, j['eye' + sd] + Vector((0, -0.004, -0.004)), 0.024, (0.85, 1.0, 1.25))
+                       for sd in 'LR'])
+    temples = any_of(m, *[blob(m, j['eye' + sd] + Vector((0.045 if sd == 'L' else -0.045, 0.015, 0.01)),
+                               0.03) for sd in 'LR'])
+    neck = blob(m, j['neck'] + Vector((0, -0.03, 0.0)), 0.07, (0.9, 1.0, 1.3))
+    p = mm('ADD', 0.4, mm('MULTIPLY', nose, 0.6))
+    p = mm('ADD', p, mm('MULTIPLY', malar, 0.45))
+    p = mm('ADD', p, mm('MULTIPLY', forehead, 0.35))
+    p = mm('ADD', p, mm('MULTIPLY', chin, 0.3))
+    p = mm('SUBTRACT', p, mm('MULTIPLY', eyes, 0.45))
+    p = mm('SUBTRACT', p, mm('MULTIPLY', temples, 0.15))
+    p = mm('SUBTRACT', p, mm('MULTIPLY', neck, 0.12))
+    p = mm('MULTIPLY', p, mm('SUBTRACT', 1.0, lips), clamp=True)
+    # A little random unevenness, so a zone is never perfectly uniform.
+    wobble = m.math('MULTIPLY_ADD', m.noise(12, 2, 0.5), 0.3, 0.85)
+    return mm('MULTIPLY', p, wobble, clamp=True)
+
+
 def skin_material(spec, j):
     m = Mat('skin', scale=1.0)
     attr = N(m.nt, 'Attribute', attribute_name='masks')
@@ -668,15 +699,27 @@ def skin_material(spec, j):
     flush, stubble = sep.outputs['Red'], sep.outputs['Blue']
     lips, parting, crease = lips_shape(m, j)
     zone = attr.outputs['Alpha']
-    # Pores two sizes, cell lines, and the larger soft relief of flesh.
-    pores = m.ramp(m.voronoi(2200, 'F1'), [(0.0, 1.0), (0.1, 0.0)])
-    pores2 = m.ramp(m.voronoi(5200, 'F1'), [(0.0, 1.0), (0.12, 0.0)])
-    lines = m.ramp(m.voronoi(650, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.035, 0.0)])
+    # Pores are not the same everywhere: the face has porous and smooth zones (see the
+    # realistic-skin skill, "Porosity map"). Visible pores run ~200-300 per cm2 (0.6-0.7 mm apart,
+    # openings 40-80 um, wider on the nose); the eyelids and under the eyes are almost poreless
+    # with very fine crossing wrinkles; the lips have none.
+    por = porosity(m, j, lips)
+    smooth = m.math('SUBTRACT', 1.0, por)
+    pore_cells = m.voronoi(1500, 'F1')
+    pore_r = m.math('MULTIPLY_ADD', por, 0.07, 0.04)
+    pores = m.math('MULTIPLY', m.math('SUBTRACT', 1.0, m.math('DIVIDE', pore_cells, pore_r),
+                                      clamp=True), por)
+    pores2 = m.ramp(m.voronoi(3200, 'F1'), [(0.0, 1.0), (0.1, 0.0)])
+    lines = m.ramp(m.voronoi(1100, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.03, 0.0)])
+    fine_lines = m.ramp(m.voronoi(2600, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.04, 0.0)])
     relief = m.noise(60, 4, 0.6)
-    height = m.math('SUBTRACT', m.math('MULTIPLY', relief, 0.25),
-                    m.math('ADD', m.math('MULTIPLY', pores, 0.55),
-                           m.math('ADD', m.math('MULTIPLY', pores2, 0.25),
-                                  m.math('MULTIPLY', lines, 0.2))))
+    texture = m.math('ADD', m.math('MULTIPLY', pores, 0.6),
+                     m.math('ADD', m.math('MULTIPLY', m.math('MULTIPLY', pores2, por), 0.18),
+                            m.math('MULTIPLY', lines, m.math('MULTIPLY_ADD', por, 0.12, 0.06))))
+    # Smooth thin skin: fine crossing lines instead of pores.
+    texture = m.math('ADD', texture, m.math('MULTIPLY', m.math('MULTIPLY', fine_lines, smooth), 0.12))
+    height = m.math('SUBTRACT', m.math('MULTIPLY', relief, m.math('MULTIPLY_ADD', por, 0.15, 0.12)),
+                    texture)
     # Colour: melanin unevenness, blood beneath, veins, freckles and moles.
     base = m.ramp(m.noise(5, 5, 0.6), [(0.3, spec['skin2']), (0.7, spec['skin'])])
     base = m.mix(base, m.mix(spec['skin'], spec['skin2'], 0.5), m.math(
