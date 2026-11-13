@@ -275,6 +275,12 @@ Too clean = CG. For a period piece (medieval) push them further; for a glossy fu
 
 ## 7. Pitfalls already hit
 
+- Splitting an outfit's two fabrics by height let the trouser colour climb into the hem of a
+  shirt hanging below the waist. MakeHuman suits are exactly two loose pieces: mark each piece
+  (`mark_outfit_parts`, attribute `top`) and split by that.
+- Thin, arched, 'perfect' brows read as modern plucked brows; medieval faces need full, untidy
+  ones (eyebrow009 for men, eyebrow012 for women) plus the painted brow shadow (`brow` 0.5+).
+
 - A ColorRamp clamps its input to 0..1: feeding a raw height in metres (waist at ~1 m) never
   reaches the stops. Remap first: `(z − waist)/width + 0.5` with clamp.
 - Vertex masks for small features (lips, scars) look blurry; use per-pixel object-space math.

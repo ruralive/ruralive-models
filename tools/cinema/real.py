@@ -47,9 +47,9 @@ CAST = {
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#a35a58', iris='#2a1a12',
-        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, brow=0.3, hair='long', hair_color='#0e0b0b',
+        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, brow=0.55, hair='long', hair_color='#0e0b0b',
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
-        assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
+        assets=dict(eyes='brown', eyebrows='eyebrow012', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit01', 'shoes06'])),
     # A medieval beggar: old, thin, weathered and filthy; barefoot, in torn linen and wool; long
     # matted hair, a long beard and moustache; rotten and missing teeth; black under the nails.
@@ -182,7 +182,10 @@ def outfit_material(spec, mhmat_path, waist):
     # World height, remapped round the waist: a colour ramp clamps its input to 0..1, so a raw height
     # of a metre or more would never reach the split.
     z = N(nt, 'SeparateXYZ', {'Vector': m.geometry.outputs['Position']}).outputs['Z']
-    upper = m.math('MULTIPLY_ADD', m.math('SUBTRACT', z, waist), 1 / 0.024, 0.5, clamp=True)
+    # Which garment: the MakeHuman suits are exactly two loose pieces, top and trousers, marked
+    # per vertex by mark_outfit_parts (splitting by height let the trouser colour climb into the
+    # hem of a shirt that hangs below the waist).
+    upper = N(nt, 'Attribute', attribute_name='top').outputs['Fac']
     col = m.mix(bot_col, top_col, upper)
     height = m.mix(bot_h, top_h, upper)
     rough = m.mix(bot_r, top_r, upper)
@@ -397,6 +400,38 @@ def split_eyes(obj, spec, model_id):
 
 
 # ----------------------------------------------------------------------------- rags, teeth, beard
+def mark_outfit_parts(obj):
+    """Point attribute 'top': 1 on the upper garment, 0 on the trousers. Each loose piece of the
+    outfit is one garment; the piece whose middle is higher is the top."""
+    me = obj.data
+    parent = list(range(len(me.vertices)))
+
+    def find(a):
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+    for e in me.edges:
+        a, b = find(e.vertices[0]), find(e.vertices[1])
+        if a != b:
+            parent[a] = b
+    groups = {}
+    for v in me.vertices:
+        groups.setdefault(find(v.index), []).append(v.index)
+    big = sorted(groups.values(), key=len, reverse=True)
+    mid = {id(g): sum(me.vertices[i].co.z for i in g) / len(g) for g in big}
+    # Torn rags break into many pieces: each piece joins the garment whose height it is nearer.
+    top_z = max(mid[id(g)] for g in big[:2]) if len(big) > 1 else mid[id(big[0])]
+    low_z = min(mid[id(g)] for g in big[:2]) if len(big) > 1 else top_z - 1.0
+    values = [0.0] * len(me.vertices)
+    for g in big:
+        is_top = abs(mid[id(g)] - top_z) < abs(mid[id(g)] - low_z)
+        for i in g:
+            values[i] = 1.0 if is_top else 0.0
+    attr = me.attributes.new('top', 'FLOAT', 'POINT')
+    attr.data.foreach_set('value', values)
+
+
 def tear_outfit(obj, j, seed=7):
     """Turn a garment into rags by removing cloth: ragged cuffs and trouser legs cut off at mid
     shin, worn-through holes at knees, elbows, seat and here and there, then a fraying pass that
@@ -1783,6 +1818,8 @@ def build(model_id):
             rot_teeth(frozen, spec)
         if name.endswith('_outfit') and spec.get('rags'):
             tear_outfit(frozen, j)
+        if name.endswith('_outfit'):
+            mark_outfit_parts(frozen)
         if kind == 'Eyes':
             ball, cornea = split_eyes(frozen, spec, model_id)
             parts += [('Eyes', ball), ('Cornea', cornea)]
