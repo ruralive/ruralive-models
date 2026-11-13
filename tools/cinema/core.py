@@ -950,12 +950,13 @@ class Pose:
     def _rest(self, bone):
         return self.obj.data.bones[bone].matrix_local.to_3x3()
 
-    def turn(self, bone, x=0.0, y=0.0, z=0.0):
-        """Rotate in armature axes (X to the model's left, Y back, Z up), radians."""
+    def turn(self, bone, x=0.0, y=0.0, z=0.0, order='XYZ'):
+        """Rotate in armature axes (X to the model's left, Y back, Z up), radians. `order` is the
+        Euler order: 'XYZ' applies X first; 'YXZ' applies Y first, then X."""
         if bone not in self.bones:
             return
         rest = self._rest(bone).to_quaternion()
-        world = Euler((x, y, z), 'XYZ').to_quaternion()
+        world = Euler((x, y, z), order).to_quaternion()
         q = rest.inverted() @ world @ rest
         pb = self.bones[bone]
         pb.rotation_quaternion = pb.rotation_quaternion @ q if bone in self.touched \
