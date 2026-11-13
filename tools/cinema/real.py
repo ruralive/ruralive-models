@@ -31,15 +31,15 @@ CAST = {
         macro=dict(gender=0.0, age=0.523, muscle=0.58, weight=0.5, height=0.55, proportions=0.6,
                    african=0.85, asian=0.05, caucasian=0.1),
         skin='#7a4a32', skin2='#5e3524', flush='#8a3a2e', lips='#4e2420', iris='#3a2414',
-        freckles=0.0, stubble=0.0, body_hair=0.35, grime=0.5, brow=0.45, hair='coils', hair_color='#120c0a',
+        freckles=0.0, stubble=0.0, body_hair=0.35, grime=0.5, brow=0.45, age=0.35, hair='coils', hair_color='#120c0a',
         outfit=(('wool', '#7e3526'), ('wool', '#3b4632')),
         assets=dict(eyes='brown', eyebrows='eyebrow008', eyelashes='eyelashes02', hair='afro01',
                     clothes=['female_casualsuit01', 'shoes05'])),
     'tomas': dict(
         macro=dict(gender=1.0, age=0.654, muscle=0.55, weight=0.6, height=0.6, proportions=0.5,
                    african=0.0, asian=0.0, caucasian=1.0),
-        skin='#d7a487', skin2='#c08066', flush='#c4584a', lips='#9c4f4a', iris='#6b8090',
-        freckles=0.15, stubble=0.75, body_hair=0.85, grime=0.7, brow=0.75, hair='short', hair_color='#5a4b40',
+        skin='#cfa093', skin2='#b07a70', flush='#c0545a', lips='#9a4650', iris='#6b8090',
+        freckles=0.15, stubble=0.75, body_hair=0.85, grime=0.7, brow=0.75, age=0.45, hair='short', hair_color='#5a4b40',
         outfit=(('linen', '#c4b38c'), ('wool', '#4a3626')),
         assets=dict(eyes='grey', eyebrows='eyebrow009', eyelashes='eyelashes01', hair='short02',
                     clothes=['male_casualsuit04', 'shoes02'])),
@@ -47,7 +47,7 @@ CAST = {
         macro=dict(gender=0.0, age=0.433, muscle=0.45, weight=0.42, height=0.42, proportions=0.6,
                    african=0.0, asian=0.92, caucasian=0.08),
         skin='#e6bf9f', skin2='#d4a183', flush='#d07a6c', lips='#a35a58', iris='#2a1a12',
-        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, brow=0.55, hair='long', hair_color='#0e0b0b',
+        freckles=0.05, stubble=0.0, body_hair=0.2, grime=0.4, brow=0.55, age=0.25, hair='long', hair_color='#0e0b0b',
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow012', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit01', 'shoes06'])),
@@ -56,8 +56,8 @@ CAST = {
     'beggar': dict(
         macro=dict(gender=1.0, age=0.82, muscle=0.38, weight=0.32, height=0.5, proportions=0.45,
                    african=0.0, asian=0.0, caucasian=1.0),
-        skin='#b88a6c', skin2='#96684e', flush='#b04a3e', lips='#8a4a44', iris='#5a4a30',
-        freckles=0.25, stubble=0.6, body_hair=0.9, grime=1.5, brow=0.8, hair='long',
+        skin='#b08575', skin2='#8e6255', flush='#a84848', lips='#84404a', iris='#5a4a30',
+        freckles=0.25, stubble=0.6, body_hair=0.9, grime=1.5, brow=0.8, age=0.95, hair='long',
         hair_color='#4a4038', outfit=(('linen', '#8e826a'), ('wool', '#4a3f33')),
         keep_skin=True, rags=True, wear=1.0, beard=dict(length=0.19, grey=0.25),
         teeth=dict(missing=4, rot=0.8), nail_dirt=1.0,
@@ -1156,7 +1156,7 @@ def skin_chroma(m, spec, j, base, flush):
     # The face in thirds.
     forehead = blob(m, eye + Vector((0, -0.01, 0.055)), 0.06, (0.75, 1.0, 1.3))
     lower = blob(m, mouth + Vector((0, -0.01, -0.02)), 0.06, (0.85, 1.0, 1.0))
-    base = tint('#ffe9b8', mm('MULTIPLY', forehead, 0.8))
+    base = tint('#fff0d8', mm('MULTIPLY', forehead, 0.6))
     base = tint('#ffb2a6', mm('MULTIPLY', flush, 0.6))
     base = tint('#d6e2de', mm('MULTIPLY', lower, 0.6 + 0.5 * spec['stubble']))
     # Blood comes up where skin is thin over bone or pressed and used: knuckles, elbows, knees,
@@ -1191,7 +1191,7 @@ def skin_chroma(m, spec, j, base, flush):
     # Deoxygenated blood pools under the eyes: a violet-blue cast.
     under = any_of(m, *[blob(m, j['eye' + sd] + Vector((0, -0.006, -0.016)), 0.02, (0.8, 1.0, 1.6))
                         for sd in 'LR'])
-    base = tint('#d4c4dc', mm('MULTIPLY', under, 0.6))
+    base = tint('#c8b0b8', mm('MULTIPLY', under, 0.75))
     # Painters' temperature rule: the planes that face out (cheekbones, brow, nose bridge,
     # knuckles) read warm and rosy; the hollows and creases read cool, green-grey, and their darks
     # stay saturated reddish brown rather than grey (black "kills" skin colour). Pointiness gives
@@ -1247,7 +1247,7 @@ def eye_area(m, spec, j, base, height, rough):
         tear_d = ellipse(m, c + Vector((0, 0, 0.0005)), 0.0142, 0.0062)
         tear = mm('MULTIPLY', mm('MULTIPLY', mm('SUBTRACT', 1.0, mm('DIVIDE', mm(
             'ABSOLUTE', mm('SUBTRACT', tear_d, 0.97)), 0.07), clamp=True), lower), front)
-        base = m.mix(base, '#e2a49c', mm('MULTIPLY', tear, 0.45))
+        base = m.mix(base, '#c8706c', mm('MULTIPLY', tear, 0.5))
         rough = mm('SUBTRACT', rough, mm('MULTIPLY', tear, 0.45))
         # Brow: hair-coloured skin and fine roots under the eyebrow cards, so the brow reads full
         # and dense (thicker on men; a medieval man never plucked).
@@ -1270,6 +1270,74 @@ def eye_area(m, spec, j, base, height, rough):
             'ABSOLUTE', mm('SUBTRACT', fold_d, 1.0)), 0.13), clamp=True), upper), front)
         base = m.mix(base, m.mix(spec['skin2'], '#5a3a40', 0.3), mm('MULTIPLY', fold, 0.35))
         height = mm('SUBTRACT', height, mm('MULTIPLY', fold, 0.7))
+    return base, height, rough
+
+
+def age_marks(m, spec, j, base, height, rough):
+    """What a face gains from 30 on, measured on reference photos of a 37-year-old man:
+    horizontal forehead lines, vertical lines between the brows, crow's feet at the outer eye
+    corners, fine crepey lines under the eyes, the nasolabial fold from the nose wing to the
+    mouth corner, greyer (less red) temples and sides of the neck, a few small red papules on the
+    nose. Scaled by spec['age'] (0 young .. 1 old)."""
+    age = spec.get('age', 0.0)
+    if not age:
+        return base, height, rough
+    mm = m.math
+    eye = (j['eyeL'] + j['eyeR']) / 2
+    mouth = j['mouth']
+    co = N(m.nt, 'TexCoord').outputs['Object']
+
+    def lines(scale, distortion, direction, sharp):
+        w = N(m.nt, 'TexWave', {'Vector': co, 'Scale': scale, 'Distortion': distortion,
+                                'Detail': 2.0}, wave_type='BANDS', bands_direction=direction)
+        return m.ramp(w.outputs['Fac'], [(0.0, 1.0), (sharp, 0.0)])
+    # Forehead: 4-6 shallow horizontal lines across the middle of the forehead.
+    fore = blob(m, eye + Vector((0, -0.03, 0.045)), 0.045, (0.75, 1.0, 1.6))
+    f_lines = mm('MULTIPLY', lines(14, 3.0, 'Z', 0.08), fore)
+    # Glabella: two short vertical lines between the brows.
+    glab = blob(m, eye + Vector((0, -0.04, 0.016)), 0.012, (1.6, 1.0, 0.7))
+    g_lines = mm('MULTIPLY', lines(55, 1.5, 'X', 0.06), glab)
+    # Crow's feet: fine lines fanning out from the outer eye corners.
+    crow = any_of(m, *[blob(m, j['eye' + sd] + Vector((0.028 if sd == 'L' else -0.028, -0.004, 0.0)),
+                            0.016, (0.9, 1.0, 1.0)) for sd in 'LR'])
+    c_lines = mm('MULTIPLY', lines(90, 6.0, 'Z', 0.07), crow)
+    # Under the eyes: thin, crepey skin with fine lines.
+    under = any_of(m, *[blob(m, j['eye' + sd] + Vector((0, -0.006, -0.02)), 0.018, (0.8, 1.0, 1.8))
+                        for sd in 'LR'])
+    u_lines = mm('MULTIPLY', lines(160, 4.0, 'Z', 0.1), under)
+    # Nasolabial fold: a soft groove and shadow from each nose wing to the mouth corner.
+    fold = None
+    pos = N(m.nt, 'SeparateXYZ', {'Vector': co})
+    for sd in 'LR':
+        sx = 1.0 if sd == 'L' else -1.0
+        a = Vector((sx * 0.02, 0, eye.z + (mouth.z - eye.z) * 0.62))
+        b = Vector((sx * 0.033, 0, mouth.z - 0.006))
+        ab = b - a
+        tx = mm('DIVIDE', mm('ADD', mm('MULTIPLY', mm('SUBTRACT', pos.outputs['X'], a.x), ab.x),
+                                    mm('MULTIPLY', mm('SUBTRACT', pos.outputs['Z'], a.z), ab.z)),
+                ab.length_squared)
+        t_ = mm('MINIMUM', mm('MAXIMUM', tx, 0.0), 1.0)
+        dx = mm('SUBTRACT', pos.outputs['X'], mm('ADD', a.x, mm('MULTIPLY', t_, ab.x)))
+        dz = mm('SUBTRACT', pos.outputs['Z'], mm('ADD', a.z, mm('MULTIPLY', t_, ab.z)))
+        d = mm('SQRT', mm('ADD', mm('MULTIPLY', dx, dx), mm('MULTIPLY', dz, dz)))
+        front = mm('DIVIDE', mm('SUBTRACT', eye.y - 0.01, pos.outputs['Y']), 0.01, clamp=True)
+        g = mm('MULTIPLY', mm('SUBTRACT', 1.0, mm('DIVIDE', d, 0.004), clamp=True), front)
+        fold = g if fold is None else mm('MAXIMUM', fold, g)
+    wrink = mm('ADD', mm('ADD', mm('MULTIPLY', f_lines, 0.8), mm('MULTIPLY', g_lines, 0.7)),
+               mm('ADD', mm('MULTIPLY', c_lines, 0.7), mm('MULTIPLY', u_lines, 0.5)))
+    height = mm('SUBTRACT', height, mm('MULTIPLY', mm('ADD', wrink, mm('MULTIPLY', fold, 1.2)), age))
+    base = m.mix(base, spec['skin2'], mm('MULTIPLY', mm('ADD', mm('MULTIPLY', wrink, 0.25),
+                                                       mm('MULTIPLY', fold, 0.45)), age))
+    # Temples and the sides of the neck read greyer and less red than the cheeks.
+    grey = any_of(m, *[blob(m, j['eye' + sd] + Vector((0.05 if sd == 'L' else -0.05, 0.02, 0.0)),
+                            0.03) for sd in 'LR'],
+                  *[blob(m, j['neck'] + Vector((0.05 if sd == 'L' else -0.05, 0.0, 0.0)), 0.05)
+                    for sd in 'LR'])
+    base = m.mix(base, m.mix(base, '#a09490', 0.5), mm('MULTIPLY', grey, 0.35))
+    # A few small red papules on the nose.
+    nose = blob(m, eye.lerp(mouth, 0.55) + Vector((0, -0.045, 0.0)), 0.028, (1.0, 0.8, 0.9))
+    pap, _ = rare_spots(m, 600, 0.04, 0.2, 9)
+    base = m.mix(base, '#b84848', mm('MULTIPLY', mm('MULTIPLY', pap, nose), 0.55 * min(1.0, age * 2)))
     return base, height, rough
 
 
@@ -1380,6 +1448,7 @@ def skin_material(spec, j):
                                                m.math('MULTIPLY', parting, 0.5)))
     base, height, rough = skin_imperfections(m, spec, j, base, height, rough, flush, lips)
     base, height, rough = eye_area(m, spec, j, base, height, rough)
+    base, height, rough = age_marks(m, spec, j, base, height, rough)
     # Scalp under the hair: hair-coloured skin, dense roots, a hairline broken up by noise.
     scalp = N(m.nt, 'Attribute', attribute_name='scalp').outputs['Fac']
     edge = m.ramp(m.noise(70, 3, 0.6), [(0.3, 0.0), (0.7, 1.0)])
