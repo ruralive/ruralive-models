@@ -13,7 +13,7 @@ import random
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path[:0] = [HERE, '/tmp/chars']
+sys.path[:0] = [HERE]
 
 import bpy  # noqa: E402
 import bmesh  # noqa: E402
@@ -80,7 +80,7 @@ def mpfb_body(spec):
     return body, HumanService
 
 
-MH = '/opt/chars/mh/data'
+MH = os.environ.get('MH_DATA', '/opt/chars/mh/data')   # MakeHuman CC0 system assets
 
 
 def mhmat(path):
