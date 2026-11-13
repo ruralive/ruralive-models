@@ -51,7 +51,9 @@ all x scale).
 
 ## Godot 4
 
-1. Drop the `.glb` into the project. Clips named `*_loop` import as looping.
+1. Drop the `.glb` into the project. Clips named `*_loop` import as looping, and Godot drops the
+   suffix: `walk_loop` becomes `walk`, `idle_loop` becomes `idle` (checked with Godot 4.7.2:
+   63 clips, loop flags and the Root track as expected).
 2. For root motion: AnimationTree → `root_motion_track = "Skeleton3D:Root"` (or the path the
    importer shows); in `_physics_process`:
    ```gdscript

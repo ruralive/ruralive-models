@@ -23,7 +23,8 @@ import math
 from mathutils import Quaternion, Vector
 
 from core import ease, pulse, wave
-from human import REST_DOWN, arm, curl, step
+import human
+from human import arm, curl, step
 
 FWD = -1.0          # the model faces -Y
 
@@ -249,7 +250,7 @@ def add_game_clips(rig, k):
             P.turn('Spine1', x=-0.05)
             P.turn('Head', x=-0.25, z=0.1 * sway * wave(t, 0.3))
             for side, sx in (('L', 1), ('R', -1)):
-                P.turn('UpperArm.' + side, x=-0.25, y=sx * (REST_DOWN - 2.95))
+                P.turn('UpperArm.' + side, x=-0.25, y=sx * (human.REST_DOWN - 2.95))
                 P.turn('ForeArm.' + side, x=-0.15)
                 curl(P, side, 1.2, thumb=0.8)
                 P.move('ik_foot.' + side, sx * 0.03 * k, (0.05 + 0.03 * s) * k, 0.06 * k)
@@ -275,7 +276,7 @@ def add_game_clips(rig, k):
         P.turn('Spine1', x=0.3)
         P.turn('Head', x=0.1)
         for side, sx in (('L', 1), ('R', -1)):
-            P.turn('UpperArm.' + side, x=-0.25, y=sx * (REST_DOWN - 1.6))
+            P.turn('UpperArm.' + side, x=-0.25, y=sx * (human.REST_DOWN - 1.6))
             P.turn('ForeArm.' + side, x=-1.9)
 
     def mantle(t, P):
@@ -498,11 +499,11 @@ def add_game_clips(rig, k):
         P.turn('Spine1', x=0.18)
         P.turn('Spine2', x=0.1 + 0.02 * math.sin(a))
         P.turn('Head', x=0.3)
-        arm(P, 'R', fwd=0.75 + 0.15 * math.sin(a), bend=1.2 + 0.2 * math.cos(a),
-            out=0.1 + 0.15 * math.cos(a))
+        arm(P, 'R', fwd=0.8 + 0.12 * math.sin(a), bend=1.25 + 0.2 * math.cos(a),
+            out=-0.12 + 0.12 * math.cos(a))
         P.turn('Hand.R', x=0.2 * math.sin(a))
         curl(P, 'R', 1.1, thumb=0.8)
-        arm(P, 'L', fwd=0.7, bend=1.3, out=0.15)
+        arm(P, 'L', fwd=0.7, bend=1.3, out=-0.2)
         curl(P, 'L', 1.0)
     clip('cook_stir_loop', 3.0, stir, loop=True, props=dict(right_hand='spoon'),
          note='Pot at waist height, 0.4 m in front. Cross-fade 0.3 s in.')
@@ -578,7 +579,7 @@ def add_game_clips(rig, k):
     def explain(t, P):
         g = 0.5 + 0.5 * math.sin(math.tau * t * 2.5)
         for side, sx in (('L', 1), ('R', -1)):
-            arm(P, side, fwd=0.7, bend=1.3, out=0.25 + 0.2 * g)
+            arm(P, side, fwd=0.75, bend=1.3, out=0.05 + 0.15 * g)
             P.turn('Hand.' + side, y=sx * 0.9)
             curl(P, side, 0.15)
         P.turn('Head', x=0.05 * math.sin(math.tau * t * 4))
@@ -604,7 +605,7 @@ def add_game_clips(rig, k):
     def shrug(t, P):
         for side, sx in (('L', 1), ('R', -1)):
             P.turn('Shoulder.' + side, y=sx * 0.25)
-            arm(P, side, fwd=0.35, bend=1.5, out=0.5)
+            arm(P, side, fwd=0.45, bend=1.5, out=0.3)
             P.turn('Hand.' + side, y=sx * 1.2)
             curl(P, side, 0.1)
         P.turn('Head', z=0.15, x=-0.05)
@@ -629,7 +630,7 @@ def add_game_clips(rig, k):
         P.turn('Head', z=0.1)
 
     def greet(t, P):
-        P.turn('UpperArm.R', y=-0.2 + 2.25 - REST_DOWN)
+        P.turn('UpperArm.R', y=-0.2 + 2.25 - human.REST_DOWN)
         P.turn('ForeArm.R', y=0.5 + 0.45 * math.sin(math.tau * t * 4), x=-0.3)
         curl(P, 'R', 0.05)
         arm(P, 'L', bend=0.14)

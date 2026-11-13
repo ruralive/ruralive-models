@@ -1793,6 +1793,7 @@ def build(model_id):
     arm = (j['elL'] - j['shL']).normalized()
     rest = math.acos(max(-1, min(1, arm.dot(Vector((0, 0, -1))))))
     human.REST_DOWN = rest - 0.06
+    human.ARM_ORDER = 'YXZ'
     s = dict(name=model_id, height=height)
     rig = human.build_rig(s, j)
     rig.bind_auto(full)
@@ -1918,15 +1919,21 @@ def main(argv):
     ids = argv[2:] or list(CAST)
     os.makedirs(out, exist_ok=True)
     os.makedirs(shots, exist_ok=True)
+    # REAL_FAST=1: skip the bakes and the renders (a quick rig and animation check).
+    fast = os.environ.get('REAL_FAST') == '1'
     for model_id in ids:
         rig, body, clothes, rigid = build(model_id)
-        bake_all(model_id, body, clothes, rigid)
+        if not fast:
+            bake_all(model_id, body, clothes, rigid)
         rig.obj.name = model_id + '-rig'
         core.export(os.path.join(out, 'real-' + model_id + '.glb'))
         import json
         with open(os.path.join(out, 'real-' + model_id + '.anim.json'), 'w') as fh:
             json.dump(dict(model='real-' + model_id + '.glb', fps=core.FPS, facing='-Y (Blender), +Z (glTF)',
                            root_bone='Root', clips=rig.manifest), fh, indent=1)
+        if fast:
+            print('BUILT', model_id, '(fast)', flush=True)
+            continue
         eye = None
         for o in rigid:
             if o.name.endswith('_eyes'):

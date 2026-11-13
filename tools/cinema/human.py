@@ -607,13 +607,16 @@ def curl(P, side, amount, thumb=None):
 
 
 REST_DOWN = 0.33  # how far the arms swing down from the rig's rest pose to hang
+# Rigs whose rest pose holds the arms well out (an A pose, like MPFB's) must lower the arm
+# before swinging it forward, or the forward swing turns into a twist: they set 'YXZ'.
+ARM_ORDER = 'XYZ'
 
 
 def arm(P, side, fwd=0.0, out=0.0, bend=0.0, twist=0.0, down=None):
     """fwd: swing forward; out: lift sideways from hanging; bend: elbow."""
     sx = 1 if side == 'L' else -1
     down = REST_DOWN if down is None else down
-    P.turn('UpperArm.' + side, x=-fwd, y=sx * (down - out), z=sx * twist)
+    P.turn('UpperArm.' + side, x=-fwd, y=sx * (down - out), z=sx * twist, order=ARM_ORDER)
     P.turn('ForeArm.' + side, x=-bend)
 
 
