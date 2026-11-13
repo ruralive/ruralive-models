@@ -306,6 +306,36 @@ python3 tools/cinema/real.py /tmp/chars/out /tmp/chars/shots tomas amara mei > /
 - Compare the three skin tones side by side (contact sheet); the chromophores should read on all
   of them, much less on the darkest.
 
+## 10. Neglect, dirt and age (the beggar)
+
+How a poor, filthy, old character differs, and how it is built (`CAST['beggar']`):
+- *Skin.* Weathered and tanned (`skin #b88a6c`), freckles 0.25, `grime` 1.5: above 1.0 the grime
+  layer adds large smudges everywhere (heavier on face and hands) and **mud caked on bare feet
+  and up the shins** (world height < 0.25 m, broken by noise). Cavities keep the darkest dirt.
+- *Nails.* `paint_nails` marks each nail from the MPFB finger/toe tip joints: the plate on the
+  back of the last joint (dorsal side from the vertex normal), the free edge at the tip. Clean:
+  pinker plate, paler edge, smoother. Dirty (`nail_dirt`): black-brown packed under and round
+  the tip, a grey film on the plate. Every character gets nails now.
+- *Teeth* (`teeth=dict(missing, rot)`). The MakeHuman teeth are 32 separate islands plus the
+  gums, so teeth can be removed one by one (`rot_teeth`, chosen among the 14 most visible) and
+  decayed one by one (attribute `decay`): enamel yellowing to brown, dark caries pits (worse
+  on worse teeth), brown-yellow tartar in the crease at the gum line, inflamed red gums. Medieval
+  skeletons show caries in most adults and calculus in about three quarters.
+- *Hair and beard.* No beards exist in the CC0 MakeHuman system assets, so the beard and
+  moustache are our own hair cards (`grow_beard`): roots in the beard zone (moustache roots on
+  the upper lip), strands leaving the skin along the normal and falling under gravity, longest
+  at the chin (`length` 0.19 m), short on the cheeks; the moustache droops over the lip corners;
+  cards pushed out of the body (more below the neck, for the clothes). The card texture is drawn
+  by `strand_texture` (tapered wavy strands, alpha). Greying mixes the hair colour toward grey.
+  One card per beard root reads natural; two made a broom.
+- *Rags* (`rags=True`, `wear`). `tear_outfit` removes real cloth: subdivide once first (square
+  holes otherwise), cut trousers at mid shin and sleeves above the wrist on a noisy line, worn
+  holes at knees, elbows, seat and a few at random, two fraying passes on the new edges;
+  material double-sided. A ragged character keeps the skin under the clothes (`keep_skin`),
+  else holes show nothing. Long sleeves need forearm weights (only hands and fingers dropped).
+  The cloth gets fading, sweat and grease stains, mud up from the hem, and sewn patches with
+  coarse stitches.
+
 ## 9. Sources studied
 
 - Sabrillu, *How to draw skin tones with coloured pencils* (posterize to find hidden colours; cool
@@ -324,3 +354,9 @@ python3 tools/cinema/real.py /tmp/chars/out /tmp/chars/shots tomas amara mei > /
   (painters-online *How to paint mouths*, drawing guides). Nose: sebaceous filaments are light
   grey-yellow, nose pores larger. Ears and nose: high translucency, red glow in back light.
 - mavenart.com's guide could not be read (the site blocks automated readers).
+- Medieval teeth: caries and calculus prevalence in medieval samples (Frontiers in
+  Environmental Archaeology 2025; Scottish medieval root caries, medievalists.net); poor
+  medieval dress: coarse wool, linen and hemp, one tunic, hose or leg wrappings, patched cloaks
+  (fashion-era.com, worldhistory.org).
+- Hair cards: layers from the scalp out, clumps plus flyaways, alpha clip (80.lv, CG Master
+  Academy, Blender hair-card guides).
