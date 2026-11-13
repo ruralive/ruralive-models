@@ -4,7 +4,8 @@ Copyright (c) 2026 Ruralive. All rights reserved.
 
 This repository holds 3D models, textures, animation and the scripts that generate them
 (together, "the Material"). The Material was created by Ruralive, in part with the help of
-AI tools working to Ruralive's direction. No part of it is taken from a third party.
+AI tools working to Ruralive's direction. The only parts taken from third parties are the
+public-domain (CC0) components listed in section 6; everything else is Ruralive's own work.
 
 1. No licence is granted. You may view the Material on the service that hosts this
    repository. You may not copy, download for reuse, modify, merge, publish, distribute,
@@ -25,5 +26,21 @@ AI tools working to Ruralive's direction. No part of it is taken from a third pa
 5. Earlier versions. Some earlier revisions of this repository were offered under other
    terms. This licence applies to the Material from this revision on and does not withdraw
    rights that someone lawfully obtained under those earlier terms.
+
+6. Third-party CC0 components. The realistic characters in cinema/ (files named real-*.glb)
+   and the scripts that build them (tools/cinema/real.py) start from assets released into the
+   public domain under the Creative Commons CC0 1.0 Universal dedication:
+     - the MakeHuman base body and the MakeHuman system assets (clothes, hair, eyes, eyebrows,
+       eyelashes, teeth, tongue), (C) 2020 Data Collection AB, Joel Palmius and Jonas Hauquier,
+       released as CC0 in September 2020 - https://www.makehumancommunity.org
+     - loaded and fitted with MPFB 2, the MakeHuman plugin for Blender -
+       https://github.com/makehumancommunity/mpfb2 (its assets are CC0; its code is GPL and is
+       not included in this repository).
+   CC0 lets anyone use those original components for any purpose, and this licence does not
+   restrict the original components as published by their authors. This licence covers
+   Ruralive's own contribution: the customisations (procedural and baked skin, eyes, lips,
+   hair, beard, dirt, wear and fabric materials; changes to the meshes; rigs, skinning and
+   animation; the scripts) and each finished character as a whole. Those are all rights
+   reserved under sections 1 and 2.
 
 Requests for permission: open an issue in this repository.
