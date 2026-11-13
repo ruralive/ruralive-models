@@ -1,0 +1,770 @@
+{
+ "model": "real-amara.glb",
+ "fps": 24,
+ "facing": "-Y (Blender), +Z (glTF)",
+ "root_bone": "Root",
+ "clips": [
+  {
+   "name": "walk_loop",
+   "seconds": 1.05,
+   "loop": true,
+   "speed": 0.961,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "walk_fast_loop",
+    "run_loop",
+    "sprint_loop",
+    "jump",
+    "jump_high",
+    "jump_grab",
+    "vault_fence"
+   ],
+   "markers": {
+    "left_foot_down": 0.0,
+    "right_foot_down": 0.5
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "walk_fast_loop",
+   "seconds": 0.86,
+   "loop": true,
+   "speed": 1.567,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "walk_fast_loop",
+    "run_loop",
+    "sprint_loop",
+    "jump",
+    "jump_high",
+    "jump_grab",
+    "vault_fence"
+   ],
+   "markers": {
+    "left_foot_down": 0.0,
+    "right_foot_down": 0.5
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "run_loop",
+   "seconds": 0.68,
+   "loop": true,
+   "speed": 3.791,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "walk_fast_loop",
+    "run_loop",
+    "sprint_loop",
+    "jump",
+    "jump_high",
+    "jump_grab",
+    "vault_fence"
+   ],
+   "markers": {
+    "left_foot_down": 0.0,
+    "right_foot_down": 0.5
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "sprint_loop",
+   "seconds": 0.56,
+   "loop": true,
+   "speed": 6.814,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "walk_fast_loop",
+    "run_loop",
+    "sprint_loop",
+    "jump",
+    "jump_high",
+    "jump_grab",
+    "vault_fence"
+   ],
+   "markers": {
+    "left_foot_down": 0.0,
+    "right_foot_down": 0.5
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "idle_loop",
+   "seconds": 4.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "idle_look_loop",
+   "seconds": 6.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "idle_shift_loop",
+   "seconds": 8.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "idle_tired_loop",
+   "seconds": 4.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "idle_cold_loop",
+   "seconds": 2.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": "Not idle-shaped: cross-fade 0.3 s in and out."
+  },
+  {
+   "name": "jump",
+   "seconds": 1.3,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "run_loop"
+   ],
+   "markers": {
+    "take_off": 0.36,
+    "land": 0.68
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "jump_high",
+   "seconds": 1.6,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "run_loop"
+   ],
+   "markers": {
+    "take_off": 0.36,
+    "land": 0.68
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "jump_grab",
+   "seconds": 1.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0,
+    0,
+    0.41
+   ],
+   "then": [
+    "hang_loop",
+    "climb_up",
+    "drop_from_hang"
+   ],
+   "markers": {
+    "take_off": 0.36,
+    "grab": 0.72
+   },
+   "props": {},
+   "note": "Ledge top 2.3 m x scale above the floor, ledge face 0.25 m in front."
+  },
+  {
+   "name": "hang_loop",
+   "seconds": 3.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "climb_up",
+    "drop_from_hang"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "climb_up",
+   "seconds": 2.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0,
+    -0.44,
+    1.836
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "knee_on_ledge": 0.55,
+    "standing": 0.95
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "drop_from_hang",
+   "seconds": 1.2,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0,
+    0,
+    -0.41
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "land": 0.45
+   },
+   "props": {},
+   "note": "Ends on the floor under the ledge (root back to 0 from the hang)."
+  },
+  {
+   "name": "vault_fence",
+   "seconds": 1.5,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0,
+    -1.563,
+    0
+   ],
+   "then": [
+    "idle_loop",
+    "walk_loop",
+    "run_loop"
+   ],
+   "markers": {
+    "hand_on_rail": 0.3,
+    "land": 0.72
+   },
+   "props": {},
+   "note": "Fence or rail about 1.0 m x scale high, 0.6 m in front."
+  },
+  {
+   "name": "mount_horse",
+   "seconds": 3.0,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    -0.44,
+    0.0,
+    0.567
+   ],
+   "then": [
+    "ride_loop",
+    "ride_trot_loop",
+    "dismount_horse"
+   ],
+   "markers": {
+    "foot_in_stirrup": 0.25,
+    "seated": 1.0
+   },
+   "props": {},
+   "note": "Mount from the left flank; seat 0.45 m to the right, 1.5 m x scale high."
+  },
+  {
+   "name": "ride_loop",
+   "seconds": 2.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "ride_trot_loop",
+    "dismount_horse"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "ride_trot_loop",
+   "seconds": 1.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "ride_loop",
+    "dismount_horse"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "dismount_horse",
+   "seconds": 2.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.44,
+    -0.0,
+    -0.567
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "feet_down": 0.9
+   },
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "climb_into_cart",
+   "seconds": 2.6,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0,
+    -0.684,
+    0.879
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "hands_on_tailboard": 0.2,
+    "knee_on_bed": 0.45,
+    "standing": 0.95
+   },
+   "props": {},
+   "note": "Cart bed 0.9 m x scale high, tailboard 0.3 m in front."
+  },
+  {
+   "name": "chop_tree_loop",
+   "seconds": 1.6,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "hit": 0.62
+   },
+   "props": {
+    "right_hand": "axe",
+    "left_hand": "axe shaft"
+   },
+   "note": "Trunk at waist height, 0.7 m in front, a little to the left. Cross-fade 0.3 s in."
+  },
+  {
+   "name": "cook_stir_loop",
+   "seconds": 3.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {},
+   "props": {
+    "right_hand": "spoon"
+   },
+   "note": "Pot at waist height, 0.4 m in front. Cross-fade 0.3 s in."
+  },
+  {
+   "name": "pick_plant",
+   "seconds": 3.0,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "grab": 0.4,
+    "pull": 0.52
+   },
+   "props": {
+    "right_hand": "plant, from 0.4"
+   },
+   "note": ""
+  },
+  {
+   "name": "pick_up",
+   "seconds": 2.2,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {
+    "grab": 0.42
+   },
+   "props": {
+    "right_hand": "stone or stick, from 0.42"
+   },
+   "note": "Ends at rest with the hand closed round nothing: hide or drop the prop by 0.9."
+  },
+  {
+   "name": "talk_loop",
+   "seconds": 4.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "listen_loop",
+   "seconds": 5.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "*"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_explain",
+   "seconds": 3.2,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_agree",
+   "seconds": 2.0,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_disagree",
+   "seconds": 2.0,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_shrug",
+   "seconds": 2.0,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_beckon",
+   "seconds": 2.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_point",
+   "seconds": 2.6,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_wave",
+   "seconds": 2.8,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "gesture_bow",
+   "seconds": 2.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop",
+    "talk_loop",
+    "listen_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "kneel_down",
+   "seconds": 1.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "beg_kneel_loop",
+    "stand_up_from_kneel"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "beg_kneel_loop",
+   "seconds": 4.0,
+   "loop": true,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "stand_up_from_kneel"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  },
+  {
+   "name": "stand_up_from_kneel",
+   "seconds": 1.4,
+   "loop": false,
+   "speed": 0.0,
+   "root_motion": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "then": [
+    "idle_loop"
+   ],
+   "markers": {},
+   "props": {},
+   "note": ""
+  }
+ ]
+}
