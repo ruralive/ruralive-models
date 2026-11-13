@@ -1803,7 +1803,14 @@ def build(model_id):
             rig.bind_rigid(obj, 'Jaw' if kind in ('Tongue',) else 'Head')
             rigid.append(obj)
     bpy.data.objects.remove(full)
+    # Export the Root bone (it has no skin weights, so making it a deform bone changes nothing on
+    # the mesh) so games get a root-motion track.
+    rig.obj.data.bones['Root'].use_deform = True
+    import game_clips
+    s['manifest'] = []
+    s['more_clips'] = lambda rig_, k_, idle_: s['manifest'].extend(game_clips.add_game_clips(rig_, k_))
     human.animate(rig, s, height / 1.75)
+    rig.manifest = s['manifest']
     return rig, body, clothes, rigid
 
 
@@ -1903,6 +1910,10 @@ def main(argv):
         bake_all(model_id, body, clothes, rigid)
         rig.obj.name = model_id + '-rig'
         core.export(os.path.join(out, 'real-' + model_id + '.glb'))
+        import json
+        with open(os.path.join(out, 'real-' + model_id + '.anim.json'), 'w') as fh:
+            json.dump(dict(model='real-' + model_id + '.glb', fps=core.FPS, facing='-Y (Blender), +Z (glTF)',
+                           root_bone='Root', clips=rig.manifest), fh, indent=1)
         eye = None
         for o in rigid:
             if o.name.endswith('_eyes'):
