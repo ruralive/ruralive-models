@@ -679,7 +679,7 @@ def skin_imperfections(m, spec, j, base, height, rough, flush, lips):
                blob(m, eye + Vector((0, -0.025, 0.05)), 0.05, (0.6, 1.0, 1.2)))
     big = m.ramp(m.voronoi(1500, 'F1'), [(0.0, 1.0), (0.14, 0.0)])
     height = mm('SUBTRACT', height, mm('MULTIPLY', mm('MULTIPLY', big, tzone), 0.2))
-    rough = mm('SUBTRACT', rough, mm('MULTIPLY', tzone, 0.12))
+    rough = mm('SUBTRACT', rough, mm('MULTIPLY', tzone, 0.05))
     # Dry, slightly ashy patches here and there (elbows, knees, knuckles end up in some).
     dry = m.ramp(m.noise(4, 3, 0.6, 0.8), [(0.62, 0.0), (0.75, 1.0)])
     base = m.mix(base, m.mix(spec['skin'], '#e0d4cc', 0.3), mm('MULTIPLY', dry, 0.18))
@@ -932,12 +932,12 @@ def skin_material(spec, j):
     # with very fine crossing wrinkles; the lips have none.
     por = porosity(m, j, lips)
     smooth = m.math('SUBTRACT', 1.0, por)
-    pore_cells = m.voronoi(1500, 'F1')
+    pore_cells = m.voronoi(1800, 'F1')
     pore_r = m.math('MULTIPLY_ADD', por, 0.07, 0.04)
     pores = m.math('MULTIPLY', m.math('SUBTRACT', 1.0, m.math('DIVIDE', pore_cells, pore_r),
                                       clamp=True), por)
-    pores2 = m.ramp(m.voronoi(3200, 'F1'), [(0.0, 1.0), (0.1, 0.0)])
-    lines = m.ramp(m.voronoi(1100, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.03, 0.0)])
+    pores2 = m.ramp(m.voronoi(3800, 'F1'), [(0.0, 1.0), (0.1, 0.0)])
+    lines = m.ramp(m.voronoi(1400, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.03, 0.0)])
     fine_lines = m.ramp(m.voronoi(2600, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.04, 0.0)])
     relief = m.noise(60, 4, 0.6)
     texture = m.math('ADD', m.math('MULTIPLY', pores, 0.6),
@@ -988,8 +988,8 @@ def skin_material(spec, j):
         dots = m.math('MULTIPLY', grow, m.math('MAXIMUM', hairs, m.math('MULTIPLY', fine, 0.7)))
         base = m.mix(base, m.mix(spec['hair_color'], '#1a1410', 0.4), m.math('MULTIPLY', dots, 0.6))
         height = m.math('ADD', height, m.math('MULTIPLY', dots, 0.2))
-    base = m.mix(base, spec['skin2'], m.math('MULTIPLY', pores, 0.3))
-    rough = m.math('ADD', m.math('ADD', 0.5, m.math('MULTIPLY', pores, 0.12)),
+    base = m.mix(base, spec['skin2'], m.math('MULTIPLY', pores, 0.2))
+    rough = m.math('ADD', m.math('ADD', 0.56, m.math('MULTIPLY', pores, 0.1)),
                    m.math('MULTIPLY', lips, -0.18))
     height = m.math('SUBTRACT', height, m.math('ADD', m.math('MULTIPLY', crease, 0.15),
                                                m.math('MULTIPLY', parting, 0.5)))
@@ -1030,7 +1030,7 @@ def skin_material(spec, j):
     rough = m.math('ADD', m.math('MULTIPLY', rough, keep), m.math('MULTIPLY', lip_rough, lips))
     base = m.mix(base, '#2a1210', m.math('MULTIPLY', parting, 0.45))
     height = m.math('SUBTRACT', height, m.math('MULTIPLY', parting, 0.5))
-    m.set(color=base, rough=rough, height=height, bump=0.55, bump_distance=0.0007)
+    m.set(color=base, rough=rough, height=height, bump=0.36, bump_distance=0.0005)
     return m.m
 
 
@@ -1465,7 +1465,7 @@ def bake_all(model_id, body, clothes, rigid=()):
         if b:
             b.inputs['Subsurface Weight'].default_value = 0.35
             # Peach fuzz: the fine vellus hair all over the skin gives a soft, velvety rim glow.
-            b.inputs['Sheen Weight'].default_value = 0.22
+            b.inputs['Sheen Weight'].default_value = 0.1
             b.inputs['Sheen Roughness'].default_value = 0.45
             b.inputs['Sheen Tint'].default_value = (1.0, 0.93, 0.86, 1.0)
             b.inputs['Subsurface Radius'].default_value = (1.0, 0.35, 0.18)

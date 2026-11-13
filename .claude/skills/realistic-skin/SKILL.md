@@ -166,7 +166,7 @@ Implemented: soles found by downward normal near the ground, yellow-pale horn an
 on heel and ball; fine dark cracks at the heel.
 
 **Peach fuzz.** Vellus hair can't be modelled strand by strand at this scale: in renders use
-Principled **Sheen** (weight 0.22, roughness 0.45, warm white tint) for the soft velvety rim glow.
+Principled **Sheen** (weight 0.1, roughness 0.45, warm white tint) for the soft velvety rim glow.
 
 **Body hair.** Vellus hair is everywhere and catches back-light as a soft halo (peach fuzz on
 cheeks, especially on women). Terminal hair: forearms (outer), back of hands, first finger joints,
@@ -188,8 +188,8 @@ Skin texture is not uniform; a single pore pattern at one depth everywhere reads
 - `porosity(m, j, lips)` gives 0..1: body 0.4; nose +0.6; inner cheeks +0.45; forehead +0.35;
   chin +0.3; eyelids/under-eye −0.45; temples −0.15; neck −0.12; lips 0; with a slow random
   wobble (×0.85–1.15).
-- Pores: voronoi 1500 per metre (≈0.67 mm apart), radius 0.04–0.11 cell scaled by porosity, depth
-  ×porosity. Micro grain (3200) ×porosity. Skin lines (1100) deeper where porous; very fine
+- Pores: voronoi 1800 per metre (≈0.55 mm apart; 1500 still read slightly too big), radius 0.04–0.11 cell scaled by porosity, depth
+  ×porosity. Micro grain (3800) ×porosity. Skin lines (1400) deeper where porous; very fine
   crossing lines (2600) where smooth. Flesh relief ×(0.12 + 0.15·porosity).
 - Before this map the big pores sat 0.45 mm apart (about twice the real density) at one depth
   everywhere: the face read as uniformly rough and the grain slightly too big.
@@ -213,7 +213,8 @@ Order matters; later layers sit on top. In `skin_material`:
 9. **Roughness**: 0.5 + pores; lips smoother (−0.18); T-zone oilier.
 10. **Imperfections** (`skin_imperfections`), see section 3.
 11. **Arm hair** (attribute `hairzone`), see section 5.
-12. `m.set(...)` with bump strength 0.55, distance 0.0007 (sub-millimetre).
+12. `m.set(...)` with bump strength 0.36, distance 0.0005 (sub-millimetre). 0.55/0.0007 read as
+    too coarse and too much relief at portrait distance.
 
 ## 3. Imperfections: skin must look lived in
 
@@ -266,7 +267,8 @@ Too clean = CG. For a period piece (medieval) push them further; for a glossy fu
 
 - Renders only (not in glTF): Subsurface weight 0.35, radius (1.0, 0.35, 0.18) — red scatters
   furthest, as measured for human skin — scale 3.5 mm.
-- Specular: roughness ~0.5 on skin, 0.32 on lips, oilier T-zone. Hair: roughness 0.62, specular
+- Specular: roughness ~0.56 on skin (0.5 read oily), lips ~0.34, T-zone only −0.05; sheen
+  (peach fuzz) 0.1 — 0.22 made dark skin look greasy. Hair: roughness 0.62, specular
   IOR level 0.25 (else a white patch on the cap).
 - Portrait lights: key 160 W, fill 35 W, rim 220 W area lights, AgX view. Check under a warm and a
   cool light: good skin keeps its reds and blue-greens in both.
