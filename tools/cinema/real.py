@@ -51,6 +51,18 @@ CAST = {
         outfit=(('linen', '#d6cbb0'), ('wool', '#33455a')),
         assets=dict(eyes='brown', eyebrows='eyebrow004', eyelashes='eyelashes03', hair='long01',
                     clothes=['female_casualsuit01', 'shoes06'])),
+    # A medieval beggar: old, thin, weathered and filthy; barefoot, in torn linen and wool; long
+    # matted hair, a long beard and moustache; rotten and missing teeth; black under the nails.
+    'beggar': dict(
+        macro=dict(gender=1.0, age=0.82, muscle=0.38, weight=0.32, height=0.5, proportions=0.45,
+                   african=0.0, asian=0.0, caucasian=1.0),
+        skin='#b88a6c', skin2='#96684e', flush='#b04a3e', lips='#8a4a44', iris='#5a4a30',
+        freckles=0.25, stubble=0.6, body_hair=0.9, grime=1.5, brow=0.8, hair='long',
+        hair_color='#4a4038', outfit=(('linen', '#8e826a'), ('wool', '#4a3f33')),
+        keep_skin=True, rags=True, wear=1.0, beard=dict(length=0.19, grey=0.35),
+        teeth=dict(missing=4, rot=0.8), nail_dirt=1.0,
+        assets=dict(eyes='brownlight', eyebrows='eyebrow009', eyelashes='eyelashes01',
+                    hair='long01', clothes=['male_casualsuit03'])),
 }
 
 
@@ -182,6 +194,30 @@ def outfit_material(spec, mhmat_path, waist):
         img.colorspace_settings.name = 'Non-Color'
         shade_ = N(nt, 'TexImage', image=img).outputs['Color']
         col = m.mix(col, shade_, 0.85, 'MULTIPLY')
+    w = spec.get('wear', 0.0)
+    if w:
+        # Years of wear: sun-faded patches, grease and sweat stains, mud splashed up from the
+        # ground, a few sewn-on patches of other cloth with coarse stitches.
+        mm = m.math
+        fade = m.ramp(m.noise(4, 3, 0.6), [(0.5, 0.0), (0.75, 1.0)])
+        col = m.mix(col, m.mix(col, '#c8bca0', 0.5), mm('MULTIPLY', fade, 0.5 * w))
+        stain = m.ramp(m.noise(9, 4, 0.65, 0.5), [(0.58, 0.0), (0.7, 1.0)])
+        col = m.mix(col, m.mix(col, '#2a2016', 0.6), mm('MULTIPLY', stain, 0.6 * w))
+        mud = mm('MULTIPLY', m.ramp(z, [(0.0, 1.0), (0.6, 0.0)]),
+                 m.ramp(m.noise(30, 4, 0.6), [(0.35, 0.3), (0.65, 1.0)]))
+        col = m.mix(col, '#3e3222', mm('MULTIPLY', mud, 0.8 * w))
+        cell = m.voronoi(14, 'F1', out='Color')
+        pick = N(nt, 'SeparateColor', {'Color': cell}).outputs[0]
+        patch = m.ramp(pick, [(0.9, 0.0), (0.905, 1.0)])
+        edge = m.ramp(m.voronoi(14, 'DISTANCE_TO_EDGE'), [(0.0, 1.0), (0.03, 0.0)])
+        col = m.mix(col, m.ramp(N(nt, 'SeparateColor', {'Color': cell}).outputs[1],
+                                [(0.0, '#5a4a3a'), (0.5, '#6a5a44'), (1.0, '#3e3a30')]),
+                    mm('MULTIPLY', patch, w))
+        stitch = mm('MULTIPLY', mm('MULTIPLY', patch, edge),
+                    m.ramp(m.wave(900, 0.0, 0.0), [(0.4, 0.0), (0.6, 1.0)]))
+        col = m.mix(col, '#c8b896', mm('MULTIPLY', stitch, 0.8))
+        height = mm('ADD', height, mm('MULTIPLY', mm('ADD', patch, stitch), 0.3))
+        rough = mm('ADD', rough, mm('MULTIPLY', mud, 0.1))
     m.set(color=col, rough=rough, height=height, bump=0.35, bump_distance=0.0015)
     nrm = info.get('normalmapTexture')
     if nrm and os.path.exists(os.path.join(folder, nrm)):
@@ -360,6 +396,269 @@ def split_eyes(obj, spec, model_id):
     return obj, cornea
 
 
+# ----------------------------------------------------------------------------- rags, teeth, beard
+def tear_outfit(obj, j, seed=7):
+    """Turn a garment into rags by removing cloth: ragged cuffs and trouser legs cut off at mid
+    shin, worn-through holes at knees, elbows, seat and here and there, then a fraying pass that
+    nibbles the new edges. Real geometry, so it works in any engine without alpha."""
+    from mathutils import noise
+    rnd = random.Random(seed)
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.faces.ensure_lookup_table()
+    hip_z = j['hips'].z
+    holes = []
+    for sd in 'LR':
+        holes.append((j['kn' + sd] + Vector((0, -0.05, 0.01)), 0.045))
+        holes.append((j['el' + sd] + Vector((0, 0.03, 0)), 0.03))
+    holes.append((j['hips'] + Vector((0.06, 0.1, -0.07)), 0.035))
+    verts = [v.co.copy() for v in bm.verts]
+    for _ in range(7):
+        holes.append((rnd.choice(verts), rnd.uniform(0.015, 0.035)))
+    kill = set()
+    for f in bm.faces:
+        c = f.calc_center_median()
+        jag = noise.noise(c * 40.0) * 0.6 + noise.noise(c * 140.0) * 0.4
+        # Trousers: cut at mid shin, ragged.
+        if c.z < hip_z - 0.25:
+            sd = 'L' if c.x > 0 else 'R'
+            cut = j['kn' + sd].z * 0.5 + j['an' + sd].z * 0.5 + 0.03 * jag
+            if c.z < cut:
+                kill.add(f)
+                continue
+        # Sleeves: torn off a hand's width above the wrist.
+        for sd in 'LR':
+            el, wr = j['el' + sd], j['wr' + sd]
+            ab = wr - el
+            t = (c - el).dot(ab) / ab.length_squared
+            r = (c - (el + ab * max(0.0, min(1.0, t)))).length
+            if r < 0.09 and t > 0.55 + 0.12 * jag:
+                kill.add(f)
+        for centre, rad in holes:
+            if (c - centre).length < rad * (1.0 + 0.45 * jag):
+                kill.add(f)
+    bmesh.ops.delete(bm, geom=list(kill), context='FACES')
+    # Fray: nibble a third of the faces on the new open edges, twice.
+    for _ in range(2):
+        edge = [f for f in bm.faces if any(e.is_boundary for e in f.edges)]
+        bmesh.ops.delete(bm, geom=[f for f in edge if rnd.random() < 0.3], context='FACES')
+    loose = [v for v in bm.verts if not v.link_faces]
+    bmesh.ops.delete(bm, geom=loose, context='VERTS')
+    bm.to_mesh(obj.data)
+    bm.free()
+    for mat in obj.data.materials:
+        mat.use_backface_culling = False
+
+
+def rot_teeth(obj, spec, seed=11):
+    """Old, neglected teeth: a few missing, the rest yellow to brown, dark caries in the pits and
+    between teeth, brown tartar at the gum line, inflamed gums. Per tooth decay goes in a
+    'decay' attribute the material reads."""
+    rnd = random.Random(seed)
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    islands, seen = [], set()
+    for v in bm.verts:
+        if v in seen:
+            continue
+        stack, isl = [v], []
+        seen.add(v)
+        while stack:
+            x = stack.pop()
+            isl.append(x)
+            for e in x.link_edges:
+                o = e.other_vert(x)
+                if o not in seen:
+                    seen.add(o)
+                    stack.append(o)
+        islands.append(isl)
+    islands.sort(key=len, reverse=True)
+    gums, teeth = islands[0], islands[1:]
+    # Missing: mostly visible ones (front half), never all neighbours.
+    front = sorted(teeth, key=lambda t: sum(v.co.y for v in t) / len(t))[:14]
+    gone = rnd.sample(front, min(spec['teeth']['missing'], len(front)))
+    bmesh.ops.delete(bm, geom=[v for t in gone for v in t], context='VERTS')
+    bm.to_mesh(obj.data)
+    bm.free()
+    # Per-vertex decay: 0 gum, 0.2..1 for teeth.
+    attr = obj.data.attributes.new('decay', 'FLOAT', 'POINT')
+    gum_ids = None
+    lookup = {}
+    me = obj.data
+    # Rebuild islands on the cleaned mesh (vertex indices changed).
+    adj = {i: set() for i in range(len(me.vertices))}
+    for e in me.edges:
+        a, b = e.vertices
+        adj[a].add(b)
+        adj[b].add(a)
+    seen, groups = set(), []
+    for i in range(len(me.vertices)):
+        if i in seen:
+            continue
+        stack, g = [i], []
+        seen.add(i)
+        while stack:
+            x = stack.pop()
+            g.append(x)
+            for o in adj[x]:
+                if o not in seen:
+                    seen.add(o)
+                    stack.append(o)
+        groups.append(g)
+    groups.sort(key=len, reverse=True)
+    values = [0.0] * len(me.vertices)
+    for g in groups[1:]:
+        level = min(1.0, max(0.15, rnd.random() ** 0.7 * spec['teeth']['rot'] * 1.2))
+        for i in g:
+            values[i] = level
+    attr.data.foreach_set('value', values)
+
+
+def teeth_material():
+    m = Mat('teeth')
+    mm = m.math
+    decay = N(m.nt, 'Attribute', attribute_name='decay').outputs['Fac']
+    tooth = m.ramp(decay, [(0.0, '#b85a58'), (0.08, '#e2d6b8'), (0.5, '#c8b07a'),
+                           (1.0, '#8a6a3a')])
+    gum = mm('LESS_THAN', decay, 0.05)
+    tooth = m.mix(tooth, m.ramp(m.noise(60, 3, 0.6), [(0.3, '#a0484a'), (0.7, '#c06a64')]), gum)
+    # Caries: dark pits and patches, more on the worst teeth.
+    pits = m.ramp(m.noise(220, 4, 0.65), [(0.62, 0.0), (0.7, 1.0)])
+    caries = mm('MULTIPLY', pits, mm('MULTIPLY', decay, mm('SUBTRACT', 1.0, gum)))
+    tooth = m.mix(tooth, '#2a1a10', mm('MULTIPLY', caries, 1.2, clamp=True))
+    # Tartar: brown-yellow crust where tooth meets gum (low pointiness = the crease).
+    crease = m.ramp(m.geometry.outputs['Pointiness'], [(0.42, 1.0), (0.5, 0.0)])
+    tooth = m.mix(tooth, '#6a5030', mm('MULTIPLY', crease, mm('MULTIPLY', decay, 0.8)))
+    rough = mm('ADD', 0.25, mm('MULTIPLY', decay, 0.45))
+    m.set(color=tooth, rough=rough, height=mm('MULTIPLY', caries, -0.5), bump=0.2,
+          bump_distance=0.0004)
+    return m.m
+
+
+def strand_texture(name, seed=3, size=(256, 1024), strands=70):
+    """A hair-card texture drawn from code: tapered, slightly wavy strands of mixed tone on
+    transparent ground (RGB tone, A coverage). Root at v=0, tips towards v=1."""
+    rnd = np.random.default_rng(seed)
+    w, h = size
+    img = np.zeros((h, w, 4), np.float32)
+    ys = np.arange(h)
+    for _ in range(strands):
+        x0 = rnd.uniform(4, w - 4)
+        length = rnd.uniform(0.6, 1.0) * h
+        amp, freq, ph = rnd.uniform(1, 6), rnd.uniform(1.5, 4), rnd.uniform(0, 6.3)
+        tone = rnd.uniform(0.55, 1.0)
+        width = rnd.uniform(1.2, 3.0)
+        for y in ys[: int(length)]:
+            t = y / length
+            x = x0 + amp * np.sin(ph + freq * t * np.pi) + 8 * t * rnd.normal(0, 0.05)
+            r = width * (1 - t) ** 0.6 + 0.4
+            lo, hi = int(max(0, x - r - 1)), int(min(w, x + r + 2))
+            for xi in range(lo, hi):
+                cover = max(0.0, 1 - abs(xi - x) / r)
+                if cover > img[h - 1 - y, xi, 3]:
+                    img[h - 1 - y, xi] = (tone, tone * 0.97, tone * 0.94, cover)
+    image = bpy.data.images.new(name, w, h, alpha=True)
+    image.pixels.foreach_set(img.ravel())
+    image.pack()
+    return image
+
+
+def grow_beard(body, j, spec, model_id):
+    """A long beard and moustache from hair cards grown on the face: roots in the beard zone,
+    strands that leave the skin along its normal and fall under gravity, longest at the chin,
+    shortest on the cheeks; the moustache droops over the lip corners. Cards are pushed out of
+    the body so they never sink into the chin, neck or chest."""
+    cfg = spec['beard']
+    rnd = random.Random(5)
+    eye = (j['eyeL'] + j['eyeR']) / 2
+    mouth = j['mouth']
+    tree = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
+    down = Vector((0, 0, -1))
+    roots = []
+    for v in body.data.vertices:
+        p, n = v.co, v.normal
+        mouth_hole = abs(p.x) < 0.027 and abs(p.z - mouth.z) < 0.012 and p.y < mouth.y + 0.01
+        moustache = (mouth.z + 0.008 < p.z < mouth.z + 0.022 and abs(p.x) < 0.034 and
+                     p.y < mouth.y + 0.004)
+        zone = beard_zone(p, j, eye, 0.0)
+        if moustache:
+            roots.append((p.copy(), n.copy(), 'm'))
+        elif zone > 0.3 and not mouth_hole:
+            roots.append((p.copy(), n.copy(), 'b'))
+    bm = bmesh.new()
+    uv_layer = bm.loops.layers.uv.new('UVMap')
+    segs = 7
+    for p0, n, kind in roots:
+        for copy in range(2):
+            jitter = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))) * 0.002
+            if kind == 'm':
+                side = 1.0 if p0.x > 0 else -1.0
+                d = (n * 0.4 + down * 0.6 + Vector((side * 0.45, 0, 0))).normalized()
+                length = rnd.uniform(0.035, 0.055) * (1.0 if abs(p0.x) > 0.01 else 0.7)
+                width, gravity = 0.006, 0.25
+            else:
+                chin = max(0.0, 1 - abs(p0.x) / 0.05) * (1.0 if p0.z < mouth.z - 0.015 else 0.4)
+                length = cfg['length'] * (0.3 + 0.7 * chin) * rnd.uniform(0.75, 1.1)
+                d = (n * 0.55 + down * 0.45).normalized()
+                width, gravity = 0.009, 0.45
+            pts = [p0 + n * 0.0015 + jitter]
+            for i in range(segs):
+                d = (d + down * gravity * (i + 1) / segs +
+                     Vector((rnd.uniform(-0.08, 0.08), rnd.uniform(-0.05, 0.05), 0))).normalized()
+                q = pts[-1] + d * (length / segs)
+                hit = tree.find_nearest(q)
+                if hit[0] is not None:
+                    loc, nrm = hit[0], hit[1]
+                    clear = 0.002 + 0.012 * min(1.0, (j['neck'].z - q.z) / 0.1) if q.z < j[
+                        'neck'].z else 0.002
+                    if (q - loc).dot(nrm) < clear:
+                        q = loc + nrm * clear
+                pts.append(q)
+            u0 = rnd.choice((0.0, 0.25, 0.5, 0.75))
+            ring = []
+            for i, q in enumerate(pts):
+                t = i / segs
+                dirn = (pts[min(i + 1, segs)] - pts[max(i - 1, 0)]).normalized()
+                sidev = dirn.cross(n).normalized() * (width * (1 - 0.55 * t) / 2)
+                ring.append((bm.verts.new(q - sidev), bm.verts.new(q + sidev), t))
+            for i in range(segs):
+                a, b_, ta = ring[i]
+                c_, d_, tb = ring[i + 1]
+                f = bm.faces.new((a, b_, d_, c_))
+                for loop, uvv in zip(f.loops, ((u0, ta), (u0 + 0.25, ta), (u0 + 0.25, tb),
+                                               (u0, tb))):
+                    loop[uv_layer].uv = uvv
+    mesh = bpy.data.meshes.new(model_id + '_beard')
+    bm.to_mesh(mesh)
+    bm.free()
+    obj = link(bpy.data.objects.new(model_id + '_beard', mesh))
+    # Material: strand texture tinted to the hair colour, greying, cut-out alpha.
+    m = bpy.data.materials.new('beard')
+    m.use_nodes = True
+    nt = m.node_tree
+    b = nt.nodes['Principled BSDF']
+    tex = N(nt, 'TexImage', image=strand_texture(model_id + '_beard_strands'))
+    tint = core.rgb(spec['hair_color'])
+    grey = cfg.get('grey', 0.0)
+    tint = tuple(c * (1 - grey) + 0.58 * grey for c in tint)
+    mul = N(nt, 'MixRGB', blend_type='MULTIPLY')
+    mul.inputs['Fac'].default_value = 1.0
+    nt.links.new(tex.outputs['Color'], mul.inputs['Color1'])
+    mul.inputs['Color2'].default_value = (*[min(1.0, c * 1.6) for c in tint], 1)
+    nt.links.new(mul.outputs['Color'], b.inputs['Base Color'])
+    cut = N(nt, 'Math', operation='ROUND')
+    nt.links.new(tex.outputs['Alpha'], cut.inputs[0])
+    nt.links.new(cut.outputs[0], b.inputs['Alpha'])
+    b.inputs['Roughness'].default_value = 0.72
+    b.inputs['Specular IOR Level'].default_value = 0.1
+    if hasattr(m, 'surface_render_method'):
+        m.surface_render_method = 'DITHERED'
+    m.use_backface_culling = False
+    m['bake'] = False
+    mesh.materials.append(m)
+    return obj
+
+
 def groups_of(obj):
     names = {g.index: g.name for g in obj.vertex_groups}
     out = {}
@@ -392,6 +691,22 @@ def joints_from(body, groups):
         j['an' + side] = c('joint-%s-ankle' % s)
         j['toe' + side] = c('joint-%s-foot-2' % s)
         j['tip' + side] = j['toe' + side] + Vector((0, -0.07, -0.01))
+    # Finger and toe tips with the direction of their last joint, for the nails.
+    j['nails'] = []
+    for side, s in (('L', 'l'), ('R', 'r')):
+        sx = 1.0 if side == 'L' else -1.0
+        for f in range(1, 6):
+            tip, last = c('joint-%s-finger-%d-4' % (s, f)), c('joint-%s-finger-%d-3' % (s, f))
+            j['nails'].append((tip, (tip - last).normalized(), Vector((sx, 0.0, 0.25)).normalized(),
+                               0.0055 if f > 1 else 0.007))
+        for f in range(1, 6):
+            names = ['joint-%s-toe-%d-%d' % (s, f, k) for k in (4, 3, 2, 1)]
+            have = [n for n in names if n in groups]
+            if len(have) < 2:
+                continue
+            tip, last = c(have[0]), c(have[1])
+            j['nails'].append((tip, (tip - last).normalized(), Vector((0.0, 0.0, 1.0)),
+                               0.008 if f == 1 else 0.0045))
     for side, s in (('L', 'l'), ('R', 'r')):
         j['eye' + side] = c('helper-%s-eye' % s)
     # The lips sit just in front of the upper teeth (MakeHuman's mouth joint is up at the nose).
@@ -482,6 +797,30 @@ def nape_hair(p, j):
     v = max(0.0, min(1.0, (p.z - bottom) / (top - bottom)))
     side = max(0.0, 1 - abs(p.x) / 0.06)
     return v ** 1.5 * side * min(1.0, (p.y - neck.y - 0.01) / 0.02)
+
+
+def paint_nails(body, j):
+    """Attribute 'nails': R the nail plate, G the free edge at the tip (where dirt collects).
+    A nail sits on the back of the last joint: near the tip, on the side the dorsal direction
+    points to."""
+    attr = body.data.color_attributes.new('nails', 'FLOAT_COLOR', 'POINT')
+    data = []
+    for v in body.data.vertices:
+        p, n = v.co, v.normal
+        plate = edge = 0.0
+        for tip, axis, dorsal, size in j['nails']:
+            q = p - tip
+            if q.length > size * 2.2:
+                continue
+            along = q.dot(axis)                      # 0 at the tip joint, negative towards the hand
+            side_ = (q - axis * along).length
+            if n.dot(dorsal) < 0.15 or along < -size * 1.9 or along > size * 0.9:
+                continue
+            width = max(0.0, 1 - side_ / (size * 1.25))
+            plate = max(plate, width * min(1.0, (along + size * 1.9) / (size * 0.5)))
+            edge = max(edge, width * max(0.0, min(1.0, (along + size * 0.15) / (size * 0.5))))
+        data += [plate, edge, 0.0, 1.0]
+    attr.data.foreach_set('color', data)
 
 
 def paint_scalp(body, j, hair):
@@ -1005,6 +1344,20 @@ def skin_material(spec, j):
     base = m.mix(base, m.mix(spec['hair_color'], '#000000', 0.3),
                  m.math('MULTIPLY', m.math('MULTIPLY', cover, roots), 0.6))
     rough = m.math('ADD', rough, m.math('MULTIPLY', cover, 0.2))
+    # Nails: a smooth, pinker plate over the nail bed, a paler free edge; dirt packed under and
+    # round the tip on a dirty character.
+    nails = N(m.nt, 'SeparateColor', {'Color': N(m.nt, 'Attribute', attribute_name='nails',
+                                                  attribute_type='GEOMETRY').outputs['Color']})
+    plate, tip = nails.outputs['Red'], nails.outputs['Green']
+    base = m.mix(base, m.mix(spec['skin'], '#f0c8bc', 0.5), m.math('MULTIPLY', plate, 0.6))
+    base = m.mix(base, '#efe2d0', m.math('MULTIPLY', tip, 0.5))
+    rough = m.math('SUBTRACT', rough, m.math('MULTIPLY', plate, 0.25))
+    height = m.math('ADD', height, m.math('MULTIPLY', plate, 0.25))
+    if spec.get('nail_dirt'):
+        grime_n = m.ramp(m.noise(900, 3, 0.6), [(0.3, 0.55), (0.7, 1.0)])
+        base = m.mix(base, '#2a1e14', m.math('MULTIPLY', m.math('MULTIPLY', tip, grime_n),
+                                             0.9 * spec['nail_dirt']))
+        base = m.mix(base, '#4a3a2a', m.math('MULTIPLY', plate, 0.25 * spec['nail_dirt']))
     if spec.get('body_hair'):
         # Fine arm hair: soft darker patches made of short strokes laid along the arm.
         zone = N(m.nt, 'Attribute', attribute_name='hairzone').outputs['Fac']
@@ -1384,9 +1737,10 @@ def build(model_id):
     full.vertex_groups.clear()
     full.parent = None
     activate(body)
-    # The masks hide the helpers and the skin under the clothes: apply them.
+    # The masks hide the helpers and the skin under the clothes: apply them. Torn clothes need the
+    # skin under them, so a ragged character keeps it (only the helpers go).
     for mod in list(body.modifiers):
-        if mod.type == 'MASK':
+        if mod.type == 'MASK' and (mod.vertex_group == 'body' or not spec.get('keep_skin')):
             bpy.ops.object.modifier_apply(modifier=mod.name)
         else:
             body.modifiers.remove(mod)
@@ -1397,6 +1751,7 @@ def build(model_id):
     height = max(v.co.z for v in body.data.vertices)
     paint_masks(body, j, spec)
     paint_scalp(body, j, next((o for k, o, _ in assets if k == 'Hair'), None))
+    paint_nails(body, j)
     body.data.materials.clear()
     body.data.materials.append(skin_material(spec, j))
     parts = []
@@ -1410,12 +1765,20 @@ def build(model_id):
             name = model_id + '_boots'
         else:
             mat = mh_material(mat_path, kind.lower()) if mat_path else None
+        if kind == 'Teeth' and spec.get('teeth'):
+            mat = teeth_material()
         frozen = freeze(obj, name, mat)
+        if kind == 'Teeth' and spec.get('teeth'):
+            rot_teeth(frozen, spec)
+        if name.endswith('_outfit') and spec.get('rags'):
+            tear_outfit(frozen, j)
         if kind == 'Eyes':
             ball, cornea = split_eyes(frozen, spec, model_id)
             parts += [('Eyes', ball), ('Cornea', cornea)]
             continue
         parts.append((kind, frozen))
+    if spec.get('beard'):
+        parts.append(('Beard', grow_beard(body, j, spec, model_id)))
     arm = (j['elL'] - j['shL']).normalized()
     rest = math.acos(max(-1, min(1, arm.dot(Vector((0, 0, -1))))))
     human.REST_DOWN = rest - 0.06
@@ -1456,6 +1819,9 @@ def bake_all(model_id, body, clothes, rigid=()):
             bake_atlas(o, 1024, name=model_id + '_eyes', do_unwrap=False, ao_samples=16)
     for o in corneas:
         o.hide_render = False
+    for o in rigid:
+        if o.name.endswith('_teeth') and any(m_.get('bake', True) for m_ in o.data.materials if m_):
+            bake_atlas(o, 512, name=model_id + '_teeth', do_unwrap=False, ao_samples=8)
     for c in clothes:
         if c.name.endswith('_outfit') or c.name.endswith('_boots'):
             bake_atlas(c, 2048, name=model_id + '_outfit', do_unwrap=False, ao_samples=8)
