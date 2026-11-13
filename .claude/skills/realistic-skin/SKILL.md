@@ -42,6 +42,41 @@ Rules that follow:
   because of the beard under the skin. Ears and nose tip are the reddest; eyelids and the
   hollows under the eyes are violet.
 
+## 1f. Measured on real skin (reference photos)
+
+Phone photos of a 37-year-old light-skinned Mediterranean man under daylight, sampled as
+50x50 px averages (CIE Lab, D65). Use these numbers to keep the skin out of the orange.
+
+| Zone | Lab L / a / b | Hue | Reading |
+|---|---|---|---|
+| Forehead | 61 / 14 / 10 | 10° | light, barely more golden than the cheeks |
+| Glabella (between brows) | 46 / 18 / 12 | 9° | darker and redder than the forehead |
+| Temple | 54 / 8 / 7 | 13° | **grey**: half the redness of the cheek |
+| Cheek | 51-60 / 14-16 / 10-11 | 8-10° | the reference skin colour |
+| Nose bridge | 65 / 16 / 10 | 7° | lightest point |
+| Nose tip | 56 / 18.5 / 10 | 5° | redder |
+| Nose wing crease / nostril | 21 / 21 / 10 | 1° | deep crimson-brown |
+| Under the eye | 43-47 / 15-18 / 10-12 | 8° | darker, same red: brown-violet |
+| Upper lid (in its own shadow) | 26 / 9 / 4 | 1° | dark, cool violet-brown |
+| Inner eye corner | 24 / 18.5 / 7 | 358° | crimson |
+| Lips | 22 / 26 / 12.5 | 359° | crimson, the most saturated red |
+| Side of the neck | 60 / 11 / 9 | 12° | greyer than the face |
+
+What this changed:
+- Light skin is **pink-red, not orange**: a/b ≈ 1.4-1.6, hue 8-10°. The earlier renders sat at
+  18-20°. Tomás's tones moved from `#d7a487/#c08066` to `#cfa093/#b07a70`; lips to crimson.
+- The face thirds are subtle in life: the forehead hardly yellower (tint `#fff0d8` ×0.6, was
+  `#ffe9b8` ×0.8); the cool zone shows most at the **temples and the sides of the neck** (grey).
+- Under-eyes: darker brown-violet (`#c8b0b8` ×0.75); the waterline red-pink (`#c8706c`).
+- Seen close up: small red papules on the nose, open pores on the nose and inner cheeks as tiny
+  dark specks, salt-and-pepper grey in hair and beard at 37, fine horizontal forehead lines,
+  two short vertical lines between the brows, crow's feet, crepey lines under the eyes, the
+  nasolabial fold. `age_marks` (strength `spec['age']`: 0.25 young woman, 0.45 man in his
+  thirties, 0.95 old beggar) draws all of them as shallow grooves plus a little darkening.
+- Eyes: dark brown iris with a darker limbal ring; the sclera pinkish and veined at the corners
+  with a red caruncle; the lower waterline visibly pink-red; lashes thick and dark.
+- The photos themselves are private and are not stored in any repository; only the numbers.
+
 ## 1b. What painters and hyperrealists do (and how it maps to the shader)
 
 Studied: Sabrillu's coloured-pencil skin tutorial, Ioanna Ladopoulou's skin-tones tutorial,
@@ -341,6 +376,71 @@ How a poor, filthy, old character differs, and how it is built (`CAST['beggar']`
   else holes show nothing. Long sleeves need forearm weights (only hands and fingers dropped).
   The cloth gets fading, sweat and grease stains, mud up from the hem, and sewn patches with
   coarse stitches.
+
+## 11. Problems hit building the realistic characters, and the fixes
+
+Everything that went wrong in `tools/cinema/real.py` and `game_clips.py`, so it is not repeated.
+
+**Body and assets (MPFB 2 / MakeHuman)**
+- MPFB would not load as a plain add-on in bpy 5.x: symlink it into the `user_default`
+  extensions folder and `addon_utils.enable('bl_ext.user_default.mpfb')` (`mpfb_env.py`).
+- `joint-mouth` sits at the nose: lips and the beard put there gave a "clown nose". Mouth = the
+  upper-teeth helper − 11 mm (measured on renders).
+- MPFB masks delete the skin under clothes, so clothes have nothing to copy weights from: keep a
+  full-body copy (only the helper mask applied) and transfer weights from it.
+- Clothes stretched with the hands: drop hand and finger groups from clothes weights. Short
+  sleeves also drop the forearm; **long sleeves must keep it** or sleeve pieces stay behind in
+  the rest pose (they stuck out sideways on the beggar).
+- Torn clothes over a body without skin under them show holes into nothing: a ragged character
+  keeps the skin (`keep_skin`).
+- Square holes when tearing: subdivide the garment once before deleting faces.
+- Outfit colours split by height leaked the trouser colour into a long shirt hem: MakeHuman
+  suits are exactly two loose pieces; mark each (`mark_outfit_parts`) and split by piece.
+- The MakeHuman eye texture maps the cornea shell to a transparent corner, so the cornea was
+  invisible: split it off as its own object with a clear transmission material.
+- No beards in the CC0 system assets: grow our own hair cards.
+- The MakeHuman hair normal map flared white under the rim light: drop it, roughness 0.75,
+  specular 0.08.
+- Gap between hair and forehead: paint a hair-coloured scalp under the hair (`paint_scalp`).
+
+**Shader**
+- **Colour ramps clamp their input to 0..1.** Twice this broke things: a waist height in metres
+  never reached the split, and the eye's radius r > 1 painted the iris over the whole eye. Remap
+  first (divide, or `(x − c)/w + 0.5` with clamp).
+- Vertex-colour masks are too coarse for small features (lips, nails edges): compute them per
+  pixel in object space and let the bake write them into the UV texture.
+- Lips that inherited the skin's crossing lines read as "skin painted pink": replace (not add
+  to) height, colour and roughness inside the lip mask.
+- Stubble and furrows finer than a pixel at portrait distance disappear: check scale against the
+  render (1800/3400 cells per metre for stubble dots).
+- Saturated MIX for blood and veins looks like make-up: use near-white MULTIPLY tints.
+- Bump 0.55/0.0007 and pores 0.45 mm apart read too coarse; 0.36/0.0005 and 0.55 mm read right.
+- Pointiness and vertex attributes only work in Cycles: bake everything (skin 4096, outfit 2048,
+  eyes 1024, teeth 512); procedural nodes do not export to glTF.
+- Eye bake: hide the cornea from render while baking the eyeball, or it occludes it in AO.
+
+**Rig and animation**
+- MPFB's rest pose holds the arms in an A: an Euler XYZ "forward" swing became a twist (arms
+  went sideways in chopping and cooking). Lower first, then swing: `human.ARM_ORDER = 'YXZ'`.
+  Check with numbers (bone directions in world space), not only by eye: a 3/4 view misleads.
+- `from human import REST_DOWN` copies the value at import time; with several characters per run
+  the second got the first's arm rest. Read `human.REST_DOWN` at call time.
+- Composing an idle with an `arm()` call applied the arm's rest-lowering twice. Game clips use
+  absolute key poses blended with slerp/lerp (`keys`), so clips start and end exactly on idle.
+- `Root` was a non-deform bone and so not exported: set `use_deform = True` after binding
+  (no weights, so nothing changes on the mesh) to give games a root-motion track.
+- Godot imports `*_loop` clips as looping and strips the suffix (`walk_loop` → `walk`).
+- Shots picked their clip by index; adding the game clips first changed what index 2 was and the
+  portraits went wrong: pick clips by name.
+
+**Build and environment**
+- A full character takes about 10 minutes; `REAL_FAST=1` (no bake, no renders) takes about one,
+  for rig and animation checks.
+- Container restarts kill background builds; outputs written so far survive in `/tmp/chars`.
+- Draco (`pack.mjs`) suits three.js and Set Film; Godot does not read Draco, so the game gets the
+  uncompressed GLBs.
+- GitHub pushes failed with 403 when the claude.ai account was linked to another GitHub user:
+  that user must be a collaborator with write access and the Claude GitHub App installed.
 
 ## 9. Sources studied
 
