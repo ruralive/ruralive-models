@@ -59,7 +59,7 @@ CAST = {
         skin='#b88a6c', skin2='#96684e', flush='#b04a3e', lips='#8a4a44', iris='#5a4a30',
         freckles=0.25, stubble=0.6, body_hair=0.9, grime=1.5, brow=0.8, hair='long',
         hair_color='#4a4038', outfit=(('linen', '#8e826a'), ('wool', '#4a3f33')),
-        keep_skin=True, rags=True, wear=1.0, beard=dict(length=0.19, grey=0.35),
+        keep_skin=True, rags=True, wear=1.0, beard=dict(length=0.19, grey=0.25),
         teeth=dict(missing=4, rot=0.8), nail_dirt=1.0,
         assets=dict(eyes='brownlight', eyebrows='eyebrow009', eyelashes='eyelashes01',
                     hair='long01', clothes=['male_casualsuit03'])),
@@ -405,6 +405,8 @@ def tear_outfit(obj, j, seed=7):
     rnd = random.Random(seed)
     bm = bmesh.new()
     bm.from_mesh(obj.data)
+    # Finer cloth first, so torn edges are ragged rather than square.
+    bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=1, use_grid_fill=True)
     bm.faces.ensure_lookup_table()
     hip_z = j['hips'].z
     holes = []
@@ -413,12 +415,12 @@ def tear_outfit(obj, j, seed=7):
         holes.append((j['el' + sd] + Vector((0, 0.03, 0)), 0.03))
     holes.append((j['hips'] + Vector((0.06, 0.1, -0.07)), 0.035))
     verts = [v.co.copy() for v in bm.verts]
-    for _ in range(7):
-        holes.append((rnd.choice(verts), rnd.uniform(0.015, 0.035)))
+    for _ in range(5):
+        holes.append((rnd.choice(verts), rnd.uniform(0.012, 0.025)))
     kill = set()
     for f in bm.faces:
         c = f.calc_center_median()
-        jag = noise.noise(c * 40.0) * 0.6 + noise.noise(c * 140.0) * 0.4
+        jag = noise.noise(c * 40.0) * 0.5 + noise.noise(c * 140.0) * 0.3 + noise.noise(c * 400.0) * 0.2
         # Trousers: cut at mid shin, ragged.
         if c.z < hip_z - 0.25:
             sd = 'L' if c.x > 0 else 'R'
@@ -589,7 +591,7 @@ def grow_beard(body, j, spec, model_id):
     uv_layer = bm.loops.layers.uv.new('UVMap')
     segs = 7
     for p0, n, kind in roots:
-        for copy in range(2):
+        for copy in range(1 if kind == 'b' else 2):
             jitter = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), rnd.uniform(-1, 1))) * 0.002
             if kind == 'm':
                 side = 1.0 if p0.x > 0 else -1.0
@@ -644,7 +646,7 @@ def grow_beard(body, j, spec, model_id):
     mul = N(nt, 'MixRGB', blend_type='MULTIPLY')
     mul.inputs['Fac'].default_value = 1.0
     nt.links.new(tex.outputs['Color'], mul.inputs['Color1'])
-    mul.inputs['Color2'].default_value = (*[min(1.0, c * 1.6) for c in tint], 1)
+    mul.inputs['Color2'].default_value = (*[min(1.0, c * 1.25) for c in tint], 1)
     nt.links.new(mul.outputs['Color'], b.inputs['Base Color'])
     cut = N(nt, 'Math', operation='ROUND')
     nt.links.new(tex.outputs['Alpha'], cut.inputs[0])
@@ -1069,6 +1071,15 @@ def skin_imperfections(m, spec, j, base, height, rough, flush, lips):
         smudge = m.ramp(m.noise(7, 4, 0.6, 1.0), [(0.55, 0.0), (0.8, 1.0)])
         dirt = mm('ADD', mm('MULTIPLY', cavity, mm('ADD', 0.25, mm('MULTIPLY', parts, 0.75))),
                   mm('MULTIPLY', smudge, mm('ADD', 0.12, mm('MULTIPLY', parts, 0.3))))
+        if g > 1.0:
+            # Filthy: smudges everywhere, heavier on the face and hands; bare feet caked in mud up
+            # the shins.
+            big = m.ramp(m.noise(5, 4, 0.65, 0.8), [(0.4, 0.0), (0.7, 1.0)])
+            dirt = mm('ADD', dirt, mm('MULTIPLY', big, 0.35 * (g - 1.0) * 2))
+            pz = N(m.nt, 'SeparateXYZ', {'Vector': m.geometry.outputs['Position']}).outputs['Z']
+            mud = mm('MULTIPLY', m.ramp(pz, [(0.0, 1.0), (0.25, 0.0)]),
+                     m.ramp(m.noise(25, 4, 0.6), [(0.25, 0.55), (0.6, 1.0)]))
+            dirt = mm('ADD', dirt, mm('MULTIPLY', mud, 1.4))
         dirt = mm('MULTIPLY', mm('MULTIPLY', dirt, g), mm('SUBTRACT', 1.0, lips), clamp=True)
         base = m.mix(base, '#4a3a2a', mm('MULTIPLY', dirt, 0.45))
         rough = mm('ADD', rough, mm('MULTIPLY', dirt, 0.15))
@@ -1793,8 +1804,10 @@ def build(model_id):
             rig.transfer_weights(full, obj)
             # Cloth near the hands must not follow them: only the body moves clothes and hair.
             for group in list(obj.vertex_groups):
-                if group.name.split('.')[0].rstrip('0123456789') in (
-                        'Hand', 'ForeArm', 'Index', 'Middle', 'Ring', 'Pinky', 'Thumb'):
+                # Long sleeves must follow the forearm, so only a short-sleeved outfit drops it.
+                drop = ('Hand', 'Index', 'Middle', 'Ring', 'Pinky', 'Thumb') + (
+                    () if spec.get('rags') else ('ForeArm',))
+                if group.name.split('.')[0].rstrip('0123456789') in drop:
                     obj.vertex_groups.remove(group)
             activate(obj)
             bpy.ops.object.vertex_group_normalize_all(lock_active=False)
