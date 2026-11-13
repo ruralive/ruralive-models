@@ -1864,7 +1864,8 @@ def shoot(path, j_head, height, size=(900, 1100), portrait=False, samples=96, fr
     scene = bpy.context.scene
     if rig is not None:
         ad = rig.obj.animation_data
-        action = rig.actions[clip]
+        # A clip by name (or index): the portrait and full shots must not depend on clip order.
+        action = next(a for a in rig.actions if a.name == clip) if isinstance(clip, str) else rig.actions[clip]
         ad.action = action
         if hasattr(ad, 'action_slot') and action.slots:
             ad.action_slot = action.slots[0]
@@ -1941,9 +1942,9 @@ def main(argv):
                 break
         height = max(v.co.z for v in body.data.vertices)
         shoot(os.path.join(shots, model_id + '-portrait.jpg'), eye, height, (900, 1100), True,
-              rig=rig, clip=2, frame=30)
+              rig=rig, clip='Idle', frame=30)
         shoot(os.path.join(shots, model_id + '-full.jpg'), eye, height, (900, 1200), False,
-              samples=64, rig=rig, clip=0, frame=8)
+              samples=64, rig=rig, clip='Walk in Place', frame=8)
         print('BUILT', model_id, flush=True)
 
 
